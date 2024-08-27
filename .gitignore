@@ -1,3 +1,9 @@
+# Agda
+
+*.agdai
+paper.tex
+
+
 ## Core latex/pdflatex auxiliary files:
 *.aux
 *.lof
@@ -6,7 +12,7 @@
 *.fls
 *.out
 *.toc
-*.fmt
+## *.fmt
 *.fot
 *.cb
 *.cb2

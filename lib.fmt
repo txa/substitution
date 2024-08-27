@@ -1,0 +1,102 @@
+%format constructor = "\Keyword{constructor}"
+
+%format == = "=="
+%format → = "\rightarrow"
+%format ∀ = "\forall{}"
+%format λ = "\lambda" 
+%format ∘ = "\ensuremath{\mbox{$\circ$}}"
+%format _∘_ = _ "\ensuremath{\mbox{$\circ$}}" _
+
+%format ⊤ = "\top"
+%format ⊥ = "\bot"
+
+%format ⊎ = "\uplus"
+%format inj₁ = "\mathsf{inj}_1"
+%format inj₂ = "\mathsf{inj}_2"
+
+%format Σ = "\Sigma"
+%format Σℕ = "{\Sigma}{\mathbb N}"
+%format × = "\times"
+%format proj₁ = "\mathsf{proj}_{1}"
+%format proj₂ = "\mathsf{proj}_{2}"
+
+%format Π = "\Pi"
+%format Πℕ = "{\Pi}{\mathbb N}"
+ 
+%format ≡ = "\equiv"
+%format ≅ = "\cong"
+
+%format forall = "\forall{}"
+
+%format α = "\alpha"
+%format γ = "\gamma"
+%format β = "\beta"
+%format ρ = "\rho"
+%format ρ₀ = "\rho_0"
+%format δ = "\delta"
+%format ι = "\iota"
+%format ιM = "{\iota}M"
+%format Γ = "\Gamma"
+%format Γ₀ = "\Gamma_0"
+%format Δ = "\Delta"
+%format Π = "\Pi"
+%format Θ = "\Theta"
+%format Πβ = "\Pi\beta"
+%format Πη = "\Pi\eta"
+%format π = "\pi"
+%format Π[] = "\Pi[]"
+%format ′Π′ = "`\Pi`"
+%format ′Σ′ = "`\Sigma`"
+%format ′⊤′ = "`\top`"
+%format ΓM = "{\Gamma}M"
+%format Ω = "\Omega"
+%format σ = "\sigma"
+%format τ = "\tau"
+%format ν = "\nu"
+%format Λ = "\Lambda"
+%format η = "\eta"
+%format ω = "\omega"
+
+%format ℕ = "\mathbb{N}"
+%format ℝ = "\mathbb{R}"
+
+
+%format ↦ = "\mapsto"
+
+%%format [⇒] = "[\rightarrow]"
+%%format ⊢ = "\vdash"
+%%format _⊢_ = "\_\vdash\_"
+
+%format _∨ᶜ_ = "\_\vee^c\_"
+%format ∨ᶜ = "\vee^c"
+%format inj₁ᶜ = "\mathrm{inj}_1^c"
+%format inj₂ᶜ = "\mathrm{inj}_2^c" 
+%format caseᶜ = "\mathrm{case}^c"
+%format tndᶜ = "\mathrm{tnd}^c"
+
+%format μT = "\mu\mathrm{T}"
+%format νT = "\nu\mathrm{T}"
+
+%format Σ[ = "{\Sigma}["
+%format φ = "\phi"
+%format ψ = "\psi"
+%format Σ-eq = "{\Sigma}\mathrm{-eq}"
+%format Π-eq = "{\Sigma}\mathrm{-eq}"
+
+%format ∃ᶜ = "\exists^c"
+%format ∃ᶜ[ = "\exists^c["
+%format exᶜ-i = "\mathrm{ex}^c\mathrm{-i}"
+%format exᶜ-e = "\mathrm{ex}^c\mathrm{-e}"
+%format _≡ᶜ_ = "\_\equiv^c\_"
+%format ≡ᶜ = "\equiv^c"
+%format reflᶜ = "\mathrm{refl}^c"
+%format substᶜ = "\mathrm{subst}^c"
+
+%format _⊨_  = "\_\models\_"
+%format ⊨  = "\models"
+
+%format ƛ = "\lambda"
+%format ƛ_ = "\lambda\_"
+
+%format _⊨[_]_ = "\_\models[\_]\_"
+%format ⊨[ = "\models["
