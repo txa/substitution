@@ -651,7 +651,6 @@ suc*-nat[] {q = T} {A = A} {x = x} {xs} =
    x [ xs ] [ suc*[ V ] id A ] ∎
 \end{code}
 
-
 %if False
 \begin{code}
 suc*-nat∘ {xs = ∅} = refl
@@ -661,12 +660,12 @@ suc*-nat∘ {xs = xs , x} =
 tm⊑zero : (q⊑r : q ⊑ r) → zero[_] {Γ = Γ}{A = A} r ≡ tm⊑ q⊑r zero[ q ]
 tm⊑zero rfl = refl
 tm⊑zero v⊑t = refl
-
---^∘ = {!!}
 \end{code}
 %endif
 
 Finally we have all the ingredients to prove the 2nd functor law |^∘|:
+\footnote{Actually we also need that zero commutes with |tm⊑|: that is for any
+|q⊑r : q ⊑ r| we have that |tm⊑zero q⊑r : zero[ r ] ≡ tm⊑ q⊑r zero[ q ]|.}
 \begin{code}
 ^∘ {r = r}{s = s}{xs = xs}{ys = ys} {A = A} = 
     (xs ∘ ys) ^ A
