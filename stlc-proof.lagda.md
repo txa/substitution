@@ -126,6 +126,20 @@ tm⊔ = tm⊑ ⊑⊔r
 
 tm*⊔ : Γ ⊨[ r ] Δ → Γ ⊨[ s ⊔ r ] Δ
 tm*⊔ = tm*⊑ ⊑⊔r
+
+⊔⊔ : q ⊔ (r ⊔ s) ≡ (q ⊔ r) ⊔ s
+⊔⊔ {V} = refl
+⊔⊔ {T} = refl
+
+⊔v : q ⊔ V ≡ q
+⊔v {V} = refl
+⊔v {T} = refl
+
+-- q⊔q : q ⊔ q ≡ q
+-- q⊔q {V} = refl
+-- q⊔q {T} = refl
+
+{-# REWRITE ⊔⊔ ⊔v #-}
 ```
 
 Derivations
@@ -156,20 +170,6 @@ id {Γ = Γ , A}      =  id ^ A
 _∘_ : Γ ⊨[ q ] Θ → Δ ⊨[ r ] Γ → Δ ⊨[ q ⊔ r ] Θ
 ∅ ∘ τ = ∅
 (σ , x) ∘ τ = (σ ∘ τ) , x [ τ ]
-
-⊔⊔ : q ⊔ (r ⊔ s) ≡ (q ⊔ r) ⊔ s
-⊔⊔ {V} = refl
-⊔⊔ {T} = refl
-
-⊔v : q ⊔ V ≡ q
-⊔v {V} = refl
-⊔v {T} = refl
-
--- q⊔q : q ⊔ q ≡ q
--- q⊔q {V} = refl
--- q⊔q {T} = refl
-
-{-# REWRITE ⊔⊔ ⊔v  #-}
 
 zeroq : Γ , A ⊢[ q ] A
 zeroq {q = V}       =  zero
