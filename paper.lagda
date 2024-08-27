@@ -543,7 +543,7 @@ tm*rfl : {q⊑q : q ⊑ q} → tm*⊑ q⊑q xs ≡ xs
 tm*rfl {xs = ∅} {q⊑q = rfl} = refl
 tm*rfl {xs = xs , x} {q⊑q = rfl} = cong₂ _,_ (tm*rfl {xs = xs}) refl
 \end{code}
-% endif
+%endif
 
 The case for |q = V| is just definitional:
 \begin{code}
@@ -574,7 +574,7 @@ sorts.  It also uses |id∘| and |[∘]| which recursively use it.
 suc*∘ {xs = ∅} = refl
 suc*∘ {xs = xs , x} = cong₂ _,_ (suc*∘ {xs = xs}) (suc[] {x = x})
 \end{code}
-% endif
+%endif
 
 \subsection{Associativity}
 \label{sec:associativity}
@@ -595,7 +595,7 @@ tm[] : {x : Θ ⊢[ q ] A}{xs : Γ ⊨[ r ] Θ}
 tm[] {q = V} = refl
 tm[] {q = T} = refl
 \end{code}
-% endif
+%endif
 We are now ready to prove |[∘]| by structural induction:
 \begin{code}
 [∘] {x = zero} {ys , y} = refl
@@ -662,7 +662,7 @@ suc*-nat∘ {xs = xs , x} =
   cong₂ _,_ (suc*-nat∘ {xs = xs}) (suc*-nat[] {x = x})
 
 \end{code}
-% endif
+%endif
 
 Finally we have all the ingredients to prove the 2nd functor law |^∘|:
 \begin{spec}
