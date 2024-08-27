@@ -651,38 +651,36 @@ suc*-nat[] {q = T} {A = A} {x = x} {xs} =
    x [ xs ] [ suc*[ V ] id A ] ∎
 \end{code}
 
-\begin{code}
---[∘] = {!!}
-^∘ = {!!}
-\end{code}
+
 %if False
 \begin{code}
 suc*-nat∘ {xs = ∅} = refl
 suc*-nat∘ {xs = xs , x} =
   cong₂ _,_ (suc*-nat∘ {xs = xs}) (suc*-nat[] {x = x})
 
+tm⊑zero : (q⊑r : q ⊑ r) → zero[_] {Γ = Γ}{A = A} r ≡ tm⊑ q⊑r zero[ q ]
+tm⊑zero rfl = refl
+tm⊑zero v⊑t = refl
+
+--^∘ = {!!}
 \end{code}
 %endif
 
 Finally we have all the ingredients to prove the 2nd functor law |^∘|:
-\begin{spec}
-tm⊑zero : (q⊑r : q ⊑ r) → zero[ r ]  ≡ tm⊑ q⊑r zero[ q ] 
-tm⊑zero rfl = refl
-tm⊑zero v⊑t = refl
-
+\begin{code}
 ^∘ {r = r}{s = s}{xs = xs}{ys = ys} {A = A} = 
-    suc*[ _ ] (xs ∘ ys) A
+    (xs ∘ ys) ^ A
     ≡⟨⟩
     suc*[ _ ] (xs ∘ ys) A , zero[ r ⊔ s ]    
     ≡⟨ cong₂ _,_ (sym (suc*-nat∘ {xs = xs})) refl ⟩
     xs ∘ (suc*[ _ ] ys A) , zero[ r ⊔ s ]
     ≡⟨ cong₂ _,_ refl (tm⊑zero (⊑⊔r {r = s}{q = r})) ⟩        
-    xs ∘ (suc*[ _ ] ys A) , tm⊑ (⊑⊔r {q = r}) (zero {q = s})
-    ≡⟨ cong₂ _,_ (sym (suc*∘ {xs = xs})) (zero[ r ] {x = zero[ s ]})  ⟩    
-    (suc*[ _ ] xs A) ∘  (suc*[ _ ] ys A) , zero[ r ] [ suc*[ _ ] ys A ]
-    ≡⟨⟩           
-    (suc*[ _ ] xs A) ∘ (suc*[ _ ] ys A) ∎
-\end{spec}
+    xs ∘ (suc*[ _ ] ys A) , tm⊑ (⊑⊔r {q = r}) zero[ s ]
+    ≡⟨ cong₂ _,_ (sym (suc*∘ {xs = xs})) (sym (zero[] {q = r}{x = zero[ s ]}))  ⟩    
+    (suc*[ _ ] xs A) ∘  (ys ^ A) , zero[ r ] [ ys ^ A ]
+    ≡⟨⟩  
+    (xs ^ A) ∘ (ys ^ A) ∎
+\end{code}
 
 \section{Initiality}
 \label{sec:initiality}
