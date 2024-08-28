@@ -8,7 +8,7 @@
 
 %if False
 \begin{code}
-{-# OPTIONS --prop --rewriting #-}
+{-# OPTIONS --rewriting #-}
 module paper where
 
 open import Relation.Binary.PropositionalEquality hiding ([_])
@@ -89,7 +89,7 @@ adressed using a well-founded recursion. However, this is only applied
 to the definition and the categorical laws (which follow from the
 monad laws) were not formally verified. Also the present approach
 seems to be simpler and scales better avoiding well-founded recursion.
-This has been further investigated in \cite{mcbride2006type}. The
+The monadic approach has been further investigated in \cite{mcbride2006type}. The
 structure of the proofs is explained in \cite{allais2017type} from a
 monadic perspective. Indeed this example is one of the motivations for
 relative monads \cite{altenkirch2015monads}.
@@ -192,9 +192,9 @@ _[_] : Γ ⊢ A → Δ ⊨ Γ → Δ ⊢ A
 (ƛ t)   [ ts ]       =  ƛ ?
 \end{spec}
 As usual we have a problem with the binder |ƛ_| we are given a
-substitution |xs : Δ ⊨ Γ| but our term lives in the extended context
+substitution |ts : Δ ⊨ Γ| but our term lives in the extended context
 |t : Γ , A ⊢ B|. We need to exploit the fact that context extension
-|_,_| is functorial:
+|_▷_| is functorial:
 \begin{spec}
 _^_ : Γ ⊨ Δ → (A : Ty) → Γ ▷ A ⊨ Δ ▷ A
 \end{spec}
@@ -380,14 +380,14 @@ tm⊑ v⊑t i = ` i
 \end{code}
 Using a parametric version of |_^_|
 \begin{code}
-_^_ : Γ ⊨[ q ] Δ → (A : Ty) → Γ ▷ A ⊨[ q ] Δ ▷ A   
+_^_ : Γ ⊨[ q ] Δ → ∀ A → Γ ▷ A ⊨[ q ] Δ ▷ A   
 \end{code}
 we are ready to define substitution and renaming in one operation
 \begin{code}
 _[_] : Γ ⊢[ q ] A → Δ ⊨[ r ] Γ → Δ ⊢[ q ⊔ r ] A
   
-zero    [ xs , x ]  =  x
-(suc i _) [ xs , x ]  =  i [ xs ]
+zero    [ xs , x ]   =  x
+(suc i _) [ xs , x ] =  i [ xs ]
 (` i)   [ xs ]       =  tm⊑  ⊑t  (i [ xs ])
 (t · u) [ xs ]       =  (t [ xs ]) · (u [ xs ])
 (ƛ t)   [ xs ]       =  ƛ (t [ xs ^ _ ]) 
@@ -398,8 +398,8 @@ need to use |tm⊑| to take care of the two cases when substituting for
 a variable. We can also define |id| using |_^_|:
 \begin{code}
 id : Γ ⊨[ q ] Γ
-id {Γ = •}          =  ε
-id {Γ = Γ ▷ A}    =  id ^ A
+id {Γ = •}     =  ε
+id {Γ = Γ ▷ A} =  id ^ A
 \end{code}
 To define |_^_| we need parametric versions of |zero|, |suc| and
 |suc*|. |zero| is very easy:
@@ -490,14 +490,14 @@ Note that the |ƛ_|-case is easy here: we need the law for
 |id {Γ = Γ , A}  =  id ^ A|.
 
 This is the first time we use Agda's syntax for equational derivations
-which is just syntactic sygar for constructing an equational
+which is just syntactic sugar for constructing an equational
 derivation using transitivity and reflexivity exploiting Agda's
 flexible syntax. Here |e ≡⟨ p ⟩ e'| means that |p| is the proof that
 |e ≡ e'|. Later we will also use the special case |e ≡⟨⟩ e'| which
 means that |e| and |e'| are definitionally equal (this corresponds to
 |e ≡⟨ refl ⟩ e'|), this is just used to make the proof more
 readable.  The proof is terminated with |∎| which inserts |refl|.
-We use the the congruence proof |cong f : a ≡ b → f a ≡ f b|
+We use the congruence proof |cong f : a ≡ b → f a ≡ f b|
 and a version for binary functions
 |cong₂ g : a ≡ b → c ≡ d → g a c ≡ g b d|.
 
