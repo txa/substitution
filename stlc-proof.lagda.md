@@ -114,18 +114,11 @@ tm⊑ : q ⊑ s → Γ ⊢[ q ] A → Γ ⊢[ s ]  A
 tm⊑ rfl x = x
 tm⊑ v⊑t i = ` i
 
-tm*⊑ : q ⊑ s → Γ ⊨[ q ] Δ → Γ ⊨[ s ] Δ
-tm*⊑ q⊑s ∅ = ∅
-tm*⊑ q⊑s (σ , x) = tm*⊑ q⊑s σ , tm⊑ q⊑s x
-
 tm : Γ ⊢[ q ] A → Γ ⊢ A
 tm = tm⊑ ⊑t
 
 tm⊔ : Γ ⊢[ r ] A → Γ ⊢[ s ⊔ r ] A
 tm⊔ = tm⊑ ⊑⊔r
-
-tm*⊔ : Γ ⊨[ r ] Δ → Γ ⊨[ s ⊔ r ] Δ
-tm*⊔ = tm*⊑ ⊑⊔r
 ```
 
 Derivations
@@ -144,13 +137,15 @@ zero    [ xs , x ]  =  x
 (ƛ t)   [ xs ]       =  ƛ (t [ xs ^ _ ])
 (t · u) [ xs ]       =  (t [ xs ]) · (u [ xs ])
 
-id : Γ ⊨[ q ] Γ
-id {Γ = ∅}          =  ∅
-id {Γ = Γ , A}      =  id ^ A
+-- Trick to avoid termination errors
+id′ : Sort → Γ ⊨[ V ] Γ
 
---id : Γ ⊨[ V ] Γ
--- destroys termination
+id : Γ ⊨[ V ] Γ
+id = id′ V
+{-# INLINE id #-}
 
+id′ {Γ = ∅} _          =  ∅
+id′ {Γ = Γ , A} _      =  id ^ A
 
 
 _∘_ : Γ ⊨[ q ] Θ → Δ ⊨[ r ] Γ → Δ ⊨[ q ⊔ r ] Θ
@@ -181,7 +176,7 @@ tm⊑zeroq {q⊑r = v⊑t} = refl
 
 sucq : Γ ⊢[ q ] B  → Γ , A ⊢[ q ] B -- should also get A
 sucq {q = V} i      =  suc i
-sucq {q = T} t      =  t [ id {q = V} ↑ _ ]
+sucq {q = T} t      =  t [ id ↑ _ ]
 
 suc* ∅ A = ∅
 suc* (xs , x) A = suc* xs A , sucq x 
@@ -205,7 +200,7 @@ The right identity law:
 ↑-nat[]v {i = suc j} {xs , _} = ↑-nat[]v {i = j}
 
 
-[id] : x [ id {q = V} ] ≡ x
+[id] : x [ id ] ≡ x
 [id] {x = zero} = refl
 [id] {x = suc i} = 
    i [ id ↑ _ ] 
@@ -217,7 +212,7 @@ The right identity law:
 [id] {x = t · u} = cong₂ _·_ ([id] {x = t}) ([id] {x = u})
 [id] {x = ƛ t} = cong ƛ_ ([id] {x = t})
 
-∘id : xs ∘ (id {q = V}) ≡ xs
+∘id : xs ∘ id ≡ xs
 ∘id {xs = ∅} = refl
 ∘id {xs = xs , x} = cong₂ _,_ (∘id {xs = xs}) ([id] {x = x})
 
@@ -232,41 +227,42 @@ We use functoriality but prove it later.
 The left identity law:
 ```
 ↑∘ : xs ↑ A  ∘ (ys , x) ≡ xs ∘ ys
-id∘ : ∀ {r} {xs : Γ ⊨[ q ] Δ} → (id {q = r}) ∘ xs ≡ tm*⊔ {s = r} xs
+
+-- Trick to avoid termination errors
+id∘′ : ∀ {xs : Γ ⊨[ q ] Δ} → Sort → id ∘ xs ≡ xs
+
+id∘ : ∀ {xs : Γ ⊨[ q ] Δ} → id ∘ xs ≡ xs
+id∘ = id∘′ V
+
+{-# INLINE id∘ #-}
 
 zeroq[] : tm⊔ {s = q} x ≡ zeroq {q = q} [ xs , x ]
 zeroq[] {q = V} = refl
 zeroq[] {q = T} = refl
-
-tm*rfl : {q⊑q : q ⊑ q} → tm*⊑ q⊑q xs ≡ xs
-tm*rfl {xs = ∅} {q⊑q = rfl} = refl
-tm*rfl {xs = xs , x} {q⊑q = rfl} = cong₂ _,_ (tm*rfl {xs = xs}) refl
 
 sucq[] : {ys : Γ ⊨[ r ] Δ} → sucq {q = q} x [ ys , y ] ≡ x [ ys ]
 sucq[] {q = V} = refl
 sucq[] {q = T} {x = x} {y = y} {ys = ys} =
   sucq x [ ys , y ]
   ≡⟨⟩
-  x [ id {q = V} ↑ _ ] [ ys , y ]
+  x [ id ↑ _ ] [ ys , y ]
   ≡⟨ sym ([∘] {x = x}) ⟩
-  x [ (id {q = V} ↑ _) ∘  (ys , y) ]
+  x [ (id ↑ _) ∘  (ys , y) ]
   ≡⟨ cong (λ ρ → x [ ρ ]) ↑∘  ⟩
-  x [ (id {q = V}) ∘  ys  ]
+  x [ id ∘  ys  ]
   ≡⟨ cong (λ ρ → x [ ρ ]) id∘ ⟩
-  x [ tm*⊔ {s = V} ys ]
-  ≡⟨ cong (λ ρ → x [ ρ ]) tm*rfl ⟩
   x [ ys ]  ∎
 
 ↑∘ {xs = ∅} = refl
 ↑∘ {xs = xs , x} = cong₂ _,_ (↑∘ {xs = xs}) (sucq[] {x = x})
 
-id∘ {xs = ∅} = refl
-id∘ {r = r} {xs = xs , x} = cong₂ _,_ (
+id∘′ {xs = ∅} _ = refl
+id∘′ {xs = xs , x} _ = cong₂ _,_ (
    id ↑ _ ∘ (xs , x)
      ≡⟨ ↑∘ {xs = id} ⟩
    id ∘ xs
      ≡⟨ id∘ {xs = xs} ⟩
-   tm*⊔ {s = r} xs ∎) (sym (zeroq[] {q = r}))
+   xs ∎) refl
 
 ```
 
@@ -290,11 +286,11 @@ Associativity
 ↑-nat[] {q = T} {A = A} {x = x} {xs} = 
    x [ xs ↑ A ]
    ≡⟨ cong (λ ρ → x [ ρ ↑ A ]) (sym ∘id) ⟩
-   x [ (xs ∘ id {q = V}) ↑ A ]     
+   x [ (xs ∘ id) ↑ A ]     
    ≡⟨ cong (λ ρ → x [ ρ ]) (sym (↑-nat∘ {xs = xs})) ⟩
-   x [ xs ∘ (id {q = V} ↑ A) ]   
+   x [ xs ∘ (id ↑ A) ]   
    ≡⟨ [∘] {x = x} ⟩
-   x [ xs ] [ id {q = V} ↑ A ] ∎
+   x [ xs ] [ id ↑ A ] ∎
 
 
 ↑-nat∘ {xs = ∅} = refl
@@ -343,3 +339,4 @@ tm[] {q = T} = refl
 ```
 
 
+ 
