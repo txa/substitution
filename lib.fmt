@@ -95,8 +95,18 @@
 %format _⊨_  = "\_\models\_"
 %format ⊨  = "\models"
 
+%%format ƛ = "\text{\textcrlambda}"
+%%format ƛ_ = "\text{\textcrlambda}\_"
+
 %format ƛ = "\lambda"
 %format ƛ_ = "\lambda\_"
 
+
 %format _⊨[_]_ = "\_\models[\_]\_"
 %format ⊨[ = "\models["
+
+%format _▷_ = "\_\rhd\_"
+%format ▷ = "\rhd"
+
+%format ^ = "\uparrow"
+%format _^_ = "\_\uparrow\_"

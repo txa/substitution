@@ -2,8 +2,6 @@
 	lhs2TeX --agda $< > $@
 
 %.pdf : %.tex local.bib
-	pdflatex $<
-
-%.bbl : %.aux
-	bibtex $<
+	latexmk -pdf paper.tex
+#	latexmk -pdf -pdflatex="xelatex" paper.tex
 

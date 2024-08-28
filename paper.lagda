@@ -1,4 +1,6 @@
 \documentclass[sigplan,10pt,anonymous,review]{acmart}\settopmatter{printfolios=true,printccs=false,printacmref=false}
+%\usepackage{tipa}
+%\usepackage{fontspec}
 \let\Bbbk\relax % to avoid conflict
 %include lhs2TeX.fmt
 %include agda.fmt
@@ -17,6 +19,7 @@ open  ≡-Reasoning public
 --infix   3  _⊢_
 infix   3  _⊢[_]_
 infix   3  _⊨[_]_
+infixl  4  _▷_
 infixl  4  _,_
 infix   5  _∘_
 infix   5  ƛ_
@@ -24,7 +27,7 @@ infixr  6  _⇒_
 infixl  6  _·_
 infix   7  `_
 infix   8  _^_
---infix   8  _↑_
+infix   8  _⁺_
 infix   8  _[_]
 \end{code}
 %endif
@@ -65,7 +68,7 @@ substitutions hence it seemed a good idea to give the definition and
 ask the students to prove the category laws. When writing the answer
 they realised that it  is not as easy as they thought. To make sure that
 there are no mistakes they started to formalize the problem in agda.
-Now this wasn't as easy as thought but the main setback was that the
+Now this wasn't as easy as they thought but the main setback was that the
 same proofs got repeated many times. If there is one guideline of good
 software engineering then it is \textbf{Do not write code by copy and
   paste} and this applies even more so to formal proofs.
@@ -81,13 +84,13 @@ i.e. interpreting dependent types in higher categories.
 \label{sec:related-work}
 
 In \cite{alti:csl99} the problem of showing termination of a simple
-definition of substitution (for the untyped $\lambda$-calculus is
+definition of substitution (for the untyped $\lambda$-calculus) is
 adressed using a well-founded recursion. However, this is only applied
-to the definition and the categorical laws (which follow form the
+to the definition and the categorical laws (which follow from the
 monad laws) were not formally verified. Also the present approach
 seems to be simpler and scales better avoiding well-founded recursion.
 This has been further investigated in \cite{mcbride2006type}. The
-structure of the proofs is explained in \cite{allais2017type} form a
+structure of the proofs is explained in \cite{allais2017type} from a
 monadic perspective. Indeed this example is one of the motivations for
 relative monads \cite{altenkirch2015monads}.
 
@@ -105,7 +108,7 @@ For the technical details of agda we refer to the online documentation
 \cite{agda}. We only use plain agda and inductive definitions and
 structurally recursive programs and proofs.  Termination is checked by
 agda's termination checker \cite{alti:jfp02} which uses a lexical
-combination of structural decent which is inferred by the termination
+combination of structural descent which is inferred by the termination
 checker by investigating all possible recursive paths. We will define
 mutually recursive proofs which heavily rely on each other.
 
@@ -142,8 +145,8 @@ data Ty : Set where
   _⇒_ : Ty → Ty → Ty
 
 data Con : Set where
-  ∅ : Con
-  _,_ : Con → Ty → Con
+  • : Con
+  _▷_ : Con → Ty → Con
 \end{code}
 %if False
 \begin{code}
@@ -157,13 +160,13 @@ Next we introduce intrinsically typed de Bruijn variables (|i,j,k|) and
 $\lambda$-terms (|t,u,v|) :
 \begin{spec}
 data _∋_ : Con → Ty → Set where 
-  zero : Γ , A ∋ A
-  suc  : Γ ∋ A → (B : Ty) → Γ , B ∋ A
+  zero : Γ ▷ A ∋ A
+  suc  : Γ ∋ A → (B : Ty) → Γ ▷ B ∋ A
   
 data _⊢_ : Con → Ty → Set where 
   `_   : Γ ∋ A → Γ ⊢ A
   _·_  : Γ ⊢ A ⇒ B → Γ ⊢ A → Γ ⊢ B
-  ƛ_   : Γ , A ⊢ B → Γ ⊢ A ⇒ B  
+  ƛ_   : Γ ▷ A ⊢ B → Γ ⊢ A ⇒ B  
 \end{spec}
 Here the constructor |`_| corresponds to \emph{variables are
   $\lambda$-terms}; we write applications as |t  · u|, since we use de
@@ -172,15 +175,16 @@ refers to the variable |zero|. We also define substitutions as
 sequences of terms:
 \begin{spec}
 data _⊨_ : Con → Con → Set where
-  ∅   : Γ ⊨ ∅
+  ε   : Γ ⊨ •
   _,_ : Γ ⊨ Δ → Γ ⊢ A → Γ ⊨ Δ , A  
 \end{spec}
 Now to define the categorical structure (|_∘_|,|id|) we first need to define
 substitution for terms and variables:
 \begin{spec}
 _v[_] : Γ ∋ A → Δ ⊨ Γ → Δ ⊢ A
-zero    v[ ts , t ]  =  t
+zero    v[ ts , t ]    =  t
 (suc i _) v[ ts , t ]  =  i v[ ts ]
+
 
 _[_] : Γ ⊢ A → Δ ⊨ Γ → Δ ⊢ A
 (` i)   [ ts ]       =  i v[ ts ]
@@ -192,7 +196,7 @@ substitution |xs : Δ ⊨ Γ| but our term lives in the extended context
 |t : Γ , A ⊢ B|. We need to exploit the fact that context extension
 |_,_| is functorial:
 \begin{spec}
-_^_ : Γ ⊨ Δ → (A : Ty) → Γ , A ⊨ Δ , A
+_^_ : Γ ⊨ Δ → (A : Ty) → Γ ▷ A ⊨ Δ ▷ A
 \end{spec}
 Using |_^_| we can complete |_[_]|
 \begin{spec}
@@ -201,19 +205,19 @@ Using |_^_| we can complete |_[_]|
 However, now we have to define |_^_|. This is easy, isn't it but we
 need weakening on substitutions:
 \begin{spec}
-suc-tm* : Γ ⊨ Δ → (A : Ty) → Γ , A ⊨ Δ
+_⁺_ : Γ ⊨ Δ → (A : Ty) → Γ ▷ A ⊨ Δ
 \end{spec}
 And now we can define |_^_|:
 \begin{spec}
-ts ^ A = suc-tm* ts A , ` zero 
+ts ^ A = ts ⁺ A , ` zero 
 \end{spec}
-but we need to define |suc-tm*| which is nothing but a fold of weakening
+but we need to define |_⁺_ | which is nothing but a fold of weakening
 of terms
 \begin{spec}
-suc-tm : Γ ⊢ B → (A : Ty) → Γ , A ⊢ B
+suc-tm : Γ ⊢ B → (A : Ty) → Γ ▷ A ⊢ B
 
-suc-tm* ∅ A = ∅
-suc-tm* (ts , t) A = suc-tm* ts A , suc-tm t A  
+ε         ⁺ A  = •
+(ts , t)  ⁺ A  = ts ⁺ A , suc-tm t A  
 \end{spec}
 But how to define |suc-tm| we only have weakening for variables? If we
 already had identity and substitution we could say:
@@ -288,43 +292,49 @@ this means we can pattern match over |Sort| just with |V| and |T|,
 which are indeed the only elements of |Sort| but now |V| is
 structurally smaller than |T|.
 
-We can now define terms and variables in one go (|x , y , z|) :
+We can now define terms and variables in one go (|x , y , z|) ~:
 \begin{code}
 data _⊢[_]_ : Con → Sort → Ty → Set where
-  zero : Γ , A ⊢[ V ] A
-  suc  : Γ  ⊢[ V ]  A → (B : Ty) → Γ , B  ⊢[ V ]  A
+  zero : Γ ▷ A ⊢[ V ] A
+  suc  : Γ  ⊢[ V ]  A → (B : Ty) → Γ ▷ B  ⊢[ V ]  A
   `_   : Γ  ⊢[ V ]  A → Γ  ⊢[ T ]  A
   _·_  : Γ ⊢[ T ] A ⇒ B → Γ ⊢[ T ] A → Γ ⊢[ T ] B
-  ƛ_   : Γ , A ⊢[ T ] B → Γ ⊢[ T ] A ⇒ B
+  ƛ_   : Γ ▷ A ⊢[ T ] B → Γ ⊢[ T ] A ⇒ B
 \end{code}
 
 While almost identical to the previous definition (|Γ ⊢[ V ] A| corresponds to
-|Γ ∋ A| and |Γ  ⊢[ T ]  A| to |Γ ⊢ A|
+|Γ ∋ A| and |Γ  ⊢[ T ]  A| to |Γ ⊢ A|)
 we can now
 parametrize all definitions and theorems explicitly. As a first step
 we can generalize renamings and substitutions (|xs , ys , zs|):
 \begin{code}
 data _⊨[_]_ : Con → Sort → Con → Set where
-  ∅   : Γ ⊨[ q ] ∅
-  _,_ : Γ ⊨[ q ] Δ → Γ ⊢[ q ] A → Γ ⊨[ q ] Δ , A  
+  ε   : Γ ⊨[ q ] •
+  _,_ : Γ ⊨[ q ] Δ → Γ ⊢[ q ] A → Γ ⊨[ q ] Δ ▷ A  
 \end{code}
 %if False
 \begin{code}
 variable
+  i j k    : Γ ⊢[ V ] A
+  t u v    : Γ ⊢[ T ] A
   x y z : Γ ⊢[ q ] A
   xs ys zs : Γ ⊨[ q ] Δ  
 \end{code}
 %endif
 
-We define an order and a least upper bound operation on |Sort| 
+To account for the non-uniform behaviour of substitution and
+composition (the result is |V| only of both inputs are |V|) we define
+a least upper bound on |Sort|:
+\begin{code}
+_⊔_ : Sort → Sort → Sort
+V ⊔ r  =  r
+T ⊔ r  =  T
+\end{code}
+We also need the order to insert a coercion when necessary:
 \begin{code}
 data _⊑_ : Sort → Sort → Set where
   rfl : s ⊑ s
   v⊑t : V ⊑ T
-
-_⊔_ : Sort → Sort → Sort
-V ⊔ r  =  r
-T ⊔ r  =  T
 \end{code}
 Yes, this is just boolean algebra. We need a number of laws:
 \begin{code}
@@ -370,7 +380,7 @@ tm⊑ v⊑t i = ` i
 \end{code}
 Using a parametric version of |_^_|
 \begin{code}
-_^_ : Γ ⊨[ q ] Δ → (A : Ty) → Γ , A ⊨[ q ] Δ , A   
+_^_ : Γ ⊨[ q ] Δ → (A : Ty) → Γ ▷ A ⊨[ q ] Δ ▷ A   
 \end{code}
 we are ready to define substitution and renaming in one operation
 \begin{code}
@@ -388,35 +398,40 @@ need to use |tm⊑| to take care of the two cases when substituting for
 a variable. We can also define |id| using |_^_|:
 \begin{code}
 id : Γ ⊨[ q ] Γ
-id {Γ = ∅}          =  ∅
-id {Γ = Γ , A}      =  id ^ A
+id {Γ = •}          =  ε
+id {Γ = Γ ▷ A}    =  id ^ A
 \end{code}
 To define |_^_| we need parametric versions of |zero|, |suc| and
-|suc*| -- the first two are defined by case analysis on the sort.
+|suc*|. |zero| is very easy:
+
 \begin{code}
-zero[_] : ∀ q → Γ , A ⊢[ q ] A
+zero[_] : ∀ q → Γ ▷ A ⊢[ q ] A
 zero[ V ]      =  zero
 zero[ T ]      =  ` zero
+\end{code}
 
-suc*[_] : ∀ q → Γ ⊨[ q ] Δ → (A : Ty) → Γ , A ⊨[ q ] Δ
+However, |suc| is more subtle since the case for |T| depends on its
+fold for substitutions (|_⁺_|):
+\begin{code}
+_⁺_ : Γ ⊨[ q ] Δ → (A : Ty) → Γ ▷ A ⊨[ q ] Δ
 
-suc[_] :  ∀ q → Γ ⊢[ q ] B → (A : Ty) → Γ , A ⊢[ q ] B
+suc[_] :  ∀ q → Γ ⊢[ q ] B → (A : Ty) → Γ ▷ A ⊢[ q ] B
 suc[ V ] i  A   =  suc i A
-suc[ T ] t  A   =  t [ suc*[ V ] id A ]
+suc[ T ] t  A   =  t [ id {q = V} ⁺  A ]
 
-suc*[ q ] ∅ A = ∅
-suc*[ q ] (xs , x) A = suc*[ q ] xs A , suc[ q ] x A 
+ε ⁺ A = ε
+(xs , x) ⁺ A = xs ⁺ A , suc[ _ ] x A 
 \end{code}
 And now we define:
 \begin{code}
-xs ^ A                 =  suc*[ _ ] xs A , zero[ _ ]
+xs ^ A                 =  xs ⁺ A , zero[ _ ]
 \end{code}
 
 Finally, we define composition by folding substitution:
 \begin{code}
 _∘_ : Γ ⊨[ q ] Θ → Δ ⊨[ r ] Γ → Δ ⊨[ q ⊔ r ] Θ
-∅ ∘ τ         = ∅
-(σ , x) ∘ τ  = (σ ∘ τ) , x [ τ ]
+ε ∘ ys         = ε
+(xs , x) ∘ ys  = (xs ∘ ys) , x [ ys ]
 \end{code}
 
 Clearly, the definitions are very recursive and exploits the structural
@@ -445,34 +460,53 @@ The main lemma is the identity law for the substitution functor:
 To prove the successor case we need naturality of |suc[ q ]| but here
 only in the case where the term is a variable which can be shown by a
 simple induction over the variable:
+% ⁺-nat[]v : {i : Γ  ⊢[ V ] B}{xs : Δ ⊨[ q ] Γ}
+%   → i [ xs ⁺ A ] ≡ suc[ q ] (i [ xs ]) A
 \begin{code}
-suc*-nat[]v : {i : Γ  ⊢[ V ] B}{xs : Δ ⊨[ q ] Γ}
-  → i [ suc*[ q ] xs A ] ≡ suc[ q ] (i [ xs ]) A
-suc*-nat[]v {i = zero} {xs , x} = refl
-suc*-nat[]v {i = suc j A} {xs , _} = suc*-nat[]v {i = j}
+⁺-nat[]v : i [ xs ⁺ A ] ≡ suc[ q ] (i [ xs ]) A
+⁺-nat[]v {i = zero}      {xs = xs , x} = refl
+⁺-nat[]v {i = suc j A}  {xs = xs , _} = ⁺-nat[]v {i = j}
 \end{code}
+
 The identity law is now easily provable by structural induction:
+
 \begin{code}
 [id] {x = zero} = refl
 [id] {x = suc i A} = 
-   i [ suc*[ V ] id A ] 
-   ≡⟨ suc*-nat[]v {i = i} ⟩
+   i [ id ⁺ A ] 
+   ≡⟨ ⁺-nat[]v {i = i} ⟩
    suc (i [ id ]) A
    ≡⟨ cong (λ j → suc j A) ([id] {x = i}) ⟩      
    suc i A ∎
-[id] {x = ` i} = cong `_ ([id] {x = i})
-[id] {x = t · u} = cong₂ _·_ ([id] {x = t}) ([id] {x = u})
-[id] {x = ƛ t} = cong ƛ_ ([id] {x = t})
+[id] {x = ` i} =
+   cong `_ ([id] {x = i})
+[id] {x = t · u} =
+   cong₂ _·_ ([id] {x = t}) ([id] {x = u})
+[id] {x = ƛ t} =
+   cong ƛ_ ([id] {x = t})
 \end{code}
 Note that the |ƛ_|-case is easy here: we need the law for
 |t :  Γ , A ⊢[ T ] B| but this is just another instance because
 |id {Γ = Γ , A}  =  id ^ A|.
 
-The category law now is a fold of the functor law':
+This is the first time we use Agda's syntax for equational derivations
+which is just syntactic sygar for constructing an equational
+derivation using transitivity and reflexivity exploiting Agda's
+flexible syntax. Here |e ≡⟨ p ⟩ e'| means that |p| is the proof that
+|e ≡ e'|. Later we will also use the special case |e ≡⟨⟩ e'| which
+means that |e| and |e'| are definitionally equal (this corresponds to
+|e ≡⟨ refl ⟩ e'|), this is just used to make the proof more
+readable.  The proof is terminated with |∎| which inserts |refl|.
+We use the the congruence proof |cong f : a ≡ b → f a ≡ f b|
+and a version for binary functions
+|cong₂ g : a ≡ b → c ≡ d → g a c ≡ g b d|.
+
+The category law now is a fold of the functor law:
 \begin{code}
 ∘id : xs ∘ (id {q = V}) ≡ xs
-∘id {xs = ∅} = refl
-∘id {xs = xs , x} = cong₂ _,_ (∘id {xs = xs}) ([id] {x = x})
+∘id {xs = ε}         = refl
+∘id {xs = xs , x}  =
+   cong₂ _,_ (∘id {xs = xs}) ([id] {x = x})
 \end{code}
 
 \subsection{Right identity}
@@ -483,24 +517,42 @@ functor law for substitution which is the main lemma for
 associativity. 
 
 Let's state the functor law but postpone the proof to the next section
-\begin{code}
-[∘] : {x : Θ ⊢[ q ] A}{xs : Γ ⊨[ r ] Θ}{ys : Δ ⊨[ s ] Γ}
-      → x [ xs ∘ ys ] ≡ x [ xs ] [ ys ]
-\end{code}
-This actually uses the strict equality |⊔⊔ : q ⊔ (r ⊔ s) ≡ (q ⊔ r) ⊔
-s| because the left hand side has the type |Δ ⊢[  q ⊔ (r ⊔ s) ] A|
-while the right hand side has type |Δ ⊢[  (q ⊔ r) ⊔ ) ] A|.
 
+\begin{code}
+[∘] :
+  {x : Θ ⊢[ q ] A}{xs : Γ ⊨[ r ] Θ}{ys : Δ ⊨[ s ] Γ}
+  → x [ xs ∘ ys ] ≡ x [ xs ] [ ys ]
+\end{code}
+This actually uses the strict equality
+\footnote{We use agda's rewrite here.
+Alternatively we would have to insert a transport using |subst|.}
+\begin{spec}
+ ⊔⊔ : q ⊔ (r ⊔ s) ≡ (q ⊔ r) ⊔ s
+\end{spec}
+because the left hand side has the type
+\begin{spec}
+Δ ⊢[  q ⊔ (r ⊔ s) ] A
+\end{spec}
+while the right hand side has type
+\begin{spec}
+Δ ⊢[  (q ⊔ r) ⊔ ) ] A.
+\end{spec}
+
+% actually the coercion wouldn't be necessary if we restrict to
+%|id {q = V}| but this seems to break the proof?
 We also need to adopt the left identity law because given
 |xs : Γ ⊨[ r ] Δ| the left hand side has a different type
-|(id {q = q}) ∘ xs :  Γ ⊨[ q ⊔ r ] Δ|. We use the extension of |tm⊑|
+\begin{spec}
+(id {q = q}) ∘ xs :  Γ ⊨[ q ⊔ r ] Δ 
+\end{spec}
+We use the extension of |tm⊑|
 to substitutions:
 \begin{code}
 tm*⊑ : q ⊑ s → Γ ⊨[ q ] Δ → Γ ⊨[ s ] Δ
 \end{code}
 %if False
 \begin{code}
-tm*⊑ q⊑s ∅ = ∅
+tm*⊑ q⊑s ε = ε
 tm*⊑ q⊑s (σ , x) = tm*⊑ q⊑s σ , tm⊑ q⊑s x
 \end{code}
 %endif
@@ -509,17 +561,17 @@ and |⊑⊔r : r ⊑ (q ⊔ r| to state the law:
 id∘ : {xs : Γ ⊨[ r ] Δ}
   → (id {q = q}) ∘ xs ≡ tm*⊑ (⊑⊔r {q = q}) xs
 \end{code}
-To prove it we need the $\beta$-laws for |zero[_]| and |suc*[_]|:
+To prove it we need the $\beta$-laws for |zero[_]| and |_⁺_|:
 \begin{code}
 zero[] : zero[ q ] [ xs , x ] ≡ tm⊑ (⊑⊔r {q = q}) x 
-suc*∘ : suc*[ q ] xs A  ∘ (ys , x) ≡ xs ∘ ys
+⁺∘ : xs ⁺ A  ∘ (ys , x) ≡ xs ∘ ys
 \end{code}
 Now |id∘| can be shown easily:
 \begin{code}
-id∘ {xs = ∅} = refl
+id∘ {xs = ε} = refl
 id∘ {q = q} {xs = xs , x} = cong₂ _,_ (
-   suc*[ _ ] id _ ∘ (xs , x)
-     ≡⟨ suc*∘ {xs = id} ⟩
+   id ⁺ _ ∘ (xs , x)
+     ≡⟨ ⁺∘ {xs = id} ⟩
    id ∘ xs
      ≡⟨ id∘ {xs = xs} ⟩
    tm*⊑ (⊑⊔r {q = q}) xs ∎)
@@ -535,12 +587,13 @@ zero[] {q = T} = refl
 %endif
 while |suc*∘| relies on a corresponding property for substitution:
 \begin{code}
-suc[] : {ys : Γ ⊨[ r ] Δ} → (suc[ q ] x _) [ ys , y ] ≡ x [ ys ] 
+suc[] : {ys : Γ ⊨[ r ] Δ}
+    → (suc[ q ] x _) [ ys , y ] ≡ x [ ys ] 
 \end{code}
 %if False
 \begin{code}
 tm*rfl : {q⊑q : q ⊑ q} → tm*⊑ q⊑q xs ≡ xs
-tm*rfl {xs = ∅} {q⊑q = rfl} = refl
+tm*rfl {xs = ε} {q⊑q = rfl} = refl
 tm*rfl {xs = xs , x} {q⊑q = rfl} = cong₂ _,_ (tm*rfl {xs = xs}) refl
 \end{code}
 %endif
@@ -556,23 +609,23 @@ and the first functor law for |tm*⊑|: |tm*rfl : {q⊑q : q ⊑ q} → tm*⊑ q
 suc[] {q = T} {x = x} {y = y} {ys = ys} =
   (suc[ T ] x _) [ ys , y ]
   ≡⟨⟩
-  x [ suc*[ _ ] (id {q = V}) _ ] [ ys , y ]
+  x [(id {q = V}) ⁺ _ ] [ ys , y ]
   ≡⟨ sym ([∘] {x = x}) ⟩
-  x [ (suc*[ _ ] (id {q = V}) _) ∘  (ys , y) ]
-  ≡⟨ cong (λ ρ → x [ ρ ]) suc*∘  ⟩
+  x [ ((id {q = V}) ⁺ _) ∘  (ys , y) ]
+  ≡⟨ cong (λ ρ → x [ ρ ]) ⁺∘  ⟩
   x [ (id {q = V}) ∘  ys  ]
   ≡⟨ cong (λ ρ → x [ ρ ]) id∘ ⟩
   x [ tm*⊑ (⊑⊔r {q = V}) ys ]
   ≡⟨ cong (λ ρ → x [ ρ ]) tm*rfl ⟩
   x [ ys ]  ∎
 \end{code}
-Now the $\beta$-law |suc*∘| is just a simple fold. You may note that
-|suc*∘| relies on itself  but on an easier instance in the ordering of
+Now the $\beta$-law |⁺∘| is just a simple fold. You may note that
+|⁺∘| relies on itself  but on an easier instance in the ordering of
 sorts.  It also uses |id∘| and |[∘]| which recursively use it.
 %if False
 \begin{code}
-suc*∘ {xs = ∅} = refl
-suc*∘ {xs = xs , x} = cong₂ _,_ (suc*∘ {xs = xs}) (suc[] {x = x})
+⁺∘ {xs = ε} = refl
+⁺∘ {xs = xs , x} = cong₂ _,_ (⁺∘ {xs = xs}) (suc[] {x = x})
 \end{code}
 %endif
 
@@ -586,8 +639,11 @@ second functor law for context extension:
 ^∘ :  {xs : Γ ⊨[ r ] Θ}{ys : Δ ⊨[ s ] Γ}{A : Ty}
       → (xs ∘ ys) ^ A ≡ (xs ^ A) ∘ (ys ^ A)
 \end{code}
-To verify the variable case we also need that |tm| commutes with substitution, which is easy to prove by case analysis 
-|tm[] : tm⊑ ⊑t (x [ xs ]) ≡ (tm⊑ ⊑t x) [ xs ]|
+To verify the variable case we also need that |tm| commutes with substitution,
+which is easy to prove by case analysis
+\begin{spec}
+tm[] : tm⊑ ⊑t (x [ xs ]) ≡ (tm⊑ ⊑t x) [ xs ]
+\end{spec}
 %if False
 \begin{code}
 tm[] : {x : Θ ⊢[ q ] A}{xs : Γ ⊨[ r ] Θ}
@@ -606,56 +662,59 @@ We are now ready to prove |[∘]| by structural induction:
    tm⊑ ⊑t (x [ xs ] [ ys ])
     ≡⟨ tm[] {x = x [ xs ]} ⟩        
    (tm⊑ ⊑t (x [ xs ])) [ ys ] ∎
-[∘] {x = t · u} = cong₂ _·_ ([∘] {x = t}) ([∘] {x = u})
-[∘] {x = ƛ t}{xs = xs}{ys = ys} = cong ƛ_ (
-   t [ (xs ∘ ys) ^ _ ]
-   ≡⟨ cong (λ zs → t [ zs ]) ^∘  ⟩
-   t [ (xs ^ _) ∘ (ys ^ _)  ]
-   ≡⟨ [∘] {x = t} ⟩           
-   (t [ xs ^ _ ]) [ ys ^ _ ] ∎)
+[∘] {x = t · u} =
+   cong₂ _·_ ([∘] {x = t}) ([∘] {x = u})
+[∘] {x = ƛ t}{xs = xs}{ys = ys} =
+   cong ƛ_ (
+     t [ (xs ∘ ys) ^ _ ]
+     ≡⟨ cong (λ zs → t [ zs ]) ^∘  ⟩
+     t [ (xs ^ _) ∘ (ys ^ _)  ]
+     ≡⟨ [∘] {x = t} ⟩           
+     (t [ xs ^ _ ]) [ ys ^ _ ] ∎)
 \end{code}
 From here we prove associativity by a fold:
 \begin{code}
 ∘∘ : xs ∘ (ys ∘ zs) ≡ (xs ∘ ys) ∘ zs
-∘∘ {xs = ∅} = refl
-∘∘ {xs = xs , x} = cong₂ _,_ (∘∘ {xs = xs}) ([∘] {x = x})
+∘∘ {xs = ε} = refl
+∘∘ {xs = xs , x} =
+   cong₂ _,_ (∘∘ {xs = xs}) ([∘] {x = x})
 \end{code}
 
 However, we are not done yet we still need to prove
 the 2nd functor law for |^| (|^∘|). It turns out that this depends on
 the naturality of  weakening:
 \begin{code}
-suc*-nat∘ : xs ∘ (suc*[ _ ] ys A) ≡ suc*[ _ ] (xs ∘ ys) A  
+⁺-nat∘ : xs ∘ (ys ⁺ A) ≡ (xs ∘ ys) ⁺ A  
 \end{code}
 which unsurprisingly hs to be shown by establishing a corresponding
 property for substitution:
 \begin{code}
-suc*-nat[] : {x : Γ  ⊢[ q ] B}{xs : Δ ⊨[ r ] Γ}
-     → x [ suc*[ _ ] xs A ] ≡ suc[ _ ] (x [ xs ]) A
+⁺-nat[] : {x : Γ  ⊢[ q ] B}{xs : Δ ⊨[ r ] Γ}
+     → x [ xs ⁺ A ] ≡ suc[ _ ] (x [ xs ]) A
 \end{code}
 The case |q = V| is just the naturality for variables which we have
 already proven :
 \begin{code}
-suc*-nat[] {q = V}{x = i} = suc*-nat[]v {i = i}
+⁺-nat[] {q = V}{x = i} = ⁺-nat[]v {i = i}
 \end{code}
 The case for |q = T| is more interesting and relies again on |[∘]| and
 |∘id|:
 \begin{code}
-suc*-nat[] {q = T} {A = A} {x = x} {xs} = 
-   x [ suc*[ _ ] xs A ]
-   ≡⟨ cong (λ zs → x [ suc*[ _ ] zs A ]) (sym ∘id) ⟩
-   x [ suc*[ _ ] (xs ∘ id {q = V}) A ]     
-   ≡⟨ cong (λ zs → x [ zs ]) (sym (suc*-nat∘ {xs = xs})) ⟩
-   x [ xs ∘ (suc*[ V ] id A) ]   
+⁺-nat[] {q = T} {A = A} {x = x} {xs} = 
+   x [ xs ⁺ A ]
+   ≡⟨ cong (λ zs → x [ zs ⁺ A ]) (sym ∘id) ⟩
+   x [ (xs ∘ id {q = V}) ⁺ A ]     
+   ≡⟨ cong (λ zs → x [ zs ]) (sym (⁺-nat∘ {xs = xs})) ⟩
+   x [ xs ∘ (id ⁺ A) ]   
    ≡⟨ [∘] {x = x} ⟩
-   x [ xs ] [ suc*[ V ] id A ] ∎
+   x [ xs ] [ id ⁺ A ] ∎
 \end{code}
 
 %if False
 \begin{code}
-suc*-nat∘ {xs = ∅} = refl
-suc*-nat∘ {xs = xs , x} =
-  cong₂ _,_ (suc*-nat∘ {xs = xs}) (suc*-nat[] {x = x})
+⁺-nat∘ {xs = ε} = refl
+⁺-nat∘ {xs = xs , x} =
+  cong₂ _,_ (⁺-nat∘ {xs = xs}) (⁺-nat[] {x = x})
 
 tm⊑zero : (q⊑r : q ⊑ r) → zero[_] {Γ = Γ}{A = A} r ≡ tm⊑ q⊑r zero[ q ]
 tm⊑zero rfl = refl
@@ -670,13 +729,15 @@ Finally we have all the ingredients to prove the 2nd functor law |^∘|:
 ^∘ {r = r}{s = s}{xs = xs}{ys = ys} {A = A} = 
     (xs ∘ ys) ^ A
     ≡⟨⟩
-    suc*[ _ ] (xs ∘ ys) A , zero[ r ⊔ s ]    
-    ≡⟨ cong₂ _,_ (sym (suc*-nat∘ {xs = xs})) refl ⟩
-    xs ∘ (suc*[ _ ] ys A) , zero[ r ⊔ s ]
+    (xs ∘ ys) ⁺ A , zero[ r ⊔ s ]    
+    ≡⟨ cong₂ _,_ (sym (⁺-nat∘ {xs = xs})) refl ⟩
+    xs ∘ (ys ⁺ A) , zero[ r ⊔ s ]
     ≡⟨ cong₂ _,_ refl (tm⊑zero (⊑⊔r {r = s}{q = r})) ⟩        
-    xs ∘ (suc*[ _ ] ys A) , tm⊑ (⊑⊔r {q = r}) zero[ s ]
-    ≡⟨ cong₂ _,_ (sym (suc*∘ {xs = xs})) (sym (zero[] {q = r}{x = zero[ s ]}))  ⟩    
-    (suc*[ _ ] xs A) ∘  (ys ^ A) , zero[ r ] [ ys ^ A ]
+    xs ∘ (ys ⁺ A) , tm⊑ (⊑⊔r {q = r}) zero[ s ]
+    ≡⟨ cong₂ _,_
+         (sym (⁺∘ {xs = xs}))
+         (sym (zero[] {q = r}{x = zero[ s ]}))  ⟩    
+    (xs ⁺ A) ∘  (ys ^ A) , zero[ r ] [ ys ^ A ]
     ≡⟨⟩  
     (xs ^ A) ∘ (ys ^ A) ∎
 \end{code}
@@ -686,6 +747,39 @@ Finally we have all the ingredients to prove the 2nd functor law |^∘|:
 
 \section{Conclusions and further work}
 \label{sec:concl-furth-work}
+
+The subject of the paper is a problem which everybody including
+ourselves would have thought to be trivial. As it turns out it isn't
+and we are not the only one who noticed this, in
+particular if you don't want to prove it using copy-and-paste. 
+We spend some time going down alleys that didn't work find clever
+parametrisation. In the end with hindsight the main idea seems rather
+obvious: introduce sorts as a datatype with the structure of a boolean
+algebra. To be able to implement the solution in agda we managed to
+convince the termination checker that |V| is structurally smaller than
+|T| which means that the actual work determining and verifying the
+termination ordering is left to agda. This greatly simplifies the
+formal development. In a way one would like to be able to instrument
+the termination checker for example with an ordering on
+constructors. Also it would be nice if the termination checker
+provides evidence that its actual non-trivial reasoning is sound and
+can be checked independently. 
+
+This paper can also be seen as a preparation for the harder problem to
+implement recursive substitution for dependent types. This is harder
+because here the typing oof the constructors actually depends on the
+substitution laws. While such a M\"unchhausian \cite{altenkirch2023munchhausen} construction should
+actually be possible in agda, the theoretical underpinning of
+inductive-inductive-recursive definitions is mostly unexplored (with
+the exception of the proposal by \cite{kaposi2023towards}. However, there are
+potential interesting applications: strictifying substitution laws is
+essential to prove coherence of models of type theory in higher types
+in the sense of HoTT.
+
+Hence this paper has two aspects: it turns out that an apparently trivial
+problem isn't so hard after all, and it is a stepping stone to more
+exciting open questions. But before you can run you need to walk abd
+we also believe that the construction here can be useful to others.
 
 \bibliographystyle{ACM-Reference-Format}
 \bibliography{local}
