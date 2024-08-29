@@ -79,8 +79,8 @@ record _⊨_ (Γ Δ : Con) : Set where
     xss : Γ ⊨[ qq ] Δ
 
 variable
-  xx yy : Γ ⊢ A 
-  xss yss : Γ ⊨ Δ 
+  xx yy zz : Γ ⊢ A 
+  xss yss zss : Γ ⊨ Δ 
 
 idx : Γ ⊨ Γ
 idx = record { qq = V ; xss = id }
@@ -99,6 +99,13 @@ idx∘x : idx ∘x xss ≡ xss
 idx∘x {xss = record { qq = qq ; xss = xss }} =
   cong (λ xss → record { qq = qq ; xss = xss }) (id∘ {q = V}{xs = xss})
 
+∘xidx : xss ∘x idx ≡ xss
+∘xidx {xss = record { qq = qq ; xss = xss }} =
+  cong (λ xss → record { qq = qq ; xss = xss }) (∘id {xs = xss})
+
+∘x∘x :  xss ∘x (yss ∘x zss) ≡ (xss ∘x yss) ∘x zss
+∘x∘x {xss = record { qq = q ; xss = xs }} {yss = record { qq = r ; xss = xs }} {zss = record { qq = s ; xss = zs }} = {!!}
+
 stlc : CwF-simple
 stlc = record
          { Con = Con
@@ -108,7 +115,7 @@ stlc = record
          ; id = idx
          ; _∘_ = _∘x_
          ; id∘ = idx∘x
-         ; ∘id = {!!}
+         ; ∘id = ∘xidx
          ; ∘∘ = {!!}
          ; _[_] = {!!}
          ; [id] = {!!}
