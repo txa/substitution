@@ -108,11 +108,10 @@ vz = π₁ id
 ```
 
 ```
-import cwf-simple as cwf
-open import cwf-simple using (CwF-simple)
+open import cwf-simple renaming (CwF-simple to CwF)
 
 module initial-cwf-is-cwf where
-  initial-cwf-is-cwf : CwF-simple
+  initial-cwf-is-cwf : CwF
   initial-cwf-is-cwf = record {
     Con = Con;
     Ty = Ty;
@@ -146,11 +145,11 @@ module initial-cwf-is-cwf where
     ƛ[] = ≡→≡ᵢ ƛ[]
     }
 
-module Recursor (cwf : CwF-simple) where
-  rec-con : Con → cwf .cwf.Con
-  rec-ty  : Ty  → cwf .cwf.Ty
-  rec-tms : Δ ⊨ Γ → cwf .cwf._⊨_ (rec-con Δ) (rec-con Γ)
-  rec-tm  : Γ ⊢ A → cwf .cwf._⊢_ (rec-con Γ) (rec-ty A)
+module Recursor (cwf : CwF) where
+  rec-con : Con → cwf .CwF.Con
+  rec-ty  : Ty  → cwf .CwF.Ty
+  rec-tms : Δ ⊨ Γ → cwf .CwF._⊨_ (rec-con Δ) (rec-con Γ)
+  rec-tm  : Γ ⊢ A → cwf .CwF._⊢_ (rec-con Γ) (rec-ty A)
 
   -- Directly implementing 'rec-tm' or 'rec-tms' by pattern matching relies on 
   -- injectivity/no confusion, which Cubical Agda does not support. 
@@ -158,48 +157,48 @@ module Recursor (cwf : CwF-simple) where
   -- nicely!
 
   rec-code : Code → Set
-  rec-code (tm Γ A) = cwf .cwf._⊢_ (rec-con Γ) (rec-ty A)
-  rec-code (tms Δ Γ) = cwf .cwf._⊨_ (rec-con Δ) (rec-con Γ)
+  rec-code (tm Γ A) = cwf .CwF._⊢_ (rec-con Γ) (rec-ty A)
+  rec-code (tms Δ Γ) = cwf .CwF._⊨_ (rec-con Δ) (rec-con Γ)
 
   rec-syn : ∀ {c} → Syn c → rec-code c
 
-  rec-con • = cwf .cwf.•
-  rec-con (Γ ▷ A) = cwf .cwf._▷_ (rec-con Γ) (rec-ty A)
+  rec-con • = cwf .CwF.•
+  rec-con (Γ ▷ A) = cwf .CwF._▷_ (rec-con Γ) (rec-ty A)
 
-  rec-ty o = cwf .cwf.o
-  rec-ty (A ⇒ B) = cwf .cwf._⇒_ (rec-ty A) (rec-ty B)
+  rec-ty o = cwf .CwF.o
+  rec-ty (A ⇒ B) = cwf .CwF._⇒_ (rec-ty A) (rec-ty B)
 
-  rec-syn id = cwf .cwf.id
-  rec-syn (σ ∘ δ) = cwf .cwf._∘_ (rec-tms σ) (rec-tms δ)
-  rec-syn (id∘ {δ = δ} i) = ≡ᵢ→≡ (cwf .cwf.id∘ {δ = rec-tms δ}) i
-  rec-syn (∘id {δ = δ} i) = ≡ᵢ→≡ (cwf .cwf.∘id {δ = rec-tms δ}) i
+  rec-syn id = cwf .CwF.id
+  rec-syn (σ ∘ δ) = cwf .CwF._∘_ (rec-tms σ) (rec-tms δ)
+  rec-syn (id∘ {δ = δ} i) = ≡ᵢ→≡ (cwf .CwF.id∘ {δ = rec-tms δ}) i
+  rec-syn (∘id {δ = δ} i) = ≡ᵢ→≡ (cwf .CwF.∘id {δ = rec-tms δ}) i
   rec-syn (∘∘ {ξ = ξ} {σ = σ} {δ = δ} i) 
-    = ≡ᵢ→≡ (cwf .cwf.∘∘ {ξ = rec-tms ξ} {θ = rec-tms σ}  {δ = rec-tms δ}) i
-  rec-syn (M [ δ ]) = cwf .cwf._[_] (rec-tm M) (rec-tms δ)
-  rec-syn ([id] {M = M} i) = ≡ᵢ→≡ (cwf .cwf.[id] {t = rec-tm M}) i
+    = ≡ᵢ→≡ (cwf .CwF.∘∘ {ξ = rec-tms ξ} {θ = rec-tms σ}  {δ = rec-tms δ}) i
+  rec-syn (M [ δ ]) = cwf .CwF._[_] (rec-tm M) (rec-tms δ)
+  rec-syn ([id] {M = M} i) = ≡ᵢ→≡ (cwf .CwF.[id] {t = rec-tm M}) i
   rec-syn ([∘] {M = M} {σ = σ} {δ = δ} i) 
-    = ≡ᵢ→≡ (cwf .cwf.[∘] {t = rec-tm M} {θ = rec-tms σ} {δ = rec-tms δ}) i
-  rec-syn ε = cwf .cwf.ε
-  rec-syn (δ , M) = cwf .cwf._,_ (rec-tms δ) (rec-tm M)
-  rec-syn (•-η {δ = δ} i) = ≡ᵢ→≡ (cwf .cwf.•-η {δ = rec-tms δ}) i
-  rec-syn (π₀ δ) = cwf .cwf.π₀ (rec-tms δ)
-  rec-syn (π₁ δ) = cwf .cwf.π₁ (rec-tms δ)
+    = ≡ᵢ→≡ (cwf .CwF.[∘] {t = rec-tm M} {θ = rec-tms σ} {δ = rec-tms δ}) i
+  rec-syn ε = cwf .CwF.ε
+  rec-syn (δ , M) = cwf .CwF._,_ (rec-tms δ) (rec-tm M)
+  rec-syn (•-η {δ = δ} i) = ≡ᵢ→≡ (cwf .CwF.•-η {δ = rec-tms δ}) i
+  rec-syn (π₀ δ) = cwf .CwF.π₀ (rec-tms δ)
+  rec-syn (π₁ δ) = cwf .CwF.π₁ (rec-tms δ)
   rec-syn (▷-β₀ {δ = δ} {M = M} i) 
-    = ≡ᵢ→≡ (cwf .cwf.▷-β₀ {δ = rec-tms δ} {t = rec-tm M}) i
+    = ≡ᵢ→≡ (cwf .CwF.▷-β₀ {δ = rec-tms δ} {t = rec-tm M}) i
   rec-syn (▷-β₁ {δ = δ} {M = M} i) 
-    = ≡ᵢ→≡ (cwf .cwf.▷-β₁ {δ = rec-tms δ} {t = rec-tm M}) i
-  rec-syn (▷-η {δ = δ} i) = ≡ᵢ→≡ (cwf .cwf.▷-η {δ = rec-tms δ}) i
+    = ≡ᵢ→≡ (cwf .CwF.▷-β₁ {δ = rec-tms δ} {t = rec-tm M}) i
+  rec-syn (▷-η {δ = δ} i) = ≡ᵢ→≡ (cwf .CwF.▷-η {δ = rec-tms δ}) i
   rec-syn (π₀∘ {σ = σ} {δ = δ} i) 
-    = ≡ᵢ→≡ (cwf .cwf.π₀∘ {θ = rec-tms σ} {δ = rec-tms δ}) i
+    = ≡ᵢ→≡ (cwf .CwF.π₀∘ {θ = rec-tms σ} {δ = rec-tms δ}) i
   rec-syn (π₁∘ {σ = σ} {δ = δ} i)
-    = ≡ᵢ→≡ (cwf .cwf.π₁∘ {θ = rec-tms σ} {δ = rec-tms δ}) i
-  rec-syn (M · N) = cwf .cwf._·_ (rec-tm M) (rec-tm N)
-  rec-syn (ƛ M) = cwf .cwf.ƛ_ (rec-tm M)
+    = ≡ᵢ→≡ (cwf .CwF.π₁∘ {θ = rec-tms σ} {δ = rec-tms δ}) i
+  rec-syn (M · N) = cwf .CwF._·_ (rec-tm M) (rec-tm N)
+  rec-syn (ƛ M) = cwf .CwF.ƛ_ (rec-tm M)
   rec-syn (·[] {M = M} {N = N} {δ = δ} i) 
-    = ≡ᵢ→≡ (cwf .cwf.·[] {t = rec-tm M} {u = rec-tm N} {δ = rec-tms δ}) i
+    = ≡ᵢ→≡ (cwf .CwF.·[] {t = rec-tm M} {u = rec-tm N} {δ = rec-tms δ}) i
   rec-syn (ƛ[] {M = M} {δ = δ} i) 
-    = ≡ᵢ→≡ (cwf .cwf.ƛ[] {t = rec-tm M} {δ = rec-tms δ}) i
+    = ≡ᵢ→≡ (cwf .CwF.ƛ[] {t = rec-tm M} {δ = rec-tms δ}) i
 
   rec-tms = rec-syn
   rec-tm  = rec-syn
-```  
+```   

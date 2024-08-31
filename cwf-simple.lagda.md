@@ -62,6 +62,4 @@ record CwF-simple : Set₁ where
            → (t · u) [ δ ] ≡ (t [ δ ]) · (u [ δ ])
     ƛ[] :  ∀ {Γ Δ A B}{t : Γ ▷ A ⊢ B}{δ : Δ ⊨ Γ}
            → (ƛ t) [ δ ] ≡ ƛ (t [ δ ^ _ ])
-
-open CwF-simple public
 ```
