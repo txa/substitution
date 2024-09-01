@@ -22,24 +22,13 @@ x ≡[ refl ]≡ y = x ≡ y
 
 infix   3  _⊢_
 infix   3  _⊨_
-infixl  4  _▷_
-infixl  4  _,_
 infix   5  _∘_
 infix   5  ƛ_
-infixr  6  _⇒_
 infixl  6  _·_
 infix   8  _[_]
 
-data Con : Set
-data Ty  : Set
-
-data Con where
-  •   : Con
-  _▷_ : Con → Ty → Con
-
-data Ty where
-  o : Ty
-  _⇒_ : Ty → Ty → Ty
+-- We reuse 'Con' and 'Ty' from the paper
+open import paper using (Con; Ty; •; _▷_; o; _⇒_)
 
 postulate
   _⊢_ : Con → Ty → Set
@@ -159,6 +148,7 @@ module Recursor (cwf : CwF) where
 
   {-# REWRITE rec-tms-idβ rec-tms-∘β rec-tms-[]β rec-tms-εβ rec-tms-,β 
               rec-tms-π₀β rec-tms-π₁β rec-tm-·β rec-tm-ƛβ #-}
+open Recursor public
 
 record Motive : Set₁ where
   field
@@ -271,4 +261,5 @@ module Eliminator {𝕄} (C : Cases 𝕄) where
 
   {-# REWRITE elim-tms-idβ elim-tms-∘β elim-tms-[]β elim-tms-εβ elim-tms-,β 
               elim-tms-π₀β elim-tms-π₁β elim-tm-·β elim-tm-ƛβ #-}
+open Eliminator public
 ```
