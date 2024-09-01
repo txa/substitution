@@ -87,6 +87,8 @@ postulate
   ·[] : (M · N) [ δ ] ≡ M [ δ ] · N [ δ ]
   ƛ[] : (ƛ M) [ δ ] ≡ ƛ (M [ δ ^ A ])
 
+vs : Γ ⊢ B → Γ ▷ A ⊢ B
+vs x = x [ π₀ id ]
 ```
 
 ```
@@ -283,5 +285,10 @@ module Recursor (cwf : CwF) where
   rec-ty  = elim-ty  cwf-to-cases
   rec-tm  = elim-tm  cwf-to-cases
   rec-tms = elim-tms cwf-to-cases
+
 open Recursor public
-```
+
+-- Inlining lets us define rewrite rules with 'rec-con' and 'rec-ty' on the LHS
+{-# INLINE rec-con #-}
+{-# INLINE rec-ty #-}
+``` 

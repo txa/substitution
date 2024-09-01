@@ -2,6 +2,7 @@
 ```
 {-# OPTIONS --rewriting #-}
 
+open import Data.Unit
 open import Relation.Binary.PropositionalEquality hiding ([_])
   renaming (trans to _∙_)
 
@@ -152,5 +153,98 @@ module SecondAttempt where
     ƛ x [ ys ∘ id ⁺ A , ` zero ]
     ≡⟨ cong (λ ρ → ƛ x [ ρ , ` zero ]) (∘⊑ {xs = ys} {ys = id ⁺ A}) ⟩
     ƛ x [ ys ∘ tm*⊑ v⊑t (id-poly ⁺ A) , ` zero ] ∎
-```
   
+  open import initial-cwf as ICwF 
+    using (rec-con; rec-ty; rec-tm; rec-tms
+          ; elim-con; elim-ty; elim-tm; elim-tms)
+  open ICwF.Motive
+  open ICwF.Cases
+
+  Con≡ : rec-con stlc Γ ≡ Γ
+  Ty≡  : rec-ty stlc A ≡ A
+
+  Con≡ {Γ = •} = refl
+  Con≡ {Γ = Γ ▷ A} = cong₂ _▷_ Con≡ Ty≡
+
+  Ty≡ {A = o} = refl
+  Ty≡ {A = A ⇒ B} = cong₂ _⇒_ Ty≡ Ty≡
+
+  {-# REWRITE Con≡ Ty≡ #-}
+
+  to-stlc-tm : Γ ICwF.⊢ A → Γ ⊢ A
+  to-stlc-tm = rec-tm stlc
+
+  to-stlc-tms : Δ ICwF.⊨ Γ → Δ ⊨ Γ
+  to-stlc-tms = rec-tms stlc
+
+  to-cwf-tm : Γ ⊢[ q ] A → Γ ICwF.⊢ A
+  to-cwf-tm zero = ICwF.vz
+  to-cwf-tm (suc x _) = ICwF.vs (to-cwf-tm x)
+  to-cwf-tm (` x) = to-cwf-tm x
+  to-cwf-tm (M · N) = to-cwf-tm M ICwF.· to-cwf-tm N
+  to-cwf-tm (ƛ M) = ICwF.ƛ (to-cwf-tm M)
+
+  to-cwf-tms : Δ ⊨ Γ → ICwF._⊨_ Δ Γ
+  to-cwf-tms ε = ICwF.ε
+  to-cwf-tms (δ , M) = to-cwf-tms δ ICwF., to-cwf-tm M
+
+  to-stlc-inv-tm : ∀ {M : Γ ⊢[ q ] A} → to-stlc-tm (to-cwf-tm M) ≡ tm⊑ ⊑t M
+  to-stlc-inv-tm {M = zero} = refl
+  to-stlc-inv-tm {M = suc x B} = {!   !}
+  to-stlc-inv-tm {M = ` x} = to-stlc-inv-tm {M = x}
+  to-stlc-inv-tm {M = M · N} 
+    = cong₂ _·_ (to-stlc-inv-tm {M = M}) (to-stlc-inv-tm {M = N})
+  to-stlc-inv-tm {M = ƛ M} = cong ƛ_ (to-stlc-inv-tm {M = M})
+
+  to-cwf-inv-𝕄 : ICwF.Motive
+  to-cwf-inv-𝕄 .Conᴱ _ = ⊤
+  to-cwf-inv-𝕄 .Tyᴱ  _ = ⊤
+  to-cwf-inv-𝕄 .Tmᴱ Γ A M = to-cwf-tm (to-stlc-tm M) ≡ M
+  to-cwf-inv-𝕄 .Tmsᴱ Δ Γ δ = to-cwf-tms (to-stlc-tms δ) ≡ δ
+
+  to-cwf-inv-ℂ : ICwF.Cases to-cwf-inv-𝕄
+  to-cwf-inv-ℂ .idᴱ {•} = sym (ICwF.•-η {δ = ICwF.id})
+  to-cwf-inv-ℂ .idᴱ {Γ ▷ A} = {!!}
+  to-cwf-inv-ℂ ._∘ᴱ_ = {!   !}
+  to-cwf-inv-ℂ .id∘ᴱ = {!   !}
+  to-cwf-inv-ℂ .∘idᴱ = {!   !}
+  to-cwf-inv-ℂ .∘∘ᴱ = {!   !}
+  to-cwf-inv-ℂ ._[_]ᴱ Mᴱ δᴱ = {!   !}
+  to-cwf-inv-ℂ .[id]ᴱ = {!   !}
+  to-cwf-inv-ℂ .[∘]ᴱ = {!   !}
+  to-cwf-inv-ℂ .•ᴱ = {!   !}
+  to-cwf-inv-ℂ .εᴱ = {!   !}
+  to-cwf-inv-ℂ .•-ηᴱ = {!   !}
+  to-cwf-inv-ℂ ._▷ᴱ_ = {!   !}
+  to-cwf-inv-ℂ ._,ᴱ_ = {!   !}
+  to-cwf-inv-ℂ .π₀ᴱ = {!   !}
+  to-cwf-inv-ℂ .π₁ᴱ = {!   !}
+  to-cwf-inv-ℂ .▷-β₀ᴱ = {!   !}
+  to-cwf-inv-ℂ .▷-β₁ᴱ = {!   !}
+  to-cwf-inv-ℂ .▷-ηᴱ = {!   !}
+  to-cwf-inv-ℂ .π₀∘ᴱ = {!   !}
+  to-cwf-inv-ℂ .π₁∘ᴱ = {!   !}
+  to-cwf-inv-ℂ .oᴱ = {!   !}
+  to-cwf-inv-ℂ ._⇒ᴱ_ = {!   !}
+  to-cwf-inv-ℂ ._·ᴱ_ = {!   !}
+  to-cwf-inv-ℂ .ƛᴱ_ = {!   !}
+  to-cwf-inv-ℂ .·[]ᴱ = {!   !}
+  to-cwf-inv-ℂ .ƛ[]ᴱ = {!   !}
+
+
+  -- to-cwf-inv-tm : ∀ {M : Γ ICwF.⊢ A} → to-cwf-tm (to-stlc-tm M) ≡ M
+  -- to-cwf-inv-tm {M = M} 
+  --   = elim-tm {𝕄 = record 
+  --   { Conᴱ = λ _ → ⊤
+  --   ; Tyᴱ  = λ _ → ⊤
+  --   ; Tmᴱ  = λ Γ A M → to-cwf-tm (to-stlc-tm M) ≡ M
+  --   ; Tmsᴱ = λ Δ Γ δ → ⊤ }} record 
+  --   { idᴱ = tt
+  --   ; _∘ᴱ_ = λ where _ _ → tt
+  --   ; id∘ᴱ = refl
+  --   ; ∘idᴱ = refl
+  --   ; ∘∘ᴱ  = refl
+  --   ; _[_]ᴱ = λ where {M = M} Mᴱ tt → {!!}
+  --   } M
+```
+    
