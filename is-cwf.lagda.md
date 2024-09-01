@@ -4,81 +4,67 @@
 
 open import Relation.Binary.PropositionalEquality hiding ([_])
 
-open import cwf-simple
+open import cwf-simple renaming (CwF-simple to CwF)
 open import paper
 
-record _⊢_ (Γ : Con)(A : Ty) : Set where
-  field
-    qq : Sort
-    xx : Γ ⊢[ qq ] A
+module is-cwf where
 
-record _⊨_ (Γ Δ : Con) : Set where
-  field
-    qq : Sort
-    xss : Γ ⊨[ qq ] Δ
+module FirstAttempt where
+  -- Here, we get stuck! 
 
-variable
-  xx yy zz : Γ ⊢ A 
-  xss yss zss : Γ ⊨ Δ 
+  record _⊢_ (Γ : Con)(A : Ty) : Set where
+    constructor tm
+    field
+      {qq} : Sort
+      xx : Γ ⊢[ qq ] A
 
-idx : Γ ⊨ Γ
-idx = record { qq = V ; xss = id }
+  record _⊨_ (Γ Δ : Con) : Set where
+    constructor tms
+    field
+      {qq} : Sort
+      xss : Γ ⊨[ qq ] Δ
 
-_∘x_ : Γ ⊨ Θ → Δ ⊨ Γ → Δ ⊨ Θ
-record { qq = pp ; xss = xs } ∘x record { qq = qq ; xss = ys } =
-  record { qq = pp ⊔ qq ; xss = xs ∘ ys }
+  variable
+    xx yy zz : Γ ⊢ A 
+    xss yss zss : Γ ⊨ Δ 
 
-tm*⊑rfl : tm*⊑ rfl xs ≡ xs 
-tm*⊑rfl {xs = ε} = refl
-tm*⊑rfl {xs = xs , x} = cong₂ _,_ (tm*⊑rfl {xs = xs}) refl
+  stlc : CwF
+  stlc .CwF.Con = Con
+  stlc .CwF.Ty = Ty
+  stlc .CwF._⊢_ = _⊢_
+  stlc .CwF._⊨_ = _⊨_
+  stlc .CwF.id = tms id
+  stlc .CwF._∘_ (tms xs) (tms ys) = tms (xs ∘ ys)
+  stlc .CwF.id∘ = cong tms id∘
+  stlc .CwF.∘id = cong tms ∘id
+  stlc .CwF.∘∘ = cong tms (sym ∘∘)
+  stlc .CwF._[_] (tm x) (tms xs) = tm (x [ xs ])
+  stlc .CwF.[id] = cong tm [id]
+  stlc .CwF.[∘] {t = tm x} = cong tm (sym ([∘] {x = x}))
+  stlc .CwF.• = •
+  stlc .CwF.ε = tms {qq = V} ε
+  -- We are stuck!
+  stlc .CwF.•-η {δ = tms ε} = {!!}
+  stlc .CwF._▷_ = _▷_
+  stlc .CwF._,_ (tms xs) (tm x) = tms (xs , {!x!})
+  stlc .CwF.π₀ = {!   !}
+  stlc .CwF.π₁ = {!   !}
+  stlc .CwF.▷-β₀ = {!   !}
+  stlc .CwF.▷-β₁ = {!   !}
+  stlc .CwF.▷-η = {!   !}
+  stlc .CwF.π₀∘ = {!   !}
+  stlc .CwF.π₁∘ = {!   !}
+  stlc .CwF.o = {!   !}
+  stlc .CwF._⇒_ = {!   !}
+  stlc .CwF._·_ = {!   !}
+  CwF.ƛ stlc = {!   !}
+  stlc .CwF.·[] = {!   !}
+  stlc .CwF.ƛ[] = {!   !}
 
-{-# REWRITE tm*⊑rfl  #-}
+module SecondAttempt where
 
-idx∘x : idx ∘x xss ≡ xss
-idx∘x {xss = record { qq = qq ; xss = xss }} =
-  cong (λ xss → record { qq = qq ; xss = xss }) (id∘ {q = V}{xs = xss})
-
-∘xidx : xss ∘x idx ≡ xss
-∘xidx {xss = record { qq = qq ; xss = xss }} =
-  cong (λ xss → record { qq = qq ; xss = xss }) (∘id {xs = xss})
-
-∘x∘x :  xss ∘x (yss ∘x zss) ≡ (xss ∘x yss) ∘x zss
-∘x∘x {xss = record { qq = q ; xss = xs }} 
-     {yss = record { qq = r ; xss = ys }} 
-     {zss = record { qq = s ; xss = zs }} = {!!}
-
-stlc : CwF-simple
-stlc = record
-         { Con = Con
-         ; Ty = Ty
-         ; _⊢_ = _⊢_
-         ; _⊨_ = _⊨_
-         ; id = idx
-         ; _∘_ = _∘x_
-         ; id∘ = idx∘x
-         ; ∘id = ∘xidx
-         ; ∘∘ = {!!}
-         ; _[_] = {!!}
-         ; [id] = {!!}
-         ; [∘] = {!!}
-         ; • = {!!}
-         ; ε = {!!}
-         ; •-η = {!!}
-         ; _▷_ = {!!}
-         ; _,_ = {!!}
-         ; π₀ = {!!}
-         ; π₁ = {!!}
-         ; ▷-β₀ = {!!}
-         ; ▷-β₁ = {!!}
-         ; ▷-η = {!!}
-         ; π₀∘ = {!!}
-         ; π₁∘ = {!!}
-         ; o = {!!}
-         ; _⇒_ = {!!}
-         ; _·_ = {!!}
-         ; ƛ_ = {!!}
-         ; ·[] = {!!}
-         ; ƛ[] = {!!}
-         }
+  _⊢_ = _⊢[ T ]_
+  _⊨_ = _⊨[ T ]_
 
 ```
+  
