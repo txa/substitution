@@ -205,12 +205,18 @@ module Recursor (cwf : CwF) where
   rec-tms = rec-syn
   rec-tm  = rec-syn
 
+record Motive : Set₁ where
+  field
+    Conᴱ : Con → Set
+    Tyᴱ  : Ty → Set
+    Tmᴱ  : Conᴱ Γ → Tyᴱ A → Γ ⊢ A → Set
+    Tmsᴱ : Conᴱ Δ → Conᴱ Γ → Δ ⊨ Γ → Set
+
 -- We index by the type constructors so we can generalise over variables of
 -- those types
-module _ (Conᴱ : Con → Set) (Tyᴱ : Ty → Set) 
-         (Tmᴱ : ∀ {Γ A} → Conᴱ Γ → Tyᴱ A → Γ ⊢ A → Set) 
-         (Tmsᴱ : ∀ {Δ Γ} → Conᴱ Δ → Conᴱ Γ → Δ ⊨ Γ → Set) 
+module _ (𝕄 : Motive) 
          where
+  open Motive 𝕄
 
   variable
     Γᴱ Δᴱ θᴱ Ξᴱ : Conᴱ Γ
@@ -218,7 +224,8 @@ module _ (Conᴱ : Con → Set) (Tyᴱ : Ty → Set)
     Mᴱ Nᴱ Lᴱ : Tmᴱ Γᴱ Aᴱ M
     δᴱ σᴱ ξᴱ : Tmsᴱ Δᴱ Γᴱ δ
 
-  record Motive : Set₁ where
+
+  record Cases : Set₁ where
     infixl  4  _▷ᴱ_
     infixl  4  _,ᴱ_
     infix   5  _∘ᴱ_
@@ -278,12 +285,10 @@ module _ (Conᴱ : Con → Set) (Tyᴱ : Ty → Set)
           ≡[ ap (Tmᴱ Δᴱ (Aᴱ ⇒ᴱ Bᴱ)) ƛ[] 
           ]≡ ƛᴱ (Mᴱ [ δᴱ ^ᴱ Aᴱ ]ᴱ)
 
-module Eliminator {Conᴱ Tyᴱ} 
-                  {Tmᴱ : ∀ {Γ A} → Conᴱ Γ → Tyᴱ A → Γ ⊢ A → Set} 
-                  {Tmsᴱ : ∀ {Δ Γ} → Conᴱ Δ → Conᴱ Γ → Δ ⊨ Γ → Set} 
-                  (M : Motive Conᴱ Tyᴱ Tmᴱ Tmsᴱ) 
+module Eliminator {𝕄} (C : Cases 𝕄) 
   where
-  open Motive M
+  open Motive 𝕄
+  open Cases C
 
   elim-con : ∀ Γ → Conᴱ Γ
   elim-ty  : ∀ A → Tyᴱ  A
