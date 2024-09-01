@@ -1,5 +1,5 @@
 ```
-{-# OPTIONS --rewriting --cubical-compatible #-}
+{-# OPTIONS --rewriting #-}
 module cwf-simple where
 
 open import Relation.Binary.PropositionalEquality hiding ([_])
