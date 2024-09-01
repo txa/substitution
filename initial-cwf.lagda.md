@@ -5,18 +5,27 @@ import Agda.Builtin.Equality.Rewrite
 
 open import Level
 open import Relation.Binary.PropositionalEquality hiding ([_])
+open import Data.Product using (Σ; proj₁; proj₂)
 
 module initial-cwf where
 
 -- Utilities
  
 private variable
-  ℓ : Level
+  ℓ ℓ₁ ℓ₂ : Level
 
 infix 4 _≡[_]≡_
 
 _≡[_]≡_ : ∀ {A B : Set ℓ} → A → A ≡ B → B → Set ℓ
 x ≡[ refl ]≡ y = x ≡ y
+
+-- Used to easily convert from the non-dependent equations of 'CwF-simple' to
+-- the dependent equations of 'Cases'
+cong-const : ∀ {A : Set ℓ₁} {B : Set ℓ₂} {x y} {z w : B} {p : z ≡ w} 
+           → (x ≡[ cong (λ _ → A) p ]≡ y) ≡ (x ≡ y)
+cong-const {p = refl} = refl
+
+{-# REWRITE cong-const #-}
 
 -- End utilities
 
@@ -118,38 +127,6 @@ module initial-cwf-is-cwf where
     ƛ[] = ƛ[]
     }
 
-module Recursor (cwf : CwF) where
-  rec-con : Con → cwf .CwF.Con
-  rec-ty  : Ty  → cwf .CwF.Ty
-
-  rec-con • = cwf .CwF.•
-  rec-con (Γ ▷ A) = cwf .CwF._▷_ (rec-con Γ) (rec-ty A)
-
-  rec-ty o = cwf .CwF.o
-  rec-ty (A ⇒ B) = cwf .CwF._⇒_ (rec-ty A) (rec-ty B)
-
-  postulate
-    rec-tms : Δ ⊨ Γ → cwf .CwF._⊨_ (rec-con Δ) (rec-con Γ)
-    rec-tm  : Γ ⊢ A → cwf .CwF._⊢_ (rec-con Γ) (rec-ty A)
-
-    rec-tms-idβ : rec-tms (id {Γ}) ≡ cwf .CwF.id
-    rec-tms-∘β  : rec-tms (σ ∘ δ) ≡ cwf .CwF._∘_ (rec-tms σ) (rec-tms δ)
-
-    rec-tms-[]β : rec-tm (M [ δ ]) ≡ cwf .CwF._[_] (rec-tm M) (rec-tms δ)
-
-    rec-tms-εβ  : rec-tms (ε {Δ = Δ}) ≡ cwf .CwF.ε
-    rec-tms-,β  : rec-tms (δ , M) ≡ cwf .CwF._,_ (rec-tms δ) (rec-tm M)
-    rec-tms-π₀β : rec-tms (π₀ δ) ≡ cwf .CwF.π₀ (rec-tms δ)
-    rec-tms-π₁β : rec-tm (π₁ δ) ≡ cwf .CwF.π₁ (rec-tms δ)
-
-    rec-tm-·β : rec-tm (M · N) ≡ cwf .CwF._·_ (rec-tm M) (rec-tm N)
-    rec-tm-ƛβ : rec-tm (ƛ M) ≡ cwf .CwF.ƛ_ (rec-tm M)
-
-
-  {-# REWRITE rec-tms-idβ rec-tms-∘β rec-tms-[]β rec-tms-εβ rec-tms-,β 
-              rec-tms-π₀β rec-tms-π₁β rec-tm-·β rec-tm-ƛβ #-}
-open Recursor public
-
 record Motive : Set₁ where
   field
     Conᴱ : Con → Set
@@ -167,7 +144,6 @@ module _ (𝕄 : Motive) where
     Aᴱ Bᴱ Cᴱ Dᴱ : Tyᴱ A
     Mᴱ Nᴱ Lᴱ : Tmᴱ Γᴱ Aᴱ M
     δᴱ σᴱ ξᴱ : Tmsᴱ Δᴱ Γᴱ δ
-
 
   record Cases : Set₁ where
     infixl  4  _▷ᴱ_
@@ -262,4 +238,50 @@ module Eliminator {𝕄} (C : Cases 𝕄) where
   {-# REWRITE elim-tms-idβ elim-tms-∘β elim-tms-[]β elim-tms-εβ elim-tms-,β 
               elim-tms-π₀β elim-tms-π₁β elim-tm-·β elim-tm-ƛβ #-}
 open Eliminator public
+
+module Recursor (cwf : CwF) where
+  rec-con : Con → cwf .CwF.Con
+  rec-ty  : Ty  → cwf .CwF.Ty
+  rec-tms : Δ ⊨ Γ → cwf .CwF._⊨_ (rec-con Δ) (rec-con Γ)
+  rec-tm  : Γ ⊢ A → cwf .CwF._⊢_ (rec-con Γ) (rec-ty A)
+
+  cwf-to-motive : Motive
+  cwf-to-motive .Motive.Conᴱ _     = cwf .CwF.Con
+  cwf-to-motive .Motive.Tyᴱ  _     = cwf .CwF.Ty
+  cwf-to-motive .Motive.Tmᴱ Γ A _  = cwf .CwF._⊢_ Γ A
+  cwf-to-motive .Motive.Tmsᴱ Δ Γ _ = cwf .CwF._⊨_ Δ Γ
+  
+  cwf-to-cases : Cases cwf-to-motive
+  cwf-to-cases .Cases.idᴱ         = cwf .CwF.id
+  cwf-to-cases .Cases._∘ᴱ_        = cwf .CwF._∘_
+  cwf-to-cases .Cases.id∘ᴱ        = cwf .CwF.id∘
+  cwf-to-cases .Cases.∘idᴱ        = cwf .CwF.∘id
+  cwf-to-cases .Cases.∘∘ᴱ         = cwf .CwF.∘∘
+  cwf-to-cases .Cases._[_]ᴱ       = cwf .CwF._[_]
+  cwf-to-cases .Cases.[id]ᴱ       = cwf .CwF.[id]
+  cwf-to-cases .Cases.[∘]ᴱ        = cwf .CwF.[∘]
+  cwf-to-cases .Cases.•ᴱ          = cwf .CwF.•
+  cwf-to-cases .Cases.εᴱ          = cwf .CwF.ε
+  cwf-to-cases .Cases.•-ηᴱ        = cwf .CwF.•-η
+  cwf-to-cases .Cases._▷ᴱ_        = cwf .CwF._▷_
+  cwf-to-cases .Cases._,ᴱ_        = cwf .CwF._,_
+  cwf-to-cases .Cases.π₀ᴱ         = cwf .CwF.π₀
+  cwf-to-cases .Cases.π₁ᴱ         = cwf .CwF.π₁
+  cwf-to-cases .Cases.▷-β₀ᴱ       = cwf .CwF.▷-β₀
+  cwf-to-cases .Cases.▷-β₁ᴱ       = cwf .CwF.▷-β₁
+  cwf-to-cases .Cases.▷-ηᴱ        = cwf .CwF.▷-η
+  cwf-to-cases .Cases.π₀∘ᴱ        = cwf .CwF.π₀∘
+  cwf-to-cases .Cases.π₁∘ᴱ        = cwf .CwF.π₁∘
+  cwf-to-cases .Cases.oᴱ          = cwf .CwF.o
+  cwf-to-cases .Cases._⇒ᴱ_        = cwf .CwF._⇒_
+  cwf-to-cases .Cases._·ᴱ_        = cwf .CwF._·_
+  cwf-to-cases .Cases.ƛᴱ_         = cwf .CwF.ƛ_
+  cwf-to-cases .Cases.·[]ᴱ        = cwf .CwF.·[]
+  cwf-to-cases .Cases.ƛ[]ᴱ        = cwf .CwF.ƛ[]
+
+  rec-con = elim-con cwf-to-cases
+  rec-ty  = elim-ty  cwf-to-cases
+  rec-tm  = elim-tm  cwf-to-cases
+  rec-tms = elim-tms cwf-to-cases
+open Recursor public
 ```
