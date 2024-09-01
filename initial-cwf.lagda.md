@@ -11,7 +11,7 @@ module initial-cwf where
 -- Utilities
 
 private variable
-  ℓ : Level
+  ℓ ℓ₁ ℓ₂ : Level
 
 _≡_ : ∀ {A : Set ℓ} → A → A → Set ℓ
 _≡_ {A = A} x y = PathP (λ _ → A) x y
@@ -26,6 +26,9 @@ infix 4 _≡_ _≡[_]≡_
 
 ≡→≡ᵢ : ∀ {A : Set ℓ} {x y : A} → x ≡ y → x ≡ᵢ y
 ≡→≡ᵢ {x = x} p = primTransp (λ i → x ≡ᵢ p i) i0 (erefl x)
+
+ap : ∀ {A : Set ℓ₁} {B : Set ℓ₂} (f : A → B) {x y} → x ≡ y → f x ≡ f y
+ap f p = λ i → f (p i)
 
 -- End utilities
 
@@ -91,7 +94,7 @@ data Syn where
   ▷-β₁ : π₁ (δ , M) ≡ M
   ▷-η  : (π₀ δ , π₁ δ) ≡ δ
   π₀∘  : π₀ (σ ∘ δ) ≡ π₀ σ ∘ δ
-  π₁∘  : π₁ (σ ∘ δ) ≡ (π₁ σ) [ δ ]
+  π₁∘  : π₁ (σ ∘ δ) ≡ π₁ σ [ δ ]
 
   _·_ : Γ ⊢ A ⇒ B → Γ ⊢ A → Γ ⊢ B
   ƛ_  : Γ ▷ A ⊢ B → Γ ⊢ A ⇒ B
@@ -201,4 +204,133 @@ module Recursor (cwf : CwF) where
 
   rec-tms = rec-syn
   rec-tm  = rec-syn
-```   
+
+-- We index by the type constructors so we can generalise over variables of
+-- those types
+module _ (Conᴱ : Con → Set) (Tyᴱ : Ty → Set) 
+         (Tmᴱ : ∀ {Γ A} → Conᴱ Γ → Tyᴱ A → Γ ⊢ A → Set) 
+         (Tmsᴱ : ∀ {Δ Γ} → Conᴱ Δ → Conᴱ Γ → Δ ⊨ Γ → Set) 
+         where
+
+  variable
+    Γᴱ Δᴱ θᴱ Ξᴱ : Conᴱ Γ
+    Aᴱ Bᴱ Cᴱ Dᴱ : Tyᴱ A
+    Mᴱ Nᴱ Lᴱ : Tmᴱ Γᴱ Aᴱ M
+    δᴱ σᴱ ξᴱ : Tmsᴱ Δᴱ Γᴱ δ
+
+  record Motive : Set₁ where
+    infixl  4  _▷ᴱ_
+    infixl  4  _,ᴱ_
+    infix   5  _∘ᴱ_
+    infix   5  ƛᴱ_
+    infixr  6  _⇒ᴱ_
+    infixl  6  _·ᴱ_
+    infix   8  _[_]ᴱ
+    field
+      idᴱ  : Tmsᴱ Γᴱ Γᴱ id 
+      _∘ᴱ_ : Tmsᴱ Δᴱ Γᴱ σ → Tmsᴱ θᴱ Δᴱ δ → Tmsᴱ θᴱ Γᴱ (σ ∘ δ)
+      
+      id∘ᴱ : idᴱ ∘ᴱ δᴱ ≡[ ap (Tmsᴱ Δᴱ Γᴱ) id∘ ]≡ δᴱ
+      ∘idᴱ : δᴱ ∘ᴱ idᴱ ≡[ ap (Tmsᴱ Δᴱ Γᴱ) ∘id ]≡ δᴱ
+      ∘∘ᴱ  : (ξᴱ ∘ᴱ σᴱ) ∘ᴱ δᴱ ≡[ ap (Tmsᴱ Ξᴱ Γᴱ) ∘∘ ]≡ ξᴱ ∘ᴱ (σᴱ ∘ᴱ δᴱ) 
+
+      _[_]ᴱ : Tmᴱ Γᴱ Aᴱ M → Tmsᴱ Δᴱ Γᴱ δ → Tmᴱ Δᴱ Aᴱ (M [ δ ])
+      
+      [id]ᴱ : Mᴱ [ idᴱ ]ᴱ ≡[ ap (Tmᴱ Γᴱ Aᴱ) [id] ]≡ Mᴱ
+      [∘]ᴱ  : Mᴱ [ σᴱ ]ᴱ [ δᴱ ]ᴱ ≡[ ap (Tmᴱ θᴱ Aᴱ) [∘] ]≡ Mᴱ [ σᴱ ∘ᴱ δᴱ ]ᴱ
+
+      •ᴱ : Conᴱ •
+      εᴱ : Tmsᴱ Δᴱ •ᴱ ε
+
+      •-ηᴱ : δᴱ ≡[ ap (Tmsᴱ Δᴱ •ᴱ) •-η ]≡ εᴱ
+
+      _▷ᴱ_ : Conᴱ Γ → Tyᴱ A → Conᴱ (Γ ▷ A)
+      _,ᴱ_ : Tmsᴱ Δᴱ Γᴱ δ → Tmᴱ Δᴱ Aᴱ M → Tmsᴱ Δᴱ (Γᴱ ▷ᴱ Aᴱ) (δ , M)
+      π₀ᴱ  : Tmsᴱ Δᴱ (Γᴱ ▷ᴱ Aᴱ) δ → Tmsᴱ Δᴱ Γᴱ (π₀ δ)
+      π₁ᴱ  : Tmsᴱ Δᴱ (Γᴱ ▷ᴱ Aᴱ) δ → Tmᴱ Δᴱ Aᴱ (π₁ δ)
+
+      ▷-β₀ᴱ : π₀ᴱ (δᴱ ,ᴱ Mᴱ) ≡[ ap (Tmsᴱ Δᴱ Γᴱ) ▷-β₀ ]≡ δᴱ
+      ▷-β₁ᴱ : π₁ᴱ (δᴱ ,ᴱ Mᴱ) ≡[ ap (Tmᴱ Δᴱ Aᴱ) ▷-β₁ ]≡ Mᴱ
+      ▷-ηᴱ  : (π₀ᴱ δᴱ ,ᴱ π₁ᴱ δᴱ) ≡[ ap (Tmsᴱ Δᴱ (Γᴱ ▷ᴱ Aᴱ)) ▷-η ]≡ δᴱ
+      π₀∘ᴱ  : π₀ᴱ (σᴱ ∘ᴱ δᴱ) ≡[ ap (Tmsᴱ θᴱ Γᴱ) π₀∘ ]≡ π₀ᴱ σᴱ ∘ᴱ δᴱ
+      π₁∘ᴱ  : π₁ᴱ (σᴱ ∘ᴱ δᴱ) ≡[ ap (Tmᴱ θᴱ Aᴱ) π₁∘ ]≡ π₁ᴱ σᴱ [ δᴱ ]ᴱ
+    
+    wkᴱ : Tmsᴱ (Γᴱ ▷ᴱ Aᴱ) Γᴱ wk
+    wkᴱ = π₀ᴱ idᴱ
+
+    vzᴱ : Tmᴱ (Γᴱ ▷ᴱ Aᴱ) Aᴱ vz
+    vzᴱ = π₁ᴱ idᴱ
+
+    _^ᴱ_ : Tmsᴱ Δᴱ Γᴱ δ → ∀ Aᴱ → Tmsᴱ (Δᴱ ▷ᴱ Aᴱ) (Γᴱ ▷ᴱ Aᴱ) (δ ^ A)
+    δᴱ ^ᴱ Aᴱ = (δᴱ ∘ᴱ wkᴱ) ,ᴱ vzᴱ
+
+    field
+      oᴱ   : Tyᴱ o
+      _⇒ᴱ_ : Tyᴱ A → Tyᴱ B → Tyᴱ (A ⇒ B)
+      
+      _·ᴱ_ : Tmᴱ Γᴱ (Aᴱ ⇒ᴱ Bᴱ) M → Tmᴱ Γᴱ Aᴱ N → Tmᴱ Γᴱ Bᴱ (M · N)
+      ƛᴱ_  : Tmᴱ (Γᴱ ▷ᴱ Aᴱ) Bᴱ M → Tmᴱ Γᴱ (Aᴱ ⇒ᴱ Bᴱ) (ƛ M)
+      
+      ·[]ᴱ : (Mᴱ ·ᴱ Nᴱ) [ δᴱ ]ᴱ 
+          ≡[ ap (Tmᴱ Δᴱ Bᴱ) ·[] 
+          ]≡ Mᴱ [ δᴱ ]ᴱ ·ᴱ Nᴱ [ δᴱ ]ᴱ
+      ƛ[]ᴱ : (ƛᴱ Mᴱ) [ δᴱ ]ᴱ 
+          ≡[ ap (Tmᴱ Δᴱ (Aᴱ ⇒ᴱ Bᴱ)) ƛ[] 
+          ]≡ ƛᴱ (Mᴱ [ δᴱ ^ᴱ Aᴱ ]ᴱ)
+
+module Eliminator {Conᴱ Tyᴱ} 
+                  {Tmᴱ : ∀ {Γ A} → Conᴱ Γ → Tyᴱ A → Γ ⊢ A → Set} 
+                  {Tmsᴱ : ∀ {Δ Γ} → Conᴱ Δ → Conᴱ Γ → Δ ⊨ Γ → Set} 
+                  (M : Motive Conᴱ Tyᴱ Tmᴱ Tmsᴱ) 
+  where
+  open Motive M
+
+  elim-con : ∀ Γ → Conᴱ Γ
+  elim-ty  : ∀ A → Tyᴱ  A
+  elim-tm  : ∀ M → Tmᴱ (elim-con Γ) (elim-ty A) M
+  elim-tms : ∀ δ → Tmsᴱ (elim-con Δ) (elim-con Γ) δ
+
+  elim-con • = •ᴱ
+  elim-con (Γ ▷ A) = (elim-con Γ) ▷ᴱ (elim-ty A)
+
+  elim-ty o = oᴱ
+  elim-ty (A ⇒ B) = (elim-ty A) ⇒ᴱ (elim-ty B)  
+
+  elim-code : ∀ c → Syn c → Set
+  elim-code (tm Γ A) M = Tmᴱ (elim-con Γ) (elim-ty A) M
+  elim-code (tms Δ Γ) δ = Tmsᴱ (elim-con Δ) (elim-con Γ) δ
+
+  elim-syn : ∀ {c} s → (elim-code c s)
+  
+  elim-tm M  = elim-syn M
+  elim-tms δ = elim-syn δ
+
+  elim-syn id = idᴱ
+  elim-syn (δ ∘ σ) = elim-tms δ ∘ᴱ elim-tms σ
+  elim-syn (id∘ {δ = δ} i) = id∘ᴱ {δᴱ = elim-tms δ} i
+  elim-syn (∘id {δ = δ} i) = ∘idᴱ {δᴱ = elim-tms δ} i
+  elim-syn (∘∘ {ξ = ξ} {σ = σ} {δ = δ} i) 
+    = ∘∘ᴱ {ξᴱ = elim-tms ξ} {σᴱ = elim-tms σ} {δᴱ = elim-tms δ} i
+  elim-syn (M [ δ ]) = elim-tm M [ elim-tms δ ]ᴱ
+  elim-syn ([id] {M = M} i) = [id]ᴱ {Mᴱ = elim-tm M} i
+  elim-syn ([∘] {M = M} {σ = σ} {δ = δ} i) 
+    = [∘]ᴱ {Mᴱ = elim-tm M} {σᴱ = elim-tms σ} {δᴱ = elim-tms δ} i
+  elim-syn ε = εᴱ
+  elim-syn (δ , M) = elim-tms δ ,ᴱ elim-tm M
+  elim-syn (π₀ δ) = π₀ᴱ (elim-tms δ)
+  elim-syn (π₁ δ) = π₁ᴱ (elim-tms δ)
+  elim-syn (•-η {δ = δ} i) = •-ηᴱ {δᴱ = elim-tms δ} i
+  elim-syn (▷-β₀ {δ = δ} {M = M} i) 
+    = ▷-β₀ᴱ {δᴱ = elim-tms δ} {Mᴱ = elim-tm M} i
+  elim-syn (▷-β₁ {δ = δ} {M = M} i)
+    = ▷-β₁ᴱ {δᴱ = elim-tms δ} {Mᴱ = elim-tm M} i
+  elim-syn (▷-η {δ = δ} i) 
+    = ▷-ηᴱ {δᴱ = elim-tms δ} i
+  elim-syn (π₀∘ {σ = σ} {δ = δ} i) = π₀∘ᴱ {σᴱ = elim-tms σ} {δᴱ = elim-tms δ} i
+  elim-syn (π₁∘ {σ = σ} {δ = δ} i) = π₁∘ᴱ {σᴱ = elim-tms σ} {δᴱ = elim-tms δ} i
+  elim-syn (M · N) = elim-tm M ·ᴱ elim-tm N
+  elim-syn (ƛ M) = ƛᴱ (elim-tm M)
+  elim-syn (·[] {M = M} {N = N} {δ = δ} i) 
+    = ·[]ᴱ {Mᴱ = elim-tm M} {Nᴱ = elim-tm N} {δᴱ = elim-tms δ} i
+  elim-syn (ƛ[] {M = M} {δ = δ} i) = ƛ[]ᴱ {Mᴱ = elim-tm M} {δᴱ = elim-tms δ} i
+``` 
