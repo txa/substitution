@@ -154,8 +154,10 @@ module SecondAttempt where
     ≡⟨ cong (λ ρ → ƛ x [ ρ , ` zero ]) (∘⊑ {xs = ys} {ys = id ⁺ A}) ⟩
     ƛ x [ ys ∘ tm*⊑ v⊑t (id-poly ⁺ A) , ` zero ] ∎
   
+  -- Conversion to and from the initial CwF
+  
   open import initial-cwf as ICwF 
-    using (rec-con; rec-ty; rec-tm; rec-tms
+    using (_≡[_]≡_; rec-con; rec-ty; rec-tm; rec-tms
           ; elim-con; elim-ty; elim-tm; elim-tms)
   open ICwF.Motive
   open ICwF.Cases
@@ -196,55 +198,80 @@ module SecondAttempt where
     = cong₂ _·_ (to-stlc-inv-tm {M = M}) (to-stlc-inv-tm {M = N})
   to-stlc-inv-tm {M = ƛ M} = cong ƛ_ (to-stlc-inv-tm {M = M})
 
+  id^ : ICwF.id {Γ = Γ} ICwF.^ A ≡ ICwF.id
+  id^ {A = A} = 
+    ICwF.id ICwF.^ A
+    ≡⟨ cong (λ ρ → ρ ICwF., ICwF.π₁ ICwF.id) ICwF.id∘ ⟩
+    ICwF.π₀ ICwF.id ICwF., ICwF.π₁ ICwF.id
+    ≡⟨ ICwF.▷-η ⟩
+    ICwF.id ∎
+
+  -- to-cwf-⊑ : ∀ {δ} → to-cwf-tms (tm*⊑ v⊑t δ) ≡ to-cwf-tms δ
+
+  to-cwf-⁺ : ∀ {δ : Δ ⊨ Γ} 
+           → to-cwf-tms (δ ⁺ A) ≡ to-cwf-tms δ ICwF.∘ ICwF.π₀ ICwF.id
+  to-cwf-⁺ {δ = ε} = sym ICwF.•-η
+  to-cwf-⁺ {δ = δ , M} = {!   !}
+
+  to-cwf-id : to-cwf-tms (tm*⊑ v⊑t id) ≡ ICwF.id {Γ = Γ}
+  to-cwf-id {Γ = •} = sym ICwF.•-η
+  to-cwf-id {Γ = Γ ▷ A} = 
+    to-cwf-tms (tm*⊑ v⊑t (id ⁺ A)) ICwF., ICwF.π₁ ICwF.id
+    ≡⟨ cong (λ ρ → to-cwf-tms ρ ICwF., ICwF.π₁ ICwF.id) (sym ⊑⁺) ⟩
+    to-cwf-tms (tm*⊑ v⊑t id ⁺ A) ICwF., ICwF.π₁ ICwF.id
+    ≡⟨ cong (λ ρ → ρ ICwF., ICwF.π₁ ICwF.id) to-cwf-⁺ ⟩
+    to-cwf-tms (tm*⊑ v⊑t id) ICwF.^ A
+    ≡⟨ cong (ICwF._^ A) to-cwf-id ⟩
+    ICwF.id ICwF.^ A
+    ≡⟨ id^ ⟩
+    ICwF.id ∎
+
   to-cwf-inv-𝕄 : ICwF.Motive
   to-cwf-inv-𝕄 .Conᴱ _ = ⊤
   to-cwf-inv-𝕄 .Tyᴱ  _ = ⊤
   to-cwf-inv-𝕄 .Tmᴱ Γ A M = to-cwf-tm (to-stlc-tm M) ≡ M
   to-cwf-inv-𝕄 .Tmsᴱ Δ Γ δ = to-cwf-tms (to-stlc-tms δ) ≡ δ
 
+  -- Paths don't compute outside of Cubical Agda so I think we need UIP
+  uip : ∀ {ℓ} {A : Set ℓ} {x y : A} {p q : x ≡ y} → p ≡ q
+  uip {p = refl} {q = refl} = refl
+
+  drefl : ∀ {ℓ} {A : Set ℓ} {x} {p : A ≡ A} → x ≡[ p ]≡ x
+  drefl {p = refl} = refl
+
+  -- I've left the cases for higher-dimensional paths commented out because they
+  -- make typechecking way slower and I plan on just filling them all with UIP 
+  -- anyway
   to-cwf-inv-ℂ : ICwF.Cases to-cwf-inv-𝕄
-  to-cwf-inv-ℂ .idᴱ {•} = sym (ICwF.•-η {δ = ICwF.id})
-  to-cwf-inv-ℂ .idᴱ {Γ ▷ A} = {!!}
-  to-cwf-inv-ℂ ._∘ᴱ_ = {!   !}
-  to-cwf-inv-ℂ .id∘ᴱ = {!   !}
-  to-cwf-inv-ℂ .∘idᴱ = {!   !}
-  to-cwf-inv-ℂ .∘∘ᴱ = {!   !}
-  to-cwf-inv-ℂ ._[_]ᴱ Mᴱ δᴱ = {!   !}
-  to-cwf-inv-ℂ .[id]ᴱ = {!   !}
-  to-cwf-inv-ℂ .[∘]ᴱ = {!   !}
-  to-cwf-inv-ℂ .•ᴱ = {!   !}
-  to-cwf-inv-ℂ .εᴱ = {!   !}
-  to-cwf-inv-ℂ .•-ηᴱ = {!   !}
-  to-cwf-inv-ℂ ._▷ᴱ_ = {!   !}
-  to-cwf-inv-ℂ ._,ᴱ_ = {!   !}
+  to-cwf-inv-ℂ .idᴱ = to-cwf-id
+  to-cwf-inv-ℂ ._∘ᴱ_ {σ = σ} σᴱ δᴱ = {!  !}
+  -- to-cwf-inv-ℂ .id∘ᴱ = {!   !}
+  -- to-cwf-inv-ℂ .∘idᴱ = {!   !}
+  -- to-cwf-inv-ℂ .∘∘ᴱ = {!   !}
+  -- to-cwf-inv-ℂ ._[_]ᴱ Mᴱ δᴱ = {!   !}
+  -- to-cwf-inv-ℂ .[id]ᴱ = {!   !}
+  -- to-cwf-inv-ℂ .[∘]ᴱ = {!   !}
+  to-cwf-inv-ℂ .•ᴱ = tt
+  to-cwf-inv-ℂ .εᴱ = refl
+  -- to-cwf-inv-ℂ .•-ηᴱ = {!   !}
+  to-cwf-inv-ℂ ._▷ᴱ_ tt tt = tt
+  to-cwf-inv-ℂ ._,ᴱ_ δᴱ Mᴱ = cong₂ ICwF._,_ δᴱ Mᴱ
   to-cwf-inv-ℂ .π₀ᴱ = {!   !}
   to-cwf-inv-ℂ .π₁ᴱ = {!   !}
-  to-cwf-inv-ℂ .▷-β₀ᴱ = {!   !}
-  to-cwf-inv-ℂ .▷-β₁ᴱ = {!   !}
-  to-cwf-inv-ℂ .▷-ηᴱ = {!   !}
-  to-cwf-inv-ℂ .π₀∘ᴱ = {!   !}
-  to-cwf-inv-ℂ .π₁∘ᴱ = {!   !}
-  to-cwf-inv-ℂ .oᴱ = {!   !}
-  to-cwf-inv-ℂ ._⇒ᴱ_ = {!   !}
-  to-cwf-inv-ℂ ._·ᴱ_ = {!   !}
-  to-cwf-inv-ℂ .ƛᴱ_ = {!   !}
-  to-cwf-inv-ℂ .·[]ᴱ = {!   !}
-  to-cwf-inv-ℂ .ƛ[]ᴱ = {!   !}
+  -- to-cwf-inv-ℂ .▷-β₀ᴱ = {!   !}
+  -- to-cwf-inv-ℂ .▷-β₁ᴱ = {!   !}
+  -- to-cwf-inv-ℂ .▷-ηᴱ = {!   !}
+  -- to-cwf-inv-ℂ .π₀∘ᴱ = {!   !}
+  -- to-cwf-inv-ℂ .π₁∘ᴱ = {!   !}
+  to-cwf-inv-ℂ .oᴱ = tt
+  to-cwf-inv-ℂ ._⇒ᴱ_ tt tt = tt
+  to-cwf-inv-ℂ ._·ᴱ_ Mᴱ Nᴱ = cong₂ ICwF._·_ Mᴱ Nᴱ
+  to-cwf-inv-ℂ .ƛᴱ_ Mᴱ = cong (ICwF.ƛ_) Mᴱ
+  -- to-cwf-inv-ℂ .·[]ᴱ = {!   !}
+  -- to-cwf-inv-ℂ .ƛ[]ᴱ = {!!}
 
 
-  -- to-cwf-inv-tm : ∀ {M : Γ ICwF.⊢ A} → to-cwf-tm (to-stlc-tm M) ≡ M
-  -- to-cwf-inv-tm {M = M} 
-  --   = elim-tm {𝕄 = record 
-  --   { Conᴱ = λ _ → ⊤
-  --   ; Tyᴱ  = λ _ → ⊤
-  --   ; Tmᴱ  = λ Γ A M → to-cwf-tm (to-stlc-tm M) ≡ M
-  --   ; Tmsᴱ = λ Δ Γ δ → ⊤ }} record 
-  --   { idᴱ = tt
-  --   ; _∘ᴱ_ = λ where _ _ → tt
-  --   ; id∘ᴱ = refl
-  --   ; ∘idᴱ = refl
-  --   ; ∘∘ᴱ  = refl
-  --   ; _[_]ᴱ = λ where {M = M} Mᴱ tt → {!!}
-  --   } M
-```
-    
+  to-cwf-inv-tm : ∀ {M : Γ ICwF.⊢ A} → to-cwf-tm (to-stlc-tm M) ≡ M
+  to-cwf-inv-tm {M = M} = elim-tm to-cwf-inv-ℂ M
+```  
+     
