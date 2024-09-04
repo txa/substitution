@@ -6,6 +6,7 @@ import Agda.Builtin.Equality.Rewrite
 open import Level
 open import Relation.Binary.PropositionalEquality hiding ([_])
 open import Data.Product using (Σ; proj₁; proj₂)
+open ≡-Reasoning
 
 module initial-cwf where
 
@@ -90,6 +91,32 @@ postulate
 vs : Γ ⊢ B → Γ ▷ A ⊢ B
 vs x = x [ π₀ id ]
 ```
+
+```
+id^ : id {Γ = Γ} ^ A ≡ id
+id^ {A = A} = 
+  id ^ A
+  ≡⟨ cong (λ ρ → ρ , π₁ id) id∘ ⟩
+  π₀ id , π₁ id
+  ≡⟨ ▷-η ⟩
+  id ∎
+
+
+∘[] : (δ , M) ∘ σ ≡ (δ ∘ σ) , (M [ σ ])
+∘[] {δ = δ} {M = M} {σ = σ} = 
+  (δ , M) ∘ σ
+  ≡⟨ sym (▷-η {δ = (δ , M) ∘ σ}) ⟩
+  π₀ ((δ , M) ∘ σ) , π₁ ((δ , M) ∘ σ)
+  ≡⟨ cong (_, π₁ ((δ , M) ∘ σ)) π₀∘ ⟩
+  (π₀ (δ , M) ∘ σ) , π₁ ((δ , M) ∘ σ)
+  ≡⟨ cong (λ ρ → (ρ ∘ σ) , π₁ ((δ , M) ∘ σ)) ▷-β₀ ⟩
+  (δ ∘ σ) , π₁ ((δ , M) ∘ σ)
+  ≡⟨ cong ((δ ∘ σ) ,_) π₁∘ ⟩
+  (δ ∘ σ) , (π₁ (δ , M) [ σ ])
+  ≡⟨ cong (λ ρ → (δ ∘ σ) , (ρ [ σ ])) ▷-β₁ ⟩
+  (δ ∘ σ) , (M [ σ ]) ∎
+```
+
 
 ```
 open import cwf-simple renaming (CwF-simple to CwF)
