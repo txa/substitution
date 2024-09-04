@@ -83,33 +83,42 @@ module SecondAttempt where
   ⊑∘ {xs = ε} = refl
   ⊑∘ {xs = xs , x} = cong₂ _,_ ⊑∘ refl
 
-  ⊑⁺ : tm*⊑ v⊑t (xs ⁺ A) ≡ tm*⊑ v⊑t xs ⁺ A
-  ⊑⁺ {xs = ε} = refl
-  ⊑⁺ {xs = xs , x} {A = A} = cong₂ _,_ ⊑⁺ 
-    (` suc x A 
+  ⊑suc : tm⊑ ⊑t (suc[ q ] x A) ≡ tm⊑ ⊑t x [ id ⁺ A ]
+  ⊑suc {q = V} {x = x} {A = A} =
+    ` suc x A 
     ≡⟨ cong (λ y → ` suc y A) (sym [id]) ⟩
     ` suc (x [ id ]) A
     ≡⟨ cong `_ (sym (⁺-nat[]v {i = x})) ⟩ 
-    ` x [ id ⁺ A ] ∎)
+    ` x [ id ⁺ A ] ∎
+  ⊑suc {q = T} = refl
 
-  ⊑^ : tm*⊑ v⊑t (xs ^ A) ≡ tm*⊑ v⊑t xs ^ A
-  ⊑^ = cong (_, ` zero) ⊑⁺
+  ⊑⁺ : tm*⊑ (⊑t {s = q}) (xs ⁺ A) ≡ tm*⊑ ⊑t xs ⁺ A
+  ⊑⁺ {xs = ε} = refl
+  ⊑⁺ {q = q} {xs = xs , x} {A = A} = cong₂ _,_ ⊑⁺ (⊑suc {x = x})
 
-  `[⊑] : ∀ {x : Γ ⊢[ V ] A} {ys : Δ ⊨[ V ] Γ} → x [ tm*⊑ v⊑t ys ] ≡ ` x [ ys ]
+  ⊑zero : tm⊑ ⊑t zero[ q ] ≡ ` zero {Γ = Γ} {A = A}
+  ⊑zero {q = V} = refl
+  ⊑zero {q = T} = refl
+
+  ⊑^ : tm*⊑ (⊑t {s = q}) (xs ^ A) ≡ tm*⊑ ⊑t xs ^ A
+  ⊑^ {q = q} = cong₂ _,_ ⊑⁺ (⊑zero {q = q})
+
+  `[⊑] : ∀ {x : Γ ⊢[ V ] A} {ys : Δ ⊨[ q ] Γ} 
+       → x [ tm*⊑ ⊑t ys ] ≡ tm⊑ ⊑t x [ ys ]
   `[⊑] {x = zero} {ys = ys , y} = refl
   `[⊑] {x = suc x _} {ys = ys , y} = `[⊑] {x = x}
 
-  [⊑] : ∀ {x : Γ ⊢[ T ] A} {ys : Δ ⊨[ V ] Γ} → x [ tm*⊑ v⊑t ys ] ≡ x [ ys ]
+  [⊑] : ∀ {x : Γ ⊢[ T ] A} {ys : Δ ⊨[ q ] Γ} → x [ tm*⊑ ⊑t ys ] ≡ x [ ys ]
   [⊑] {x = ` x} = `[⊑] {x = x}
   [⊑] {x = x · y} = cong₂ _·_ ([⊑] {x = x}) ([⊑] {x = y})
   [⊑] {x = ƛ x} {ys = ys} = 
-    ƛ x [ tm*⊑ v⊑t ys ^ _ ]
+    ƛ x [ tm*⊑ ⊑t ys ^ _ ]
     ≡⟨ cong (λ ρ → ƛ x [ ρ ]) (sym ⊑^) ⟩
-    ƛ x [ tm*⊑ v⊑t (ys ^ _) ]
+    ƛ x [ tm*⊑ ⊑t (ys ^ _) ]
     ≡⟨ cong ƛ_ ([⊑] {x = x}) ⟩ 
     ƛ x [ ys ^ _ ] ∎
 
-  ∘⊑ : ∀ {xs : Δ ⊨[ T ] Γ} {ys : Θ ⊨[ V ] Δ} → xs ∘ tm*⊑ v⊑t ys ≡ xs ∘ ys
+  ∘⊑ : ∀ {xs : Δ ⊨[ T ] Γ} {ys : Θ ⊨[ q ] Δ} → xs ∘ tm*⊑ ⊑t ys ≡ xs ∘ ys
   ∘⊑ {xs = ε} {ys = ys} = refl
   ∘⊑ {xs = xs , x} = cong₂ _,_ ∘⊑ ([⊑] {x = x})
   
@@ -223,10 +232,26 @@ module SecondAttempt where
           --  → to-cwf-tms (idT ⁺ A) ≡ to-cwf-tms (idT {Γ = Δ}) ICwF.∘ ICwF.π₀ ICwF.id
            → to-cwf-tms (δ ⁺ A) ≡ to-cwf-tms δ ICwF.∘ ICwF.π₀ ICwF.id
   
+  to-cwf-⁺-poly : ∀ {δ : Δ ⊨[ q ] Γ} 
+                → to-cwf-tms (tm*⊑ ⊑t (δ ⁺ A)) 
+                ≡ to-cwf-tms (tm*⊑ ⊑t δ) ICwF.∘ ICwF.π₀ ICwF.id
+  to-cwf-⁺-poly {δ = ε} = sym ICwF.•-η
+  to-cwf-⁺-poly {q = q} {A = A} {δ = δ , M} = 
+    to-cwf-tms (tm*⊑ ⊑t (δ ⁺ A)) ICwF., to-cwf-tm (tm⊑ ⊑t (suc[ q ] M A))
+    ≡⟨ {!!} ⟩
+    to-cwf-tms (tm*⊑ ⊑t δ ⁺ A) 
+      ICwF., (to-cwf-tm (tm⊑ ⊑t M) ICwF.[ ICwF.π₀ ICwF.id ])
+    ≡⟨ cong (ICwF._, (to-cwf-tm (tm⊑ ⊑t M) ICwF.[ ICwF.π₀ ICwF.id ])) to-cwf-⁺ ⟩
+    (to-cwf-tms (tm*⊑ ⊑t δ) ICwF.∘ ICwF.π₀ ICwF.id) 
+      ICwF., (to-cwf-tm (tm⊑ ⊑t M) ICwF.[ ICwF.π₀ ICwF.id ])
+    ≡⟨ sym ICwF.∘[] ⟩
+    (to-cwf-tms (tm*⊑ ⊑t δ) ICwF., to-cwf-tm (tm⊑ ⊑t M)) 
+      ICwF.∘ ICwF.π₀ ICwF.id ∎
+
   -- Defining this lemma in a terminating way is tricky... We might need to 
   -- introduce sorts again...
-  -- to-cwf-⁺ {δ = ε} _ = sym ICwF.•-η
-  -- to-cwf-⁺ {Δ = Δ} {A = A} {δ = δ , M} id≡ = 
+  -- to-cwf-⁺ {δ = ε} = sym ICwF.•-η
+  -- to-cwf-⁺ {Δ = Δ} {A = A} {δ = δ , M} = 
   --   to-cwf-tms (δ ⁺ A) ICwF., to-cwf-tm (M [ id ⁺ A ])
   --   ≡⟨ cong (λ M[] → to-cwf-tms (δ ⁺ A) ICwF., to-cwf-tm M[]) (sym ([⊑] {x = M})) ⟩
   --   to-cwf-tms (δ ⁺ A) ICwF., to-cwf-tm (M [ tm*⊑ v⊑t (id ⁺ A) ])
@@ -234,20 +259,16 @@ module SecondAttempt where
   --   to-cwf-tms (δ ⁺ A) ICwF., to-cwf-tm (M [ idT ⁺ A ])
   --   ≡⟨ cong (to-cwf-tms (δ ⁺ A) ICwF.,_) (to-cwf-[] {M = M}) ⟩
   --   to-cwf-tms (δ ⁺ A) ICwF., (to-cwf-tm M ICwF.[ to-cwf-tms (idT ⁺ A) ])
-  --   ≡⟨ cong (λ ρ → to-cwf-tms (δ ⁺ A) ICwF., (to-cwf-tm M ICwF.[ ρ ])) id≡ ⟩
+  --   ≡⟨ cong (λ ρ → to-cwf-tms (δ ⁺ A) ICwF., (to-cwf-tm M ICwF.[ ρ ])) {!!} ⟩
   --   _ ICwF., (to-cwf-tm M ICwF.[ to-cwf-tms idT ICwF.∘ ICwF.π₀ ICwF.id ])
   --   ≡⟨ {!!} ⟩
   --   _ ICwF., (to-cwf-tm M ICwF.[ ICwF.id ICwF.∘ ICwF.π₀ ICwF.id ])
   --   ≡⟨ cong (λ ρ → to-cwf-tms (δ ⁺ A) ICwF., (to-cwf-tm M ICwF.[ ρ ])) ICwF.id∘ ⟩
   --   to-cwf-tms (δ ⁺ A) ICwF., (to-cwf-tm M ICwF.[ ICwF.π₀ ICwF.id ])
-  --   ≡⟨ cong (ICwF._, (to-cwf-tm M ICwF.[ ICwF.π₀ ICwF.id ])) (to-cwf-⁺ id≡) ⟩
+  --   ≡⟨ cong (ICwF._, (to-cwf-tm M ICwF.[ ICwF.π₀ ICwF.id ])) to-cwf-⁺ ⟩
   --   (to-cwf-tms δ ICwF.∘ ICwF.π₀ ICwF.id) ICwF., _
   --   ≡⟨ sym ICwF.∘[] ⟩
   --   (to-cwf-tms δ ICwF., to-cwf-tm M) ICwF.∘ ICwF.π₀ ICwF.id ∎
-
-  -- to-cwf-⁺′ : ∀ {δ : Δ ⊨ Γ} 
-  --           → to-cwf-tms (δ ⁺ A) ≡ to-cwf-tms δ ICwF.∘ ICwF.π₀ ICwF.id
-  -- to-cwf-⁺′ = to-cwf-⁺ (to-cwf-⁺ (to-cwf-⁺ {!!}))
 
   to-cwf-id : to-cwf-tms idT ≡ ICwF.id {Γ = Γ}
   to-cwf-id {Γ = •} = sym ICwF.•-η
@@ -319,3 +340,4 @@ module SecondAttempt where
 
   to-cwf-inv-tm : ∀ {M : Γ ICwF.⊢ A} → to-cwf-tm (to-stlc-tm M) ≡ M
   to-cwf-inv-tm {M = M} = elim-tm to-cwf-inv-ℂ M
+  ```
