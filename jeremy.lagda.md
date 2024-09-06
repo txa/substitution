@@ -34,11 +34,10 @@ Operator precedence
 infix  3 _⊢_
 infix  3 _∋_
 infix  3 _⊨ʳ_  _⊨_
-infixl 5 _•ʳ_  _•_
 infixl 5 _⨾ʳ_  _⨾_
 infixl 5 _,_
-infix  6 _⤊ʳ  _⤊
-infix  6 _^ʳ  _^
+infix  6 _⤊ʳ_  _⤊_
+infix  6 _^ʳ_  _^_
 infixr 6 _⇒_
 infix  6 ƛ_
 infixl 7 _·_
@@ -71,9 +70,9 @@ data _∋_ : Con -> Ty -> Set where
       Γ , A ∋ A
 
   suc  :
-      (x : Γ ∋ A)
+      (x : Γ ∋ B)
     → -----------
-      Γ , B ∋ A
+      Γ , A ∋ B
 
 data _⊢_ : Con -> Ty -> Set where
 
@@ -101,8 +100,16 @@ variable
 Renaming
 ```
 data _⊨ʳ_ : Con → Con → Set where
-  ∅ : Δ ⊨ʳ ∅
-  _,_ : Δ ⊨ʳ Γ → Δ ∋ A → Δ ⊨ʳ Γ , A
+
+  ∅ :
+      ------
+      Δ ⊨ʳ ∅
+
+  _,_ :
+      (ρ : Δ ⊨ʳ Γ)
+      (x : Δ ∋ A)
+    → -----------
+      Δ ⊨ʳ Γ , A
 
 variable
   ρ ξ : Δ ⊨ʳ Γ
@@ -110,12 +117,12 @@ variable
 
 Shift and extend for renaming
 ```
-_⤊ʳ : Δ ⊨ʳ Γ → Δ , A ⊨ʳ Γ
-∅ ⤊ʳ = ∅
-(ρ , x) ⤊ʳ = ρ ⤊ʳ , suc x
+_⤊ʳ_ : Δ ⊨ʳ Γ → (A : Ty) → Δ , A ⊨ʳ Γ
+∅ ⤊ʳ A = ∅
+(ρ , x) ⤊ʳ A = ρ ⤊ʳ A , suc {A = A} x
 
-_^ʳ : Δ ⊨ʳ Γ → Δ , A ⊨ʳ Γ , A
-_^ʳ ρ = ρ ⤊ʳ , zero
+_^ʳ_ : Δ ⊨ʳ Γ → (A : Ty) → Δ , A ⊨ʳ Γ , A
+ρ ^ʳ A = ρ ⤊ʳ A , zero {A = A}
 ```
 
 Instantiate a renaming
@@ -126,7 +133,7 @@ lookupʳ (suc x) (ρ , y)  =  lookupʳ x ρ
 
 _[_]ʳ : Γ ⊢ A → Δ ⊨ʳ Γ → Δ ⊢ A
 (` x) [ ρ ]ʳ = ` lookupʳ x ρ
-(ƛ N) [ ρ ]ʳ = ƛ (N [ ρ ^ʳ ]ʳ)
+(ƛ N) [ ρ ]ʳ = ƛ (N [ ρ ^ʳ _ ]ʳ)
 (L · M) [ ρ ]ʳ = (L [ ρ ]ʳ) · (M [ ρ ]ʳ)
 ```
 
@@ -134,7 +141,7 @@ Identity and composition for renaming
 ```
 idʳ : Γ ⊨ʳ Γ
 idʳ {∅}  =  ∅
-idʳ {Γ , A}  =  idʳ {Γ} ^ʳ
+idʳ {Γ , A}  =  idʳ {Γ} ^ʳ A
 
 _⨾ʳ_ : Θ ⊨ʳ Γ → Δ ⊨ʳ Θ → Δ ⊨ʳ Γ
 ∅ ⨾ʳ ξ = ∅
@@ -144,8 +151,16 @@ _⨾ʳ_ : Θ ⊨ʳ Γ → Δ ⊨ʳ Θ → Δ ⊨ʳ Γ
 Substitution
 ```
 data _⊨_ : Con → Con → Set where
-  ∅ : Δ ⊨ ∅
-  _,_ : Δ ⊨ Γ → Δ ⊢ A → Δ ⊨ Γ , A
+
+  ∅ :
+      -----
+      Δ ⊨ ∅
+
+  _,_ :
+      (σ : Δ ⊨ Γ)
+      (M : Δ ⊢ A)
+    → -----------
+      Δ ⊨ Γ , A
 
 variable
   σ τ : Γ ⊨ Δ
@@ -153,12 +168,12 @@ variable
 
 Shift and extend for substitution
 ```
-_⤊ : Δ ⊨ Γ → Δ , A ⊨ Γ
-∅ ⤊ = ∅
-(σ , M) ⤊ = σ ⤊ , M [ idʳ ⤊ʳ ]ʳ
+_⤊_ : Δ ⊨ Γ → (A : Ty) → Δ , A ⊨ Γ
+∅ ⤊ A = ∅
+(σ , M) ⤊ A = σ ⤊ A , M [ idʳ ⤊ʳ A ]ʳ
 
-_^ : Δ ⊨ Γ → Δ , A ⊨ Γ , A
-_^ σ = σ ⤊ , ` zero
+_^_ : Δ ⊨ Γ → (A : Ty) → Δ , A ⊨ Γ , A
+σ ^ A = σ ⤊ A , ` zero {A = A}
 ```
 
 Instantiate a substitution
@@ -169,7 +184,7 @@ lookup (suc x) (σ , P) = lookup x σ
 
 _[_] : Γ ⊢ A → Δ ⊨ Γ → Δ ⊢ A
 (` x) [ σ ] = lookup x σ
-(ƛ N) [ σ ] = ƛ (N [ σ ^ ])
+(ƛ N) [ σ ] = ƛ (N [ σ ^ _ ])
 (L · M) [ σ ] = (L [ σ ]) · (M [ σ ])
 ```
 
@@ -177,7 +192,7 @@ Identity and composition for renaming
 ```
 id : Γ ⊨ Γ
 id {∅}  =  ∅
-id {Γ , A}  =  id {Γ} ^
+id {Γ , A}  =  id {Γ} ^ A
 
 _⨾_ : Θ ⊨ Γ → Δ ⊨ Θ → Δ ⊨ Γ
 ∅ ⨾ τ = ∅
@@ -191,28 +206,57 @@ lift ∅ = ∅
 lift (ρ , x) = lift ρ , ` x
 ```
 
+Lemma: `lift^`
+```
+⤊ʳ-suc : lookupʳ x (ρ ⤊ʳ A) ≡ suc (lookupʳ x ρ)
+⤊ʳ-suc {x = zero} {ρ = ρ , y} = refl
+⤊ʳ-suc {x = suc x} {ρ = ρ , y} = ⤊ʳ-suc {x = x} {ρ = ρ}
+{-# REWRITE ⤊ʳ-suc #-}
 
-  ext-ren : ∀{ρ} → (` 0) • ⟰ (ren ρ) ≡ ren (extr ρ)
-  ext-ren {ρ} = extensionality aux
-      where
-      aux : ∀{ρ} → ∀ x → exts (ren ρ) x ≡ ren (extr ρ) x
-      aux {ρ} zero = refl
-      aux {ρ} (suc x) = refl
-  {-# REWRITE ext-ren #-}
+lookup-id : lookupʳ x idʳ ≡ x
+lookup-id {x = zero} = refl
+lookup-id {x = suc {A = A} x} = cong suc (lookup-id {x = x})
+{-# REWRITE lookup-id #-}
 
-  rename-ren : ∀{ρ M} → rename ρ M ≡ sub (ren ρ) M
-  rename-ren-arg : ∀{ρ b}{arg : Arg b} → rename-arg ρ arg ≡ sub-arg (ren ρ) arg
-  rename-ren-args : ∀{ρ bs}{args : Args bs}
-     → rename-args ρ args ≡ sub-args (ren ρ) args
-  rename-ren {ρ} {` x} = refl
-  rename-ren {ρ} {op ⦅ args ⦆} = cong ((λ X → op ⦅ X ⦆)) rename-ren-args
-  rename-ren-arg {ρ} {.■} {ast M} = cong ast rename-ren
-  rename-ren-arg {ρ} {.(ν _)} {bind arg} =
-      cong bind rename-ren-arg
-  rename-ren-args {ρ} {.[]} {nil} = refl
-  rename-ren-args {ρ} {.(_ ∷ _)} {cons arg args} =
-      cong₂ cons rename-ren-arg rename-ren-args
-  {-# REWRITE rename-ren #-}
+lift⤊ : lift (ρ ⤊ʳ A) ≡ (lift ρ) ⤊ A
+lift⤊ {ρ = ∅} = refl
+lift⤊ {ρ = ρ , x} = cong₂ _,_ (lift⤊ {ρ = ρ}) refl
+{-# REWRITE lift⤊ #-}
+
+lift^ : lift (ρ ^ʳ A) ≡ (lift ρ) ^ A
+lift^ {ρ = ρ} = refl
+```
+
+Lemma `[lift]`
+```
+lookup-lift : ` lookupʳ x ρ ≡ lookup x (lift ρ)
+lookup-lift {x = zero} {ρ = ρ , y} = refl
+lookup-lift {x = suc x} {ρ = ρ , y} = lookup-lift {x = x} {ρ = ρ}
+{-# REWRITE lookup-lift #-}
+
+[lift] : M [ ρ ]ʳ ≡ M [ lift ρ ]
+[lift] {M = ` x} = refl
+[lift] {M = ƛ N} = cong ƛ_ ([lift] {M = N})
+[lift] {M = L · M} = cong₂ _·_ ([lift] {M = L}) ([lift] {M = M})
+{-# REWRITE [lift] #-}
+```
+
+Lemma `⤊⨾,`
+```
+⤊⨾, : (σ ⤊ A) ⨾ (τ , M) ≡ σ ⨾ τ
+⤊⨾, {σ = ∅} = refl
+⤊⨾, {σ = σ , M} = {!!}
+```
+
+Lemma `lift⨾^`
+```
+lift⨾⤊ : (lift ρ) ⨾ (τ ⤊ A) ≡ (lift ρ ⨾ τ) ⤊ A
+lift⨾⤊ {ρ = ∅} = refl
+lift⨾⤊ {ρ = ρ , x} = cong₂ _,_ (lift⨾⤊ {ρ = ρ}) {!!}
+
+lift⨾^ : (lift ρ ^ A) ⨾ (τ ^ A) ≡ (lift ρ ⨾ τ) ^ A
+lift⨾^ = {!!}
+```
 
   ext-ren-sub : ∀ {ρ}{τ} → exts (ren ρ) ⨟ exts τ ≡ exts (ren ρ ⨟ τ)
   ext-ren-sub {ρ}{τ} = extensionality (aux{ρ}{τ})
