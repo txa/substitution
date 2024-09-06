@@ -23,8 +23,6 @@ infix   5  ƛ_
 infixr  6  _⇒_
 infixl  6  _·_
 infix   7  `_
-infix   8  _↑
-infix   8  _⇑
 infix   8  _[_]
 ```
 
@@ -191,6 +189,8 @@ _⨾_ : Θ ⊨[ q ] Γ → Δ ⊨[ r ] Θ → Δ ⊨[ q ⊔ r ] Γ
 
 _^ : Δ ⊨[ q ] Γ → Δ , A ⊨[ q ] Γ , A
 σ ^ = (σ ⨾ π₀ (id {V})) , (π₁ id)
+
+{-# INLINE _^ #-}
 
 zero    [ σ , P ]     =  P
 (suc x) [ σ , P ]     =  x [ σ ]

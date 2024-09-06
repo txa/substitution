@@ -168,7 +168,7 @@ QUESTION: If I change the signature of the marked lines to
 and remove the {V} parameters below, then Agda complains of
 non-termination. Why? Is there a fix? (Error message reported at end.)
 
-Zero and successor, gerneralised
+Zero and successor, generalised
 ```
 ● : {q : Sort} {Γ : Con} {A : Ty} → Γ , A ⊢[ q ] A
 ● {V}  =  zero

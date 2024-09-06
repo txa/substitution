@@ -778,8 +778,34 @@ in the sense of HoTT.
 
 Hence this paper has two aspects: it turns out that an apparently trivial
 problem isn't so hard after all, and it is a stepping stone to more
-exciting open questions. But before you can run you need to walk abd
+exciting open questions. But before you can run you need to walk and
 we also believe that the construction here can be useful to others.
+
+% PLW: We should be sure to cite the following as related work.
+
+% Schäfer, Steven, Tobias Tebbi, and Gert Smolka. ‘Autosubst: Reasoning
+% with de Bruijn Terms and Parallel Substitutions’. In Interactive
+% Theorem Proving, edited by Christian Urban and Xingyuan Zhang,
+% 359–74. Lecture Notes in Computer Science. Cham: Springer
+% International Publishing,
+% 2015. https://doi.org/10.1007/978-3-319-22102-1_24.
+
+% Saffrich, Hannes. ‘Abstractions for Multi-Sorted Substitutions’. In
+% DROPS-IDN/v2/Document/10.4230/LIPIcs.ITP.2024.32. Schloss Dagstuhl –
+% Leibniz-Zentrum für Informatik,
+% 2024. https://doi.org/10.4230/LIPIcs.ITP.2024.32.
+
+% Saffrich, Hannes, Peter Thiemann, and Marius Weidner. ‘Intrinsically
+% Typed Syntax, a Logical Relation, and the Scourge of the Transfer
+% Lemma’. In Proceedings of the 9th ACM SIGPLAN International Workshop
+% on Type-Driven Development, 2–15. TyDe 2024. New York, NY, USA:
+% Association for Computing Machinery,
+% 2024. https://doi.org/10.1145/3678000.3678201.
+
+
+
+
+
 
 \bibliographystyle{ACM-Reference-Format}
 \bibliography{local}
