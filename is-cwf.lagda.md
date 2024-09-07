@@ -365,9 +365,9 @@ module SecondAttempt where
   -- If we are also given a proof of 'AB : A ≡ B' and 'x ≡[ AB ]≡ z' then
   -- I think this should be derivable from standard UIP (but I think obligating
   -- callers to provide those extra proofs would be pretty painful)
-  duip : ∀ {ℓ} {A B : Set ℓ} {x y : A} {z w : B} p q (r : (x ≡ y) ≡ (z ≡ w))
+  duip : ∀ {ℓ} {A B : Set ℓ} {x y : A} {z w : B} {p q} {r : (x ≡ y) ≡ (z ≡ w)}
        → p ≡[ r ]≡ q
-  duip refl refl refl = refl
+  duip {p = refl} {q = refl} {r = refl} = refl
 
   to-cwf-inv-ℂ : ICwF.Cases to-cwf-inv-𝕄
   to-cwf-inv-ℂ .idᴱ = to-cwf-tm*⊑ ∙ to-cwf-id
@@ -405,48 +405,19 @@ module SecondAttempt where
   to-cwf-inv-ℂ .ƛᴱ_ Mᴱ = cong (ICwF.ƛ_) Mᴱ
 
   -- Boring UIP proofs
-  to-cwf-inv-ℂ .id∘ᴱ {δᴱ = δᴱ} 
-    = duip ((to-cwf-inv-ℂ ∘ᴱ idᴱ to-cwf-inv-ℂ) δᴱ) δᴱ 
-           (cong (Tmsᴱ to-cwf-inv-𝕄 _ _) ICwF.id∘)
-  to-cwf-inv-ℂ .∘idᴱ {δᴱ = δᴱ} 
-    = duip ((to-cwf-inv-ℂ ∘ᴱ δᴱ) (idᴱ to-cwf-inv-ℂ)) δᴱ
-           (cong (Tmsᴱ to-cwf-inv-𝕄 _ _) ICwF.∘id)
-  to-cwf-inv-ℂ .∘∘ᴱ {ξᴱ = ξᴱ} {σᴱ = σᴱ} {δᴱ = δᴱ } 
-    = duip ((to-cwf-inv-ℂ ∘ᴱ (to-cwf-inv-ℂ ∘ᴱ ξᴱ) σᴱ) δᴱ)
-           ((to-cwf-inv-ℂ ∘ᴱ ξᴱ) ((to-cwf-inv-ℂ ∘ᴱ σᴱ) δᴱ))
-           (cong (Tmsᴱ to-cwf-inv-𝕄 _ _) ICwF.∘∘)
-  to-cwf-inv-ℂ .[id]ᴱ {Mᴱ = Mᴱ} 
-    = duip ((to-cwf-inv-ℂ [ Mᴱ ]ᴱ) (idᴱ to-cwf-inv-ℂ)) Mᴱ
-           (cong (Tmᴱ to-cwf-inv-𝕄 _ _) ICwF.[id])
-  to-cwf-inv-ℂ .[∘]ᴱ {Mᴱ = Mᴱ} {σᴱ = σᴱ} {δᴱ = δᴱ} 
-    = duip ((to-cwf-inv-ℂ [ (to-cwf-inv-ℂ [ Mᴱ ]ᴱ) σᴱ ]ᴱ) δᴱ)
-           ((to-cwf-inv-ℂ [ Mᴱ ]ᴱ) ((to-cwf-inv-ℂ ∘ᴱ σᴱ) δᴱ))
-           (cong (Tmᴱ to-cwf-inv-𝕄 _ _) ICwF.[∘])
-  to-cwf-inv-ℂ .•-ηᴱ {δᴱ = δᴱ}
-    = duip δᴱ (εᴱ to-cwf-inv-ℂ) (cong (Tmsᴱ to-cwf-inv-𝕄 _ _) ICwF.•-η)
-  to-cwf-inv-ℂ .▷-β₀ᴱ {δᴱ = δᴱ} {Mᴱ = Mᴱ} 
-    = duip (π₀ᴱ to-cwf-inv-ℂ ((to-cwf-inv-ℂ ,ᴱ δᴱ) Mᴱ)) δᴱ
-           (cong (Tmsᴱ to-cwf-inv-𝕄 _ _) ICwF.▷-β₀)
-  to-cwf-inv-ℂ .▷-β₁ᴱ {δᴱ = δᴱ} {Mᴱ = Mᴱ}
-    = duip (π₁ᴱ to-cwf-inv-ℂ ((to-cwf-inv-ℂ ,ᴱ δᴱ) Mᴱ)) Mᴱ
-           (cong (Tmᴱ to-cwf-inv-𝕄 _ _) ICwF.▷-β₁)
-  to-cwf-inv-ℂ .▷-ηᴱ {δᴱ = δᴱ} 
-    = duip ((to-cwf-inv-ℂ ,ᴱ π₀ᴱ to-cwf-inv-ℂ δᴱ) (π₁ᴱ to-cwf-inv-ℂ δᴱ)) δᴱ
-           (cong (Tmsᴱ to-cwf-inv-𝕄 _ _) ICwF.▷-η)
-  to-cwf-inv-ℂ .π₀∘ᴱ {σᴱ = σᴱ} {δᴱ = δᴱ} 
-    = duip (π₀ᴱ to-cwf-inv-ℂ ((to-cwf-inv-ℂ ∘ᴱ σᴱ) δᴱ))
-           ((to-cwf-inv-ℂ ∘ᴱ π₀ᴱ to-cwf-inv-ℂ σᴱ) δᴱ)
-           (cong (Tmsᴱ to-cwf-inv-𝕄 _ _) ICwF.π₀∘)
-  to-cwf-inv-ℂ .π₁∘ᴱ {σᴱ = σᴱ} {δᴱ = δᴱ}
-    = duip (π₁ᴱ to-cwf-inv-ℂ ((to-cwf-inv-ℂ ∘ᴱ σᴱ) δᴱ))
-           ((to-cwf-inv-ℂ [ π₁ᴱ to-cwf-inv-ℂ σᴱ ]ᴱ) δᴱ)
-           (cong (Tmᴱ to-cwf-inv-𝕄 _ _) ICwF.π₁∘)
-  to-cwf-inv-ℂ .·[]ᴱ {Mᴱ = Mᴱ} {Nᴱ = Nᴱ} {δᴱ = δᴱ} 
-    = duip ((to-cwf-inv-ℂ [ (to-cwf-inv-ℂ ·ᴱ Mᴱ) Nᴱ ]ᴱ) δᴱ) _
-           (cong (Tmᴱ to-cwf-inv-𝕄 _ _) ICwF.·[])
-  to-cwf-inv-ℂ .ƛ[]ᴱ {Mᴱ = Mᴱ} {δᴱ = δᴱ}
-    = duip ((to-cwf-inv-ℂ [ (ƛᴱ to-cwf-inv-ℂ) Mᴱ ]ᴱ) δᴱ) _
-           (cong (Tmᴱ to-cwf-inv-𝕄 _ _) ICwF.ƛ[])
+  to-cwf-inv-ℂ .id∘ᴱ  = duip
+  to-cwf-inv-ℂ .∘idᴱ  = duip
+  to-cwf-inv-ℂ .∘∘ᴱ   = duip
+  to-cwf-inv-ℂ .[id]ᴱ = duip
+  to-cwf-inv-ℂ .[∘]ᴱ  = duip
+  to-cwf-inv-ℂ .•-ηᴱ  = duip
+  to-cwf-inv-ℂ .▷-β₀ᴱ = duip
+  to-cwf-inv-ℂ .▷-β₁ᴱ = duip
+  to-cwf-inv-ℂ .▷-ηᴱ  = duip
+  to-cwf-inv-ℂ .π₀∘ᴱ  = duip
+  to-cwf-inv-ℂ .π₁∘ᴱ  = duip
+  to-cwf-inv-ℂ .·[]ᴱ  = duip
+  to-cwf-inv-ℂ .ƛ[]ᴱ  = duip
 
  
   to-cwf-inv-tm : ∀ {M : Γ ICwF.⊢ A} → to-cwf-tm (to-stlc-tm M) ≡ M
