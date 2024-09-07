@@ -22,8 +22,8 @@ x ≡[ refl ]≡ y = x ≡ y
 
 -- Used to easily convert from the non-dependent equations of 'CwF-simple' to
 -- the dependent equations of 'Cases'
-cong-const : ∀ {A : Set ℓ₁} {B : Set ℓ₂} {x y} {z w : B} {p : z ≡ w} 
-           → (x ≡[ cong (λ _ → A) p ]≡ y) ≡ (x ≡ y)
+cong-const : ∀ {A : Set ℓ₁} {B : Set ℓ₂} {x : A} {y z : B} {p : y ≡ z} 
+           → cong (λ _ → x) p ≡ erefl x
 cong-const {p = refl} = refl
 
 {-# REWRITE cong-const #-}
@@ -303,32 +303,32 @@ module Recursor (cwf : CwF) where
   cwf-to-motive .Motive.Tmsᴱ Δ Γ _ = cwf .CwF._⊨_ Δ Γ
   
   cwf-to-cases : Cases cwf-to-motive
-  cwf-to-cases .Cases.idᴱ         = cwf .CwF.id
-  cwf-to-cases .Cases._∘ᴱ_        = cwf .CwF._∘_
-  cwf-to-cases .Cases.id∘ᴱ        = cwf .CwF.id∘
-  cwf-to-cases .Cases.∘idᴱ        = cwf .CwF.∘id
-  cwf-to-cases .Cases.∘∘ᴱ         = cwf .CwF.∘∘
-  cwf-to-cases .Cases._[_]ᴱ       = cwf .CwF._[_]
-  cwf-to-cases .Cases.[id]ᴱ       = cwf .CwF.[id]
-  cwf-to-cases .Cases.[∘]ᴱ        = cwf .CwF.[∘]
-  cwf-to-cases .Cases.•ᴱ          = cwf .CwF.•
-  cwf-to-cases .Cases.εᴱ          = cwf .CwF.ε
-  cwf-to-cases .Cases.•-ηᴱ        = cwf .CwF.•-η
-  cwf-to-cases .Cases._▷ᴱ_        = cwf .CwF._▷_
-  cwf-to-cases .Cases._,ᴱ_        = cwf .CwF._,_
-  cwf-to-cases .Cases.π₀ᴱ         = cwf .CwF.π₀
-  cwf-to-cases .Cases.π₁ᴱ         = cwf .CwF.π₁
-  cwf-to-cases .Cases.▷-β₀ᴱ       = cwf .CwF.▷-β₀
-  cwf-to-cases .Cases.▷-β₁ᴱ       = cwf .CwF.▷-β₁
-  cwf-to-cases .Cases.▷-ηᴱ        = cwf .CwF.▷-η
-  cwf-to-cases .Cases.π₀∘ᴱ        = cwf .CwF.π₀∘
-  cwf-to-cases .Cases.π₁∘ᴱ        = cwf .CwF.π₁∘
-  cwf-to-cases .Cases.oᴱ          = cwf .CwF.o
-  cwf-to-cases .Cases._⇒ᴱ_        = cwf .CwF._⇒_
-  cwf-to-cases .Cases._·ᴱ_        = cwf .CwF._·_
-  cwf-to-cases .Cases.ƛᴱ_         = cwf .CwF.ƛ_
-  cwf-to-cases .Cases.·[]ᴱ        = cwf .CwF.·[]
-  cwf-to-cases .Cases.ƛ[]ᴱ        = cwf .CwF.ƛ[]
+  cwf-to-cases .Cases.idᴱ   = cwf .CwF.id
+  cwf-to-cases .Cases._∘ᴱ_  = cwf .CwF._∘_
+  cwf-to-cases .Cases.id∘ᴱ  = cwf .CwF.id∘
+  cwf-to-cases .Cases.∘idᴱ  = cwf .CwF.∘id
+  cwf-to-cases .Cases.∘∘ᴱ   = cwf .CwF.∘∘
+  cwf-to-cases .Cases._[_]ᴱ = cwf .CwF._[_]
+  cwf-to-cases .Cases.[id]ᴱ = cwf .CwF.[id]
+  cwf-to-cases .Cases.[∘]ᴱ  = cwf .CwF.[∘]
+  cwf-to-cases .Cases.•ᴱ    = cwf .CwF.•
+  cwf-to-cases .Cases.εᴱ    = cwf .CwF.ε
+  cwf-to-cases .Cases.•-ηᴱ  = cwf .CwF.•-η
+  cwf-to-cases .Cases._▷ᴱ_  = cwf .CwF._▷_
+  cwf-to-cases .Cases._,ᴱ_  = cwf .CwF._,_
+  cwf-to-cases .Cases.π₀ᴱ   = cwf .CwF.π₀
+  cwf-to-cases .Cases.π₁ᴱ   = cwf .CwF.π₁
+  cwf-to-cases .Cases.▷-β₀ᴱ = cwf .CwF.▷-β₀
+  cwf-to-cases .Cases.▷-β₁ᴱ = cwf .CwF.▷-β₁
+  cwf-to-cases .Cases.▷-ηᴱ  = cwf .CwF.▷-η
+  cwf-to-cases .Cases.π₀∘ᴱ  = cwf .CwF.π₀∘
+  cwf-to-cases .Cases.π₁∘ᴱ  = cwf .CwF.π₁∘
+  cwf-to-cases .Cases.oᴱ    = cwf .CwF.o
+  cwf-to-cases .Cases._⇒ᴱ_  = cwf .CwF._⇒_
+  cwf-to-cases .Cases._·ᴱ_  = cwf .CwF._·_
+  cwf-to-cases .Cases.ƛᴱ_   = cwf .CwF.ƛ_
+  cwf-to-cases .Cases.·[]ᴱ  = cwf .CwF.·[]
+  cwf-to-cases .Cases.ƛ[]ᴱ  = cwf .CwF.ƛ[]
 
   rec-con = elim-con cwf-to-cases
   rec-ty  = elim-ty  cwf-to-cases
@@ -340,4 +340,4 @@ open Recursor public
 -- Inlining lets us define rewrite rules with 'rec-con' and 'rec-ty' on the LHS
 {-# INLINE rec-con #-}
 {-# INLINE rec-ty #-}
-``` 
+```  
