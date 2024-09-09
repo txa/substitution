@@ -114,3 +114,14 @@
 
 %format ^ = "\uparrow"
 %format _^_ = "\_\uparrow\_"
+
+%format •-η = "\bullet\!-\!\eta"
+%format π₀ = "\pi_0"
+%format π₁ = "\pi_1"
+%format ▷-β₀ = "\rhd\!-\!\beta_0"
+%format ▷-β₁ = "\rhd\!-\!\beta_1"
+%format ▷-η = "\rhd\!-\!\eta"
+%format π₀∘ = "\pi_0\!\circ"
+%format π₁∘ = "\pi_1\!\circ"
+%format ·[] = "\cdot\![]"
+%format ƛ[] = "\lambda[]"
