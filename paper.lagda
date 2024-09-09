@@ -53,6 +53,10 @@ substitution and renaming separately. When we want to verify the
 categorical properties of this calculus we end up repeating the same
 argument many times. In this paper we present a lightweight method
 that avoids this repetition and is implemented in Agda.
+
+We use our setup to also show that the recursive definition of
+substitution gives rise to a simply typed category with families (CwF)
+and indeed that it is isomorphic to the initial simply typed CwF.
 \end{abstract}
 
 \begin{document}
