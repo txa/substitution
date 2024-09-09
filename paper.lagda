@@ -43,6 +43,11 @@ infix   8  _[_]
 \email{thorsten.altenkirch@@nottingham.ac.uk}
 
 \author{Nathaniel Burke}
+\affiliation{
+  \institution{Imperial College London}
+  \city{London}
+  \country{United Kingdom}}
+\email{nathaniel.burke21@imperial.ac.uk}
 
 \author{Phil Wadler}
 
