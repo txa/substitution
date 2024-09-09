@@ -1,4 +1,6 @@
-\documentclass[sigplan,10pt,anonymous,review]{acmart}\settopmatter{printfolios=true,printccs=false,printacmref=false}
+\documentclass[sigplan,10pt,natbib,anonymous,review]{acmart}
+\settopmatter{printfolios=true,printccs=false,printacmref=false}
+\citestyle{acmauthoryear}
 %\usepackage{tipa}
 %\usepackage{fontspec}
 \let\Bbbk\relax % to avoid conflict
@@ -64,6 +66,39 @@ and indeed that it is isomorphic to the initial simply typed CwF.
 
 \section{Introduction}
 \label{sec:introduction}
+
+[PHIL: Begin alternative introduction.]
+
+\begin{quote}
+Some half dozen persons have written technically on combinatory logic,
+and most of these, including ourselves, have published something
+erroneous. --- \citet{curry1958combinatory}
+\end{quote}
+
+It is notoriously difficult to define substitution correctly
+in the presence of binding operators. A pleasing solution is
+suggested by \citet{debruijn1972lambda}, which not only
+introduces his eponymous indices but also the notion of
+simultaneous substitution. However, to make the recursive
+definition well-founded there is a necessary
+trick: one must first define renaming (mapping variables
+to variables), and then use this in turn to define
+substitution (mapping variables to terms). The two
+definitions are quite similar, and hence coding substitution
+in this way violates a fundamental tenet of software
+engineering: \emph{do not write code by copy and paste}.
+Worse, one needs not just two versions of composition
+(one for renaming and one for substitution) but \emph{four}
+(one may have either a renaming or substitution on
+the left, and again on the right); and this leads to
+fundamental properties that require four proofs, closely
+related by cut and paste. There are techniques for factoring
+these definitions and proofs, for instance as suggested by \citet{allais2017type},
+but these are far from elementary.
+
+[PHIL: End alternative introduction. Having written it, I think
+I like the below better!]
+
 
 The first author was writing lecture notes for an introduction to
 category theory for functional programmers. A nice example of a
