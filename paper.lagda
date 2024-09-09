@@ -749,6 +749,136 @@ Finally we have all the ingredients to prove the 2nd functor law |^∘|:
 \section{Initiality}
 \label{sec:initiality}
 
+We can do more than just prove that we have got a category, indeed we
+can verify the laws of a simply typed category with families
+(CwF). CwFs ar mostly known as models of dependent type theory but
+they can be specialised to simple types. In a general CwF we have a
+category of contexts, a presheaf to model types and a\emph{ dependent
+presheaf} over the type presheaf (that is a presheaf over the category
+of elements of the type presheaf). In the simply typed case the type
+presheaf is constant since the set of types doesn't vary over the
+context and the dependent presheaf of terms becomes an ordinary
+presheaf over the category of contexts.
+
+We start with a precise definition of a simply typed CwF with
+additional structure to model simply typed $\lambda$-calculus (section
+\ref{sec:simply-typed-cwfs}) and then we show that the recursive
+definition of substitution gives rise to a simply typed CwF (section
+\ref{sec:cwf-recurs-subst}). We can define the initial CwF as a
+Quotient Inductive Type in cubical agda but to simplify our
+development
+\footnote{Cubical agda still lacks some essential automatisation,
+  eg. integrating no-confusion properties into pattern matching.}
+we just postulate the existence of this QIIT in agda (with
+the associated rewriting rules). By initiality there is an evaluation
+functor form the initial CwF to the recursively defined CwF. On the
+other hand we can embed the recursive CwF into the initial CwF ---
+this corresponds to the embedding of normal forms into
+$\lambda$-terms, only that here we talk about \emph{substitution normal
+forms}. We then show that these two structure maps are inverse to each
+other and
+hence that the recursively defined CwF is indeed initial (section
+\ref{sec:proving-initiality}). The two identities correspond to
+completeness and stability in the language of normalisation functions.  
+
+\subsection{Simply Typed CwFs}
+\label{sec:simply-typed-cwfs}
+
+% using Spec to avoid name clashes. How can we dea with this?
+% Another question is how to use variable defs in a record?
+
+We define a record to capture simply typed CWFs:
+\begin{spec}
+record CwF-simple : Set₁ where
+\end{spec}
+
+%if False
+\begin{spec}
+  infix   3  _⊢_
+  infix   3  _⊨_
+  infixl  4  _▷_
+  infixl  4  _,_
+  infix   5  _∘_
+  infix   5  ƛ_
+  infixr  6  _⇒_
+  infixl  6  _·_
+  infix   8  _[_]  
+\end{spec}
+%endif
+We start with the category of contexts using the same names as
+introduced previously:
+% \begin{spec}
+%   field
+%     Con : Set
+%     _⊨_ : Con → Con → Set
+
+%     id : {Γ : Con} → Γ ⊨ Γ
+%     _∘_ : {Γ Δ Θ : Con} → Δ ⊨ Θ → Γ ⊨ Δ → Γ ⊨ Θ
+%     id∘ : ∀ {Γ Δ}{δ : Γ ⊨ Δ} → id ∘ δ ≡ δ
+%     ∘id : ∀ {Γ Δ}{δ : Γ ⊨ Δ} → δ ∘ id ≡ δ
+%     ∘∘ : ∀ {Γ Δ Θ Ξ}{ξ : Θ ⊨ Ξ}{θ : Δ ⊨ Θ}{δ : Γ ⊨ Δ}
+%           → (ξ ∘ θ) ∘ δ ≡ ξ ∘ (θ ∘ δ)  
+% \end{spec}
+% We introduce the set of types and associate a presheaf with each type:
+% \begin{spec}
+%     Ty : Set           
+%     _⊢_ : Con → Ty → Set         
+%     _[_] : ∀ {Γ Δ A} → Γ ⊢ A → Δ ⊨ Γ → Δ ⊢ A
+%     [id] : ∀ {Γ A}{t : Γ ⊢ A} →  (t [ id ]) ≡ t
+%     [∘] : ∀ {Γ Δ Θ}{A : Ty}{t : Θ ⊢ A}{θ : Δ ⊨ Θ}{δ : Γ ⊨ Δ} →
+%             t [ θ ] [ δ ] ≡ t [ θ ∘ δ ] 
+% \end{spec}
+% The category of contexts has a terminal object (the empty context):
+% \begin{spec}
+%     • : Con
+%     ε : {Γ : Con} → Γ ⊨ • 
+%     •-η : {Γ : Con}{δ : Γ ⊨ •} → δ ≡ ε  
+% \end{spec}
+% Context extension resembles categorical products but mixing contexts
+% and types:
+% \begin{spec}
+%     _▷_ : Con → Ty → Con
+%     _,_ : ∀ {Γ Δ A} → Γ ⊨ Δ → Γ ⊢ A → Γ ⊨ (Δ ▷ A)
+%     π₀ : ∀ {Γ Δ A} → Γ ⊨ (Δ ▷ A) → Γ ⊨ Δ
+%     π₁ : ∀ {Γ Δ A} → Γ ⊨ (Δ ▷ A) → Γ ⊢ A
+%     ▷-β₀ : ∀ {Γ Δ A}{δ : Γ ⊨ Δ}{t : Γ ⊢ A}
+%            → π₀ (δ , t) ≡ δ
+%     ▷-β₁ : ∀ {Γ Δ A}{δ : Γ ⊨ Δ}{t : Γ ⊢ A}
+%            → π₁ (δ , t) ≡ t
+%     ▷-η : ∀ {Γ Δ A}{δ : Γ ⊨ (Δ ▷ A)}
+%            → (π₀ δ , π₁ δ) ≡ δ
+%     π₀∘ : ∀ {Γ Δ Θ}{A : Ty}{θ : Δ ⊨ (Θ ▷ A)}{δ : Γ ⊨ Δ}
+%            → π₀ (θ ∘ δ) ≡ π₀ θ ∘ δ
+%     π₁∘ : ∀ {Γ Δ Θ}{A : Ty}{θ : Δ ⊨ (Θ ▷ A)}{δ : Γ ⊨ Δ}
+%            → π₁ (θ ∘ δ) ≡ (π₁ θ) [ δ ]  
+% \end{spec}
+% We can define the morphism part of the context extension functor as
+% before:
+% \begin{spec}
+%   _^_ : ∀ {Γ Δ} → Γ ⊨ Δ → ∀ A → Γ ▷ A ⊨ Δ ▷ A
+%   δ ^ A = (δ ∘ (π₀ id)) , π₁ id
+% \end{spec}
+% We need to add the specific components for simply typed
+% $\lambda$-calculus: we add the type constructors and the term
+% constructors and the corresponding naturality laws:
+% \begin{spec}
+%   field
+%     o : Ty
+%     _⇒_ : Ty → Ty → Ty
+%     _·_  : ∀ {Γ A B} → Γ ⊢ A ⇒ B → Γ ⊢ A → Γ ⊢ B
+%     ƛ_   : ∀ {Γ A B} → Γ ▷ A ⊢ B → Γ ⊢ A ⇒ B  
+%     ·[]  : ∀ {Γ Δ A B}{t : Γ ⊢ A ⇒ B}{u : Γ ⊢ A}{δ : Δ ⊨ Γ}
+%            → (t · u) [ δ ] ≡ (t [ δ ]) · (u [ δ ])
+%     ƛ[] :  ∀ {Γ Δ A B}{t : Γ ▷ A ⊢ B}{δ : Δ ⊨ Γ}
+%            → (ƛ t) [ δ ] ≡ ƛ (t [ δ ^ _ ])  
+% \end{spec}
+
+\subsection{The CwF of recursive substitutions}
+\label{sec:cwf-recurs-subst}
+
+\subsection{Proving initiality}
+\label{sec:proving-initiality}
+
 \section{Conclusions and further work}
 \label{sec:concl-furth-work}
 
