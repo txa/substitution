@@ -47,7 +47,7 @@ infix   8  _[_]
   \institution{Imperial College London}
   \city{London}
   \country{United Kingdom}}
-\email{nathaniel.burke21@imperial.ac.uk}
+\email{nathaniel.burke21@@imperial.ac.uk}
 
 \author{Phil Wadler}
 
