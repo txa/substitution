@@ -35,7 +35,7 @@ infix   8  _[_]
 %endif
 
 
-\title{Substitution without cut and paste}
+\title{Substitution without copy and paste}
 
 \author{Thorsten Altenkirch}
 \affiliation{%
