@@ -125,8 +125,8 @@ typed CwFs we are using in section \ref{sec:initiality}.
 (i.e. separating preterms and typed syntax). Here the approach from 
 \cite{allais2017type}  is used to factor the construction using
 \emph{kits}.  In \cite{saffrich2024intrinsically} this is further
-developed also using agda but this time intrinsic syntax. However
-substitutions and renamings are defined separately.
+developed also using agda but this time with intrinsic syntax, and
+with substitutions and renamings are defined separately.
 
 \subsection{Using agda}
 \label{sec:using-agda}
