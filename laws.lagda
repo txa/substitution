@@ -29,7 +29,7 @@ property.
 
 The main lemma is the identity law for the substitution functor:
 \begin{code}
-[id] : x [ id {q = V} ] ≡ x
+[id] : x [ id ] ≡ x
 \end{code}
 To prove the successor case we need naturality of |suc[ q ]| but here
 only in the case where the term is a variable which can be shown by a
@@ -80,7 +80,7 @@ and a version for binary functions
 
 The category law now is a fold of the functor law:
 \begin{code}
-∘id : xs ∘ (id {q = V}) ≡ xs
+∘id : xs ∘ id ≡ xs
 ∘id {xs = ε}         = refl
 ∘id {xs = xs , x}  =
    cong₂ _,_ (∘id {xs = xs}) ([id] {x = x})
@@ -112,32 +112,36 @@ because the left hand side has the type
 \end{spec}
 while the right hand side has type
 \begin{spec}
-Δ ⊢[  (q ⊔ r) ⊔ ) ] A.
+Δ ⊢[ (q ⊔ r) ⊔ s ] A.
 \end{spec}
 
-% actually the coercion wouldn't be necessary if we restrict to
-%|id {q = V}| but this seems to break the proof?
-We also need to adopt the left identity law because given
-|xs : Γ ⊨[ r ] Δ| the left hand side has a different type
-\begin{spec}
-(id {q = q}) ∘ xs :  Γ ⊨[ q ⊔ r ] Δ 
-\end{spec}
-We use the extension of |tm⊑|
-to substitutions:
-\begin{code}
-tm*⊑ : q ⊑ s → Γ ⊨[ q ] Δ → Γ ⊨[ s ] Δ
-\end{code}
-%if False
-\begin{code}
-tm*⊑ q⊑s ε = ε
-tm*⊑ q⊑s (σ , x) = tm*⊑ q⊑s σ , tm⊑ q⊑s x
-\end{code}
-%endif
-and |⊑⊔r : r ⊑ (q ⊔ r)| to state the law:
+Of course, we must also state the left-identity law:
+
 \begin{code}
 id∘ : {xs : Γ ⊨[ r ] Δ}
-  → (id {q = q}) ∘ xs ≡ tm*⊑ (⊑⊔r {q = q}) xs
+  → id ∘ xs ≡ xs
 \end{code}
+
+Similarly to |id|, Agda will not accept a direct implementation of |id∘| as 
+structurally recursive, though we solve this error in a slightly more hacky way.
+We declare a version of |id∘| which takes an unused |Sort| argument, and then
+implement our desired right-identity law by instantiating this unused sort with 
+|V|.
+
+\footnote{
+Alternatively, we could extend sort coercions, |tm⊑|, to 
+renamings/substitutions. The proofs end up a bit clunkier this way 
+(requiring explicit insertion and removal of these coercions).
+}
+
+\begin{code}
+id∘′ : Sort → {xs : Γ ⊨[ r ] Δ}
+  → id ∘ xs ≡ xs
+
+id∘ = id∘′ V
+{-# INLINE id∘ #-}
+\end{code}
+
 To prove it we need the $\beta$-laws for |zero[_]| and |_⁺_|:
 \begin{code}
 zero[] : zero[ q ] [ xs , x ] ≡ tm⊑ (⊑⊔r {q = q}) x 
@@ -146,14 +150,14 @@ zero[] : zero[ q ] [ xs , x ] ≡ tm⊑ (⊑⊔r {q = q}) x
 As before we state the laws but prove them later.
 Now |id∘| can be shown easily:
 \begin{code}
-id∘ {xs = ε} = refl
-id∘ {q = q} {xs = xs , x} = cong₂ _,_ (
-   id ⁺ _ ∘ (xs , x)
+id∘′ _ {xs = ε} = refl
+id∘′ _ {xs = xs , x} = cong₂ _,_
+   (id ⁺ _ ∘ (xs , x)
      ≡⟨ ⁺∘ {xs = id} ⟩
-   id ∘ xs
-     ≡⟨ id∘ {xs = xs} ⟩
-   tm*⊑ (⊑⊔r {q = q}) xs ∎)
-   (zero[] {q = q})
+   id ∘ xs 
+     ≡⟨ id∘ ⟩
+   xs ∎)
+   refl
 \end{code}
 
 Now we show the $\beta$-laws. |zero[]| is just a simple case analysis over the sort
@@ -168,42 +172,24 @@ while |⁺∘| relies on a corresponding property for substitution:
 suc[] : {ys : Γ ⊨[ r ] Δ}
     → (suc[ q ] x _) [ ys , y ] ≡ x [ ys ] 
 \end{code}
-%if False
-\begin{code}
-tm*rfl : {q⊑q : q ⊑ q} → tm*⊑ q⊑q xs ≡ xs
-tm*rfl {xs = ε} {q⊑q = rfl} = refl
-tm*rfl {xs = xs , x} {q⊑q = rfl} = cong₂ _,_ (tm*rfl {xs = xs}) refl
-\end{code}
-%endif
 
 The case for |q = V| is just definitional:
 \begin{code}
 suc[] {q = V} = refl
 \end{code}
-while |q = T| is surprisingly complicated and in particular relies on the functor law |[∘]|
-and the first functor law for |tm*⊑|:
-\begin{code}
-tm*rfl : {q⊑q : q ⊑ q} → tm*⊑ q⊑q xs ≡ xs
-\end{code}
-%if False
-\begin{code
-tm*rfl {xs = ε} {q⊑q = rfl} = refl
-tm*rfl {xs = xs , x} {q⊑q = rfl} = cong₂ _,_ (tm*rfl {xs = xs}) refl
-\end{code}
-%endif
+% It is simpler now - does it still count as "surprisingly complicated"?
+while |q = T| is surprisingly complicated and in particular relies on the functor law |[∘]|.
 Using them we can prove:
 \begin{code}
 suc[] {q = T} {x = x} {y = y} {ys = ys} =
   (suc[ T ] x _) [ ys , y ]
   ≡⟨⟩
-  x [(id {q = V}) ⁺ _ ] [ ys , y ]
+  x [ id ⁺ _ ] [ ys , y ]
   ≡⟨ sym ([∘] {x = x}) ⟩
-  x [ ((id {q = V}) ⁺ _) ∘  (ys , y) ]
+  x [ (id ⁺ _) ∘ (ys , y) ]
   ≡⟨ cong (λ ρ → x [ ρ ]) ⁺∘  ⟩
-  x [ (id {q = V}) ∘  ys  ]
+  x [ id ∘ ys  ]
   ≡⟨ cong (λ ρ → x [ ρ ]) id∘ ⟩
-  x [ tm*⊑ (⊑⊔r {q = V}) ys ]
-  ≡⟨ cong (λ ρ → x [ ρ ]) tm*rfl ⟩
   x [ ys ]  ∎
 \end{code}
 Now the $\beta$-law |⁺∘| is just a simple fold. You may note that
@@ -290,7 +276,7 @@ The case for |q = T| is more interesting and relies again on |[∘]| and
 ⁺-nat[] {q = T} {A = A} {x = x} {xs} = 
    x [ xs ⁺ A ]
    ≡⟨ cong (λ zs → x [ zs ⁺ A ]) (sym ∘id) ⟩
-   x [ (xs ∘ id {q = V}) ⁺ A ]     
+   x [ (xs ∘ id) ⁺ A ]     
    ≡⟨ cong (λ zs → x [ zs ]) (sym (⁺-nat∘ {xs = xs})) ⟩
    x [ xs ∘ (id ⁺ A) ]   
    ≡⟨ [∘] {x = x} ⟩

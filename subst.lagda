@@ -150,8 +150,6 @@ v⊑ {T} = v⊑t
 
 ⊔v {V} = refl
 ⊔v {T} = refl
-
-{-# REWRITE ⊔⊔ ⊔v  #-}
 \end{code}
 %endif
 
@@ -186,14 +184,38 @@ zero    [ xs , x ]   =  x
 (ƛ t)   [ xs ]       =  ƛ (t [ xs ^ _ ]) 
 \end{code}
 To take care of the fact that substitution will only return a variable
-if both inputs are variables / renamings we use |_⊔_| here. We alo
+if both inputs are variables / renamings we use |_⊔_| here. We also
 need to use |tm⊑| to take care of the two cases when substituting for
 a variable. We can also define |id| using |_^_|:
-\begin{code}
-id : Γ ⊨[ q ] Γ
+\begin{spec}
+id : Γ ⊨[ V ] Γ
 id {Γ = •}     =  ε
 id {Γ = Γ ▷ A} =  id ^ A
+\end{spec}
+
+%if False
+\begin{code}
+id-poly : Γ ⊨[ q ] Γ 
+id-poly {Γ = •} = ε
+id-poly {Γ = Γ ▷ A} = id-poly ^ A
+
+id : Γ ⊨[ V ] Γ 
+id = id-poly
+{-# INLINE id #-}
+
+-- Alternative:
+
+-- id′ : Sort → Γ ⊨[ V ] Γ
+
+-- id : Γ ⊨[ V ] Γ
+-- id = id′ V
+-- {-# INLINE id #-}
+
+-- id′ {Γ = •}     _ =  ε
+-- id′ {Γ = Γ ▷ A} _ = id ^ A
 \end{code}
+%endif
+
 To define |_^_| we need parametric versions of |zero|, |suc| and
 |suc*|. |zero| is very easy:
 
@@ -210,7 +232,7 @@ _⁺_ : Γ ⊨[ q ] Δ → (A : Ty) → Γ ▷ A ⊨[ q ] Δ
 
 suc[_] :  ∀ q → Γ ⊢[ q ] B → (A : Ty) → Γ ▷ A ⊢[ q ] B
 suc[ V ] i  A   =  suc i A
-suc[ T ] t  A   =  t [ id {q = V} ⁺  A ]
+suc[ T ] t  A   =  t [ id ⁺  A ]
 
 ε ⁺ A = ε
 (xs , x) ⁺ A = xs ⁺ A , suc[ _ ] x A 
@@ -220,6 +242,39 @@ And now we define:
 xs ^ A                 =  xs ⁺ A , zero[ _ ]
 \end{code}
 
+Unfortunately, we now hit a termination error.
+\begin{spec}
+Termination checking failed for the following functions:
+  _^_, _[_], id, _⁺_, suc[_]
+\end{spec}
+
+The cause turns out to be |id|. 
+Termination here hinges on the fact that |id| is a renaming - i.e. a sequences 
+of variables, for which weakening is trivial. Note that if we implemented 
+weakening for variables as |i [ id ⁺ A ]|, this would be type-correct, but our
+substitutions would genuinely loop, so perhaps Agda is right to be careful.
+
+Of course, we have specialised our weakening for variables, so we now must ask 
+why Agda still doesn't accept our program. The limitation is ultimately a 
+technical one: Agda only looks at the direct arguments to function calls when 
+building the call graph from which it identifies termination order 
+\cite{alti:jfp02}. Because |id| is not passed a sort, the sort cannot be 
+considered as  decreasing in the case of term weakening.
+
+Luckily, working around this is not difficult. We can implement |id| 
+sort-polymorphically and then define an abbreviation which specialises this to 
+variables.
+
+\begin{spec}
+id-poly : Γ ⊨[ q ] Γ 
+id-poly {Γ = •} = ε
+id-poly {Γ = Γ ▷ A} = id-poly ^ A
+
+id : Γ ⊨[ V ] Γ 
+id = id-poly
+{-# INLINE id #-}
+\end{spec}
+
 Finally, we define composition by folding substitution:
 \begin{code}
 _∘_ : Γ ⊨[ q ] Θ → Δ ⊨[ r ] Γ → Δ ⊨[ q ⊔ r ] Θ
@@ -227,6 +282,6 @@ _∘_ : Γ ⊨[ q ] Θ → Δ ⊨[ r ] Γ → Δ ⊨[ q ⊔ r ] Θ
 (xs , x) ∘ ys  = (xs ∘ ys) , x [ ys ]
 \end{code}
 
-Clearly, the definitions are very recursive and exploits the structural
+Clearly, the definitions are very recursive and exploit the structural
 ordering on terms and the order on sorts. We can leave the details to
 the termination checker.
