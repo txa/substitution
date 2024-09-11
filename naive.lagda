@@ -118,7 +118,7 @@ but this is certainly not structurally recursive (and hence rejected
 by agda's termination checker).
 
 Actually we realize that |id| is a renaming, i.e. it is a substitution
-only containing variables and we can easily define |suc*| for
+only containing variables and we can easily define |_⁺v_| for
 renamings. This leads to a structurally recursive definition but we
 also have to repeat the definition of substitutions for renamings.
 \begin{code}
