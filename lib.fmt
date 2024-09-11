@@ -98,6 +98,8 @@
 
 %format _⊨_  = "\_\models\_"
 %format ⊨  = "\models"
+%format _⊨v_  = "\_\models{v}\_"
+%format ⊨v  = "\models{v}"
 
 %%format ƛ = "\text{\textcrlambda}"
 %%format ƛ_ = "\text{\textcrlambda}\_"
@@ -114,6 +116,9 @@
 
 %format ^ = "\uparrow"
 %format _^_ = "\_\uparrow\_"
+
+%format ^v = "\uparrow{v}"
+%format _^v_ = "\_\uparrow{v}\_"
 
 %format •-η = "\bullet\!-\!\eta"
 %format π₀ = "\pi_0"

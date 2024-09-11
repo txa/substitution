@@ -51,7 +51,14 @@ _v[_] : Γ ∋ A → Δ ⊨ Γ → Δ ⊢ A
 zero    v[ ts , t ]  =  t
 (suc i _) v[ ts , t ]  =  i v[ ts ]
 
-{-# TERMINATING #-}
+data _⊨v_ : Con → Con → Set where
+  ∅   : Γ ⊨v ∅
+  _,_ : Γ ⊨v Δ → Γ ∋ A → Γ ⊨v Δ , A
+
+suc-var* : Γ ⊨v Δ → (A : Ty) → Γ , A ⊨v Δ
+suc-var* ∅ A = ∅
+suc-var* (ts , t) A = suc-var* ts A , suc-var t A
+
 suc-tm : Γ ⊢ B → (A : Ty) → Γ , A ⊢ B
 
 suc-tm* : Γ ⊨ Δ → (A : Ty) → Γ , A ⊨ Δ

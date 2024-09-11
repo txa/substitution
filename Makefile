@@ -2,7 +2,7 @@
 
 default: paper.pdf
 
-%.tex : %.lagda lib.fmt
+paper.tex : paper.lagda naive.lagda subst.lagda laws.lagda init.lagda lib.fmt
 	lhs2TeX --agda $< > $@
 
 %.pdf : %.tex local.bib
