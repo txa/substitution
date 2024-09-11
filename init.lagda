@@ -14,7 +14,7 @@ open  ≡-Reasoning public
 
 We can do more than just prove that we have got a category, indeed we
 can verify the laws of a simply typed category with families
-(CwF). CwFs ar mostly known as models of dependent type theory but
+(CwF). CwFs are mostly known as models of dependent type theory but
 they can be specialised to simple types \cite{castellan2021categories}.
 
 For the categorically minded we can summarize:
@@ -22,12 +22,20 @@ For the categorically minded we can summarize:
   understand the rest of the paper.}
 a CwF is given by
 \begin{itemize}
-\item a category of contexts
+\item a category of contexts,
 \item a presheaf to model types (i.e. a contravariant functor from the
-  category of context to Set)
-\item a dependent presheaf over the type presheaf (i..e a presheaf
-  over the category of elements of the type presheaf).
+  category of context to Set),
+\item a dependent presheaf for terms over the type presheaf (i..e a presheaf
+  over the category of elements of the type presheaf),
+\item A terminal object (empty context) and context extension.
+  Context extension corresponds to demanding that the term presheaf is
+  locally representable.  
 \end{itemize}
+To this we can add further constructors, e.g. $\Pi$-types. If we are
+only interested in a substitution calculus like in our current work, we
+only add the type and term formers and the condition that they are
+natural, i.e. commute with substitution.
+
 In the simply typed case the type
 presheaf is constant since the set of types doesn't vary over the
 context and the dependent presheaf of terms becomes an ordinary
@@ -45,7 +53,7 @@ development
 we just postulate the existence of this QIIT in agda (with
 the associated rewriting rules). By initiality there is an evaluation
 functor form the initial CwF to the recursively defined CwF (defined
-in section \ref{sec:cwf-recurs-subst}. On the
+in section \ref{sec:cwf-recurs-subst}). On the
 other hand we can embed the recursive CwF into the initial CwF ---
 this corresponds to the embedding of normal forms into
 $\lambda$-terms, only that here we talk about \emph{substitution normal
