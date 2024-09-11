@@ -45,7 +45,7 @@ and indeed that it is isomorphic to the initial simply typed CwF.
 \begin{quote}
 Some half dozen persons have written technically on combinatory logic,
 and most of these, including ourselves, have published something
-erroneous. --- \citet{curry1958combinatory}
+erroneous. \citet{curry1958combinatory}
 \end{quote}
 
 I% t is notoriously difficult to define substitution correctly
@@ -115,6 +115,18 @@ categorical constructions as mentioned in the introduction as a
 motivation; second we are interested in the application to dependent
 types where it is not clear how the monadic approach can be applied
 without using very dependent types.
+
+There are a number of publications on formalising substitution laws,
+just to mention a few recent ones: 
+\cite{stark2019autosubst} develops a Coq library but they simply
+repeat the proofs. Their equational theory is similar to the simply
+typed CwFs we are using in section \ref{sec:initiality}.
+\cite{saffrich2024abstractions} is also using agda but extrinsically
+(i.e. separating preterms and typed syntax). Here the approach from 
+\cite{allais2017type}  is used to factor the construction using
+\emph{kits}.  In \cite{saffrich2024intrinsically} this is further
+developed also using agda but this time intrinsic syntax. However
+substitutions and renamings are defined separately.
 
 \subsection{Using agda}
 \label{sec:using-agda}
