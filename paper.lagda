@@ -99,7 +99,7 @@ i.e. interpreting dependent types in higher categories.
 the notion of simultaneous substitution. We are here using a typed
 version of de Bruijn indices, e.g. see \cite{alti:csl99} where the
 problem of showing termination of a simple definition of substitution
-(for the untyped $\lambda$-calculus) is adressed using a well-founded
+(for the untyped $\lambda$-calculus) is addressed using a well-founded
 recursion. However, this is only applied to the definition and the
 categorical laws (which follow from the monad laws) were not formally
 verified. Also the present approach seems to be simpler and scales
