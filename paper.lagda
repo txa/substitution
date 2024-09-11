@@ -40,7 +40,7 @@ and indeed that it is isomorphic to the initial simply typed CwF.
 \section{Introduction}
 \label{sec:introduction}
 
-[PHIL: Begin alternative introduction.]
+% [PHIL: Begin alternative introduction.]
 
 \begin{quote}
 Some half dozen persons have written technically on combinatory logic,
@@ -48,29 +48,29 @@ and most of these, including ourselves, have published something
 erroneous. --- \citet{curry1958combinatory}
 \end{quote}
 
-It is notoriously difficult to define substitution correctly
-in the presence of binding operators. A pleasing solution is
-suggested by \citet{debruijn1972lambda}, which not only
-introduces his eponymous indices but also the notion of
-simultaneous substitution. However, to make the recursive
-definition well-founded there is a necessary
-trick: one must first define renaming (mapping variables
-to variables), and then use this in turn to define
-substitution (mapping variables to terms). The two
-definitions are quite similar, and hence coding substitution
-in this way violates a fundamental tenet of software
-engineering: \emph{do not write code by copy and paste}.
-Worse, one needs not just two versions of composition
-(one for renaming and one for substitution) but \emph{four}
-(one may have either a renaming or substitution on
-the left, and again on the right); and this leads to
-fundamental properties that require four proofs, closely
-related by cut and paste. There are techniques for factoring
-these definitions and proofs, for instance as suggested by \citet{allais2017type},
-but these are far from elementary.
+I% t is notoriously difficult to define substitution correctly
+% in the presence of binding operators. A pleasing solution is
+% suggested by \citet{debruijn1972lambda}, which not only
+% introduces his eponymous indices but also the notion of
+% simultaneous substitution. However, to make the recursive
+% definition well-founded there is a necessary
+% trick: one must first define renaming (mapping variables
+% to variables), and then use this in turn to define
+% substitution (mapping variables to terms). The two
+% definitions are quite similar, and hence coding substitution
+% in this way violates a fundamental tenet of software
+% engineering: \emph{do not write code by copy and paste}.
+% Worse, one needs not just two versions of composition
+% (one for renaming and one for substitution) but \emph{four}
+% (one may have either a renaming or substitution on
+% the left, and again on the right); and this leads to
+% fundamental properties that require four proofs, closely
+% related by cut and paste. There are techniques for factoring
+% these definitions and proofs, for instance as suggested by \citet{allais2017type},
+% but these are far from elementary.
 
-[PHIL: End alternative introduction. Having written it, I think
-I like the below better!]
+% [PHIL: End alternative introduction. Having written it, I think
+% I like the below better!]
 
 
 The first author was writing lecture notes for an introduction to
@@ -95,7 +95,7 @@ i.e. interpreting dependent types in higher categories.
 \subsection{Related work}
 \label{sec:related-work}
 
-\citet{debruijn1972lambda} introduces his eponymous indices but also
+\citet{de_bruijn_lambda_1972} introduces his eponymous indices but also
 the notion of simultaneous substitution. We are here using a typed
 version of de Bruijn indices, e.g. see \cite{alti:csl99} where the
 problem of showing termination of a simple definition of substitution
@@ -144,9 +144,10 @@ In the proofs we also use agda's syntax for equational derivations,
 which exploiting agda's general syntax is just an ordinary agda
 definition in the standard library.
 
-The source of this document contains the actual agda code, i.e. it is a
-literate agda file. Some parts of the displayed code are not checked,
-e.g. most of section \ref{sec:naive-approach} to avoid clashes. 
+The source of this document contains the actual agda code, i.e. it is
+a literate agda file. Different chapters are in different modules to
+avoid name clashes, e.g. prelimenary definitions from section \ref{sec:naive-approach}
+are redefined later.
 
 %include naive.lagda
 %include subst.lagda
@@ -175,8 +176,12 @@ can be checked independently.
 
 This paper can also be seen as a preparation for the harder problem to
 implement recursive substitution for dependent types. This is harder
-because here the typing oof the constructors actually depends on the
-substitution laws. While such a M\"unchhausian \cite{altenkirch2023munchhausen} construction should
+because here the typing of the constructors actually depends on the
+substitution laws. While such a M\"unchhausian \cite{altenkirch2023munchhausen} construction
+\footnote{The reference is to Baron Münchhausen who allegedly pulled himself on his own hair out of a swamp.
+We call definitions in type theory whose typing depends on equations about them \emph{M\"unchhausian}.
+}
+should
 actually be possible in agda, the theoretical underpinning of
 inductive-inductive-recursive definitions is mostly unexplored (with
 the exception of the proposal by \cite{kaposi2023towards}. However, there are

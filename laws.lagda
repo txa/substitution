@@ -143,6 +143,7 @@ To prove it we need the $\beta$-laws for |zero[_]| and |_⁺_|:
 zero[] : zero[ q ] [ xs , x ] ≡ tm⊑ (⊑⊔r {q = q}) x 
 ⁺∘ : xs ⁺ A  ∘ (ys , x) ≡ xs ∘ ys
 \end{code}
+As before we state the laws but prove them later.
 Now |id∘| can be shown easily:
 \begin{code}
 id∘ {xs = ε} = refl
@@ -162,7 +163,7 @@ zero[] {q = V} = refl
 zero[] {q = T} = refl
 \end{code}
 %endif
-while |suc*∘| relies on a corresponding property for substitution:
+while |⁺∘| relies on a corresponding property for substitution:
 \begin{code}
 suc[] : {ys : Γ ⊨[ r ] Δ}
     → (suc[ q ] x _) [ ys , y ] ≡ x [ ys ] 
@@ -180,8 +181,17 @@ The case for |q = V| is just definitional:
 suc[] {q = V} = refl
 \end{code}
 while |q = T| is surprisingly complicated and in particular relies on the functor law |[∘]|
-and the first functor law for |tm*⊑|: |tm*rfl : {q⊑q : q ⊑ q} → tm*⊑ q⊑q xs ≡ xs|:
-
+and the first functor law for |tm*⊑|:
+\begin{code}
+tm*rfl : {q⊑q : q ⊑ q} → tm*⊑ q⊑q xs ≡ xs
+\end{code}
+%if False
+\begin{code
+tm*rfl {xs = ε} {q⊑q = rfl} = refl
+tm*rfl {xs = xs , x} {q⊑q = rfl} = cong₂ _,_ (tm*rfl {xs = xs}) refl
+\end{code}
+%endif
+Using them we can prove:
 \begin{code}
 suc[] {q = T} {x = x} {y = y} {ys = ys} =
   (suc[ T ] x _) [ ys , y ]
@@ -263,7 +273,7 @@ the naturality of  weakening:
 \begin{code}
 ⁺-nat∘ : xs ∘ (ys ⁺ A) ≡ (xs ∘ ys) ⁺ A  
 \end{code}
-which unsurprisingly hs to be shown by establishing a corresponding
+which unsurprisingly has to be shown by establishing a corresponding
 property for substitution:
 \begin{code}
 ⁺-nat[] : {x : Γ  ⊢[ q ] B}{xs : Δ ⊨[ r ] Γ}

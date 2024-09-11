@@ -15,10 +15,20 @@ open  ≡-Reasoning public
 We can do more than just prove that we have got a category, indeed we
 can verify the laws of a simply typed category with families
 (CwF). CwFs ar mostly known as models of dependent type theory but
-they can be specialised to simple types. In a general CwF we have a
-category of contexts, a presheaf to model types and a\emph{ dependent
-presheaf} over the type presheaf (that is a presheaf over the category
-of elements of the type presheaf). In the simply typed case the type
+they can be specialised to simple types \cite{castellan2021categories}.
+
+For the categorically minded we can summarize:
+\footnote{It is not necessary to know the categorical definition to
+  understand the rest of the paper.}
+a CwF is given by
+\begin{itemize}
+\item a category of contexts
+\item a presheaf to model types (i.e. a contravariant functor from the
+  category of context to Set)
+\item a dependent presheaf over the type presheaf (i..e a presheaf
+  over the category of elements of the type presheaf).
+\end{itemize}
+In the simply typed case the type
 presheaf is constant since the set of types doesn't vary over the
 context and the dependent presheaf of terms becomes an ordinary
 presheaf over the category of contexts.
@@ -34,7 +44,8 @@ development
   eg. integrating no-confusion properties into pattern matching.}
 we just postulate the existence of this QIIT in agda (with
 the associated rewriting rules). By initiality there is an evaluation
-functor form the initial CwF to the recursively defined CwF. On the
+functor form the initial CwF to the recursively defined CwF (defined
+in section \ref{sec:cwf-recurs-subst}. On the
 other hand we can embed the recursive CwF into the initial CwF ---
 this corresponds to the embedding of normal forms into
 $\lambda$-terms, only that here we talk about \emph{substitution normal
