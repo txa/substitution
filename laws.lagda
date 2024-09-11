@@ -129,8 +129,8 @@ implement our desired right-identity law by instantiating this unused sort with
 |V|.
 
 \footnote{
-Alternatively, we could extend sort coercions |tm⊑| to 
-renamings/substitutions, though the proofs end up a bit clunkier this way 
+Alternatively, we could extend sort coercions, |tm⊑|, to 
+renamings/substitutions. The proofs end up a bit clunkier this way 
 (requiring explicit insertion and removal of these coercions).
 }
 

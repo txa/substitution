@@ -242,7 +242,13 @@ And now we define:
 xs ^ A                 =  xs ⁺ A , zero[ _ ]
 \end{code}
 
-Unfortunately, we now hit a termination error. The cause turns out to be |id|. 
+Unfortunately, we now hit a termination error.
+\begin{spec}
+Termination checking failed for the following functions:
+  _^_, _[_], id, _⁺_, suc[_]
+\end{spec}
+
+The cause turns out to be |id|. 
 Termination here hinges on the fact that |id| is a renaming - i.e. a sequences 
 of variables, for which weakening is trivial. Note that if we implemented 
 weakening for variables as |i [ id ⁺ A ]|, this would be type-correct, but our
