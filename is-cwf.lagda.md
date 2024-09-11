@@ -9,7 +9,8 @@ open import Relation.Binary.PropositionalEquality hiding ([_])
   renaming (trans to _∙_)
 
 open import cwf-simple renaming (CwF-simple to CwF)
-open import paper
+open import subst
+open import laws
 
 module is-cwf where
 

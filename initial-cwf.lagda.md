@@ -38,7 +38,7 @@ infixl  6  _·_
 infix   8  _[_]
 
 -- We reuse 'Con' and 'Ty' from the paper
-open import paper using (Con; Ty; •; _▷_; o; _⇒_)
+open import subst using (Con; Ty; •; _▷_; o; _⇒_)
 
 postulate
   _⊢_ : Con → Ty → Set
