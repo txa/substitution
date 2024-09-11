@@ -115,7 +115,7 @@ already had identity |id : Γ  ⊨ Γ| and substitution we could say:
 suc-tm t A = t [ id ⁺ A ] 
 \end{spec}
 but this is certainly not structurally recursive (and hence rejected
-by agda's termination checker).
+by Agda's termination checker).
 
 Actually we realize that |id| is a renaming, i.e. it is a substitution
 only containing variables and we can easily define |_⁺v_| for
@@ -163,5 +163,5 @@ setting.
 
 In the rest of the paper we describe a technique how the definition
 and thr proof can be
-factored only relying on the agda termination checker to validate that
+factored only relying on the Agda termination checker to validate that
 the recursion is structurally terminating.

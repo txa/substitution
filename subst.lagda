@@ -42,8 +42,8 @@ define a type |Sort| (|q , r , s|) :
 data Sort : Set where
    V T : Sort  
  \end{spec}
-but this is not exactly what we want because we want agda to know that
-the sort of variables |V| is \emph{easier} that the sort of terms
+but this is not exactly what we want because we want Agda to know that
+the sort of variables |V| is \emph{easier} than the sort of terms
 |T|. Agda's termination checker only knows about the structural
 ordering of an inductive type, and with the following definition we
 can make |V| structurally smaller than |T| maintaining that |V| and
@@ -67,7 +67,7 @@ variable
 Here the predicate |isV| only holds for |V|. We can avoid this mutual
 definition by using equality |_≡_|.
 
-We can now define |T : Sort| but even better we can tell agda that
+We can now define |T : Sort| but even better we can tell Agda that
 this is a derived pattern
 \begin{code}
 pattern T = T>V V isV

@@ -84,7 +84,7 @@ category is the category of simply typed $\lambda$-terms and
 substitutions hence it seemed a good idea to give the definition and
 ask the students to prove the category laws. When writing the answer
 they realised that it  is not as easy as they thought. To make sure that
-there are no mistakes they started to formalize the problem in agda.
+there are no mistakes they started to formalize the problem in Agda.
 Now this wasn't as easy as they thought but the main setback was that the
 same proofs got repeated many times. If there is one guideline of good
 software engineering then it is \textbf{Do not write code by copy and
@@ -126,20 +126,20 @@ just to mention a few recent ones:
 \cite{stark2019autosubst} develops a Coq library but they simply
 repeat the proofs. Their equational theory is similar to the simply
 typed CwFs we are using in section \ref{sec:initiality}.
-\cite{saffrich2024abstractions} is also using agda but extrinsically
+\cite{saffrich2024abstractions} is also using Agda but extrinsically
 (i.e. separating preterms and typed syntax). Here the approach from 
 \cite{allais2017type}  is used to factor the construction using
 \emph{kits}.  In \cite{saffrich2024intrinsically} this is further
-developed also using agda but this time with intrinsic syntax, and
+developed also using Agda but this time with intrinsic syntax, and
 with substitutions and renamings are defined separately.
 
-\subsection{Using agda}
+\subsection{Using Agda}
 \label{sec:using-agda}
 
-For the technical details of agda we refer to the online documentation
-\cite{agda}. We only use plain agda and inductive definitions and
+For the technical details of Agda we refer to the online documentation
+\cite{agda}. We only use plain Agda and inductive definitions and
 structurally recursive programs and proofs.  Termination is checked by
-agda's termination checker \cite{alti:jfp02} which uses a lexical
+Agda's termination checker \cite{alti:jfp02} which uses a lexical
 combination of structural descent that is inferred by the termination
 checker by investigating all possible recursive paths. We will define
 mutually recursive proofs which heavily rely on each other.
@@ -164,12 +164,12 @@ Implicit variables, which are indicated by using |{..}| instead of
 allowing general syntax declarations using |_| to indicate where the
 parameters go.
 
-In the proofs we also use agda's syntax for equational derivations,
-which exploiting agda's general syntax is just an ordinary agda
+In the proofs we also use Agda's syntax for equational derivations,
+which exploiting Agda's general syntax is just an ordinary Agda
 definition in the standard library.
 
-The source of this document contains the actual agda code, i.e. it is
-a literate agda file. Different chapters are in different modules to
+The source of this document contains the actual Agda code, i.e. it is
+a literate Agda file. Different chapters are in different modules to
 avoid name clashes, e.g. preliminary definitions from section \ref{sec:naive-approach}
 are redefined later.
 
@@ -188,10 +188,10 @@ particular if you don't want to prove it using copy-and-paste.
 We spend some time going down alleys that didn't work find clever
 parametrisation. In the end with hindsight the main idea seems rather
 obvious: introduce sorts as a datatype with the structure of a boolean
-algebra. To be able to implement the solution in agda we managed to
+algebra. To be able to implement the solution in Agda we managed to
 convince the termination checker that |V| is structurally smaller than
 |T| which means that the actual work determining and verifying the
-termination ordering is left to agda. This greatly simplifies the
+termination ordering is left to Agda. This greatly simplifies the
 formal development. In a way one would like to be able to instrument
 the termination checker for example with an ordering on
 constructors. Also it would be nice if the termination checker
@@ -205,10 +205,9 @@ substitution laws. While such a M\"unchhausian \cite{altenkirch2023munchhausen} 
 \footnote{The reference is to Baron Münchhausen who allegedly pulled himself on his own hair out of a swamp.
 We call definitions in type theory whose typing depends on equations about them \emph{M\"unchhausian}.
 }
-should
-actually be possible in agda, the theoretical underpinning of
+should actually be possible in Agda, the theoretical underpinning of
 inductive-inductive-recursive definitions is mostly unexplored (with
-the exception of the proposal by \cite{kaposi2023towards}. However, there are
+the exception of the proposal by \cite{kaposi2023towards}). However, there are
 potential interesting applications: strictifying substitution laws is
 essential to prove coherence of models of type theory in higher types
 in the sense of HoTT.

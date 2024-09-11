@@ -101,7 +101,7 @@ Let's state the functor law but postpone the proof to the next section
   → x [ xs ∘ ys ] ≡ x [ xs ] [ ys ]
 \end{code}
 This actually uses the definitional equality
-\footnote{We use agda's rewrite here.
+\footnote{We use Agda's rewrite here.
 Alternatively we would have to insert a transport using |subst|.}
 \begin{spec}
 ⊔⊔ : q ⊔ (r ⊔ s) = (q ⊔ r) ⊔ s
@@ -127,12 +127,9 @@ structurally recursive, though we solve this error in a slightly more hacky way.
 We declare a version of |id∘| which takes an unused |Sort| argument, and then
 implement our desired right-identity law by instantiating this unused sort with 
 |V|.
-
-\footnote{
-Alternatively, we could extend sort coercions, |tm⊑|, to 
+\footnote{Alternatively, we could extend sort coercions, |tm⊑|, to 
 renamings/substitutions. The proofs end up a bit clunkier this way 
-(requiring explicit insertion and removal of these coercions).
-}
+(requiring explicit insertion and removal of these coercions).}
 
 \begin{code}
 id∘′ : Sort → {xs : Γ ⊨[ r ] Δ}
