@@ -48,7 +48,7 @@ and most of these, including ourselves, have published something
 erroneous. \citet{curry1958combinatory}
 \end{quote}
 
-I% t is notoriously difficult to define substitution correctly
+% It is notoriously difficult to define substitution correctly
 % in the presence of binding operators. A pleasing solution is
 % suggested by \citet{debruijn1972lambda}, which not only
 % introduces his eponymous indices but also the notion of
