@@ -65,7 +65,6 @@ _^_ : Γ ⊨ Δ → (A : Ty) → Γ ▷ A ⊨ Δ ▷ A
 \end{code}
 %endif
 
-
 \begin{code}
 _v[_] : Γ ∋ A → Δ ⊨ Γ → Δ ⊢ A
 zero    v[ ts , t ]    =  t
@@ -162,6 +161,7 @@ there are in principle 8 combinations of which we need 4. And each
 time we need to prove a number of lemmas again in a different
 setting.
 
-In the rest of the paper we describe a technique how this proof can be
+In the rest of the paper we describe a technique how the definition
+and thr proof can be
 factored only relying on the agda termination checker to validate that
 the recursion is structurally terminating.

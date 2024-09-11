@@ -155,7 +155,16 @@ v⊑ {T} = v⊑t
 \end{code}
 %endif
 
-To improve readability we turn the equations  (|⊔⊔| , |⊔v|) into rewrite rules. 
+To improve readability we turn the equations  (|⊔⊔| , |⊔v|) into
+rewrite rules: by declaring
+\begin{code}
+{-# REWRITE ⊔⊔ ⊔v  #-} 
+\end{code}
+we introduce additional definitional equalities, i.e.
+|q ⊔ (r ⊔ s) = (q ⊔ r) ⊔ s| and |q ⊔ V = q| are now used by the type
+checker.
+\footnote{Basically, this feature allows a selective use of extensional
+  Type Theory.}
 The order gives rise to a functor which is witnessed by
 \begin{code}
 tm⊑ : q ⊑ s → Γ ⊢[ q ] A → Γ ⊢[ s ]  A

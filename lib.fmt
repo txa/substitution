@@ -98,8 +98,8 @@
 
 %format _⊨_  = "\_\models\_"
 %format ⊨  = "\models"
-%format _⊨v_  = "\_\models{v}\_"
-%format ⊨v  = "\models{v}"
+%format _⊨v_  = "\_\models\!{\mathrm{v}}\_"
+%format ⊨v  = "\models\!{\mathrm{v}}"
 
 %%format ƛ = "\text{\textcrlambda}"
 %%format ƛ_ = "\text{\textcrlambda}\_"
@@ -108,8 +108,8 @@
 %format ƛ_ = "\lambda\_"
 
 
-%format _⊨[_]_ = "\_\models[\_]\_"
-%format ⊨[ = "\models["
+%format _⊨[_]_ = "\_\models\![\_]\_"
+%format ⊨[ = "\models\!["
 
 %format _▷_ = "\_\rhd\_"
 %format ▷ = "\rhd"
@@ -117,8 +117,13 @@
 %format ^ = "\uparrow"
 %format _^_ = "\_\uparrow\_"
 
-%format ^v = "\uparrow{v}"
-%format _^v_ = "\_\uparrow{v}\_"
+%format ^v = "\uparrow\!{\mathrm{v}}"
+%format _^v_ = "\_\uparrow\!{\mathrm{v}}\_"
+
+%format ^∘ = "\uparrow\!\circ"
+%format ⁺∘ = "{}^+\!\circ"
+%format ⁺-nat∘ = "{}^+\!-nat\!\circ"
+
 
 %format •-η = "\bullet\!-\!\eta"
 %format π₀ = "\pi_0"

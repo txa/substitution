@@ -95,7 +95,7 @@ i.e. interpreting dependent types in higher categories.
 \subsection{Related work}
 \label{sec:related-work}
 
-\citet{de_bruijn_lambda_1972} introduces his eponymous indices but also
+\citet{de_bruijn_lambda_1972} introduces his eponymous indices and also
 the notion of simultaneous substitution. We are here using a typed
 version of de Bruijn indices, e.g. see \cite{alti:csl99} where the
 problem of showing termination of a simple definition of substitution
@@ -123,7 +123,7 @@ For the technical details of agda we refer to the online documentation
 \cite{agda}. We only use plain agda and inductive definitions and
 structurally recursive programs and proofs.  Termination is checked by
 agda's termination checker \cite{alti:jfp02} which uses a lexical
-combination of structural descent which is inferred by the termination
+combination of structural descent that is inferred by the termination
 checker by investigating all possible recursive paths. We will define
 mutually recursive proofs which heavily rely on each other.
 
@@ -135,7 +135,14 @@ using |subst| but this is not essential.
 
 We extensively use variable declarations to introduce implicit
 quantification (we summarize the variables conventions in passing in
-the text). Implicit variables can be instantiated using the syntax
+the text). However, implicit variables are not available in records,
+which makes the definitions in section \ref{sec:initiality} more
+verbose. However, we do use the $∀$-prefix which means that we don't
+have to write the type if it can be inferred, i.e. instead of |{Γ : Con} → ..| we just write
+|∀{Γ} → ..|.
+
+Implicit variables, which are indicated by using |{..}| isntead of
+|(..)| in dependent function types,  can be instantiated using the syntax
 |a{x = b}| which we use in the proofs. Agda syntax is very flexible
 allowing general syntax declarations using |_| to indicate where the
 parameters go.

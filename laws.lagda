@@ -100,11 +100,11 @@ Let's state the functor law but postpone the proof to the next section
   {x : Θ ⊢[ q ] A}{xs : Γ ⊨[ r ] Θ}{ys : Δ ⊨[ s ] Γ}
   → x [ xs ∘ ys ] ≡ x [ xs ] [ ys ]
 \end{code}
-This actually uses the strict equality
+This actually uses the definitional equality
 \footnote{We use agda's rewrite here.
 Alternatively we would have to insert a transport using |subst|.}
 \begin{spec}
-⊔⊔ : q ⊔ (r ⊔ s) ≡ (q ⊔ r) ⊔ s
+⊔⊔ : q ⊔ (r ⊔ s) = (q ⊔ r) ⊔ s
 \end{spec}
 because the left hand side has the type
 \begin{spec}
