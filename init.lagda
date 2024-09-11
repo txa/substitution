@@ -169,5 +169,57 @@ constructors and the corresponding naturality laws:
 \subsection{The CwF of recursive substitutions}
 \label{sec:cwf-recurs-subst}
 
+We now want to show that our recursive substitution syntax obeys the CwF laws,
+or in other words, that any CwF can be interpreted into our syntax.
+
+\begin{code}
+open import subst
+open import laws
+
+module CwF = CwF-simple
+
+\end{code}
+\begin{spec}
+stlc : CwF-simple
+stlc .CwF.Con = Con
+\end{spec}
+
+We now need to decide how to interpret morphisms/substitutions. In our first 
+attempt, we tried to pair renamings/substitutions with their sorts and stay 
+polymorphic:
+\begin{spec}
+record _⊨_ (Δ : Con) (Γ : Con) : Set where
+  field
+    sort : Sort
+    tms  : Δ ⊨[ sort ] Γ
+
+stlc .CwF._⊨_ = _⊨_
+stlc .CwF.id  = record {sort = V; tms = id}
+\end{spec}
+
+Unfortunately, this approach quickly breaks. The CwF laws force us to provide a 
+single implementation of the morphism to the terminal object/
+weakening-from-the-empty-context along with its eta-law. 
+\begin{spec}
+stlc .CwF.• = •
+stlc .CwF.ε = record {sort = {!!}; tms = ε}
+stlc .CwF.•-η {δ = record {sort = q; tms = ε}} = {!!}
+\end{spec}
+Our |_⊨_| record is just too flexible here. It allows two distinct 
+implementations: |record {sort = V; tms = ε}| and |record {sort = T; tms = ε}|. 
+We are stuck!
+
+% TODO
+
 \subsection{Proving initiality}
 \label{sec:proving-initiality}
+
+We have now proved that we can interpret any model of a simply-typed CwF into
+our syntax with recursive substitutions, but this is not yet sufficient for 
+proving initiality (that our syntax is isomorphic to the initial CwF).
+
+To show this isomorphism, we must first define the initial CwF. We use
+postulates and rewrite rules instead of a Cubical Agda QIIT because of 
+technical limitations mentioned previously.
+
+% TODO
