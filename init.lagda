@@ -25,7 +25,7 @@ a CwF is given by
 \item a category of contexts,
 \item a presheaf to model types (i.e. a contravariant functor from the
   category of context to Set),
-\item a dependent presheaf for terms over the type presheaf (i..e a presheaf
+\item a dependent presheaf for terms over the type presheaf (i.e. a presheaf
   over the category of elements of the type presheaf),
 \item A terminal object (empty context) and context extension.
   Context extension corresponds to demanding that the term presheaf is

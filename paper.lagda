@@ -153,7 +153,7 @@ verbose. However, we do use the $∀$-prefix which means that we don't
 have to write the type if it can be inferred, i.e. instead of |{Γ : Con} → ..| we just write
 |∀{Γ} → ..|.
 
-Implicit variables, which are indicated by using |{..}| isntead of
+Implicit variables, which are indicated by using |{..}| instead of
 |(..)| in dependent function types,  can be instantiated using the syntax
 |a{x = b}| which we use in the proofs. Agda syntax is very flexible
 allowing general syntax declarations using |_| to indicate where the
@@ -165,7 +165,7 @@ definition in the standard library.
 
 The source of this document contains the actual agda code, i.e. it is
 a literate agda file. Different chapters are in different modules to
-avoid name clashes, e.g. prelimenary definitions from section \ref{sec:naive-approach}
+avoid name clashes, e.g. preliminary definitions from section \ref{sec:naive-approach}
 are redefined later.
 
 %include naive.lagda
