@@ -6,6 +6,7 @@ import Agda.Builtin.Equality.Rewrite
 open import Level
 open import Relation.Binary.PropositionalEquality hiding ([_])
 open import Data.Product using (Σ; proj₁; proj₂)
+open ≡-Reasoning
 
 module initial-cwf where
 
@@ -21,8 +22,8 @@ x ≡[ refl ]≡ y = x ≡ y
 
 -- Used to easily convert from the non-dependent equations of 'CwF-simple' to
 -- the dependent equations of 'Cases'
-cong-const : ∀ {A : Set ℓ₁} {B : Set ℓ₂} {x y} {z w : B} {p : z ≡ w} 
-           → (x ≡[ cong (λ _ → A) p ]≡ y) ≡ (x ≡ y)
+cong-const : ∀ {A : Set ℓ₁} {B : Set ℓ₂} {x : A} {y z : B} {p : y ≡ z} 
+           → cong (λ _ → x) p ≡ erefl x
 cong-const {p = refl} = refl
 
 {-# REWRITE cong-const #-}
@@ -37,7 +38,7 @@ infixl  6  _·_
 infix   8  _[_]
 
 -- We reuse 'Con' and 'Ty' from the paper
-open import paper using (Con; Ty; •; _▷_; o; _⇒_)
+open import subst using (Con; Ty; •; _▷_; o; _⇒_)
 
 postulate
   _⊢_ : Con → Ty → Set
@@ -87,7 +88,57 @@ postulate
   ·[] : (M · N) [ δ ] ≡ M [ δ ] · N [ δ ]
   ƛ[] : (ƛ M) [ δ ] ≡ ƛ (M [ δ ^ A ])
 
+vs : Γ ⊢ B → Γ ▷ A ⊢ B
+vs x = x [ π₀ id ]
 ```
+
+```
+id^ : id {Γ = Γ} ^ A ≡ id
+id^ {A = A} = 
+  id ^ A
+  ≡⟨ cong (λ ρ → ρ , π₁ id) id∘ ⟩
+  π₀ id , π₁ id
+  ≡⟨ ▷-η ⟩
+  id ∎
+
+
+∘[] : (δ , M) ∘ σ ≡ (δ ∘ σ) , (M [ σ ])
+∘[] {δ = δ} {M = M} {σ = σ} = 
+  (δ , M) ∘ σ
+  ≡⟨ sym (▷-η {δ = (δ , M) ∘ σ}) ⟩
+  π₀ ((δ , M) ∘ σ) , π₁ ((δ , M) ∘ σ)
+  ≡⟨ cong (_, π₁ ((δ , M) ∘ σ)) π₀∘ ⟩
+  (π₀ (δ , M) ∘ σ) , π₁ ((δ , M) ∘ σ)
+  ≡⟨ cong (λ ρ → (ρ ∘ σ) , π₁ ((δ , M) ∘ σ)) ▷-β₀ ⟩
+  (δ ∘ σ) , π₁ ((δ , M) ∘ σ)
+  ≡⟨ cong ((δ ∘ σ) ,_) π₁∘ ⟩
+  (δ ∘ σ) , (π₁ (δ , M) [ σ ])
+  ≡⟨ cong (λ ρ → (δ ∘ σ) , (ρ [ σ ])) ▷-β₁ ⟩
+  (δ ∘ σ) , (M [ σ ]) ∎
+
+vz[] : vz [ δ , M ] ≡ M
+vz[] {δ = δ} {M = M} =
+  vz [ δ , M ]
+  ≡⟨ sym π₁∘ ⟩
+  π₁ (id ∘ (δ , M))
+  ≡⟨ cong π₁ id∘ ⟩
+  π₁ (δ , M)
+  ≡⟨ ▷-β₁ ⟩
+  M ∎
+
+vs[] : vs M [ δ , N ] ≡ M [ δ ]
+vs[] {M = M} {δ = δ} {N = N} =
+  vs M [ δ , N ]
+  ≡⟨ [∘] ⟩
+  M [ π₀ id ∘ δ , N ]
+  ≡⟨ cong (M [_]) (sym π₀∘) ⟩
+  M [ π₀ (id ∘ (δ , N)) ]
+  ≡⟨ cong (λ ρ → M [ π₀ ρ ]) id∘ ⟩
+  M [ π₀ (δ , N) ]
+  ≡⟨ cong (M [_]) ▷-β₀ ⟩
+  M [ δ ] ∎ 
+```
+
 
 ```
 open import cwf-simple renaming (CwF-simple to CwF)
@@ -252,36 +303,41 @@ module Recursor (cwf : CwF) where
   cwf-to-motive .Motive.Tmsᴱ Δ Γ _ = cwf .CwF._⊨_ Δ Γ
   
   cwf-to-cases : Cases cwf-to-motive
-  cwf-to-cases .Cases.idᴱ         = cwf .CwF.id
-  cwf-to-cases .Cases._∘ᴱ_        = cwf .CwF._∘_
-  cwf-to-cases .Cases.id∘ᴱ        = cwf .CwF.id∘
-  cwf-to-cases .Cases.∘idᴱ        = cwf .CwF.∘id
-  cwf-to-cases .Cases.∘∘ᴱ         = cwf .CwF.∘∘
-  cwf-to-cases .Cases._[_]ᴱ       = cwf .CwF._[_]
-  cwf-to-cases .Cases.[id]ᴱ       = cwf .CwF.[id]
-  cwf-to-cases .Cases.[∘]ᴱ        = cwf .CwF.[∘]
-  cwf-to-cases .Cases.•ᴱ          = cwf .CwF.•
-  cwf-to-cases .Cases.εᴱ          = cwf .CwF.ε
-  cwf-to-cases .Cases.•-ηᴱ        = cwf .CwF.•-η
-  cwf-to-cases .Cases._▷ᴱ_        = cwf .CwF._▷_
-  cwf-to-cases .Cases._,ᴱ_        = cwf .CwF._,_
-  cwf-to-cases .Cases.π₀ᴱ         = cwf .CwF.π₀
-  cwf-to-cases .Cases.π₁ᴱ         = cwf .CwF.π₁
-  cwf-to-cases .Cases.▷-β₀ᴱ       = cwf .CwF.▷-β₀
-  cwf-to-cases .Cases.▷-β₁ᴱ       = cwf .CwF.▷-β₁
-  cwf-to-cases .Cases.▷-ηᴱ        = cwf .CwF.▷-η
-  cwf-to-cases .Cases.π₀∘ᴱ        = cwf .CwF.π₀∘
-  cwf-to-cases .Cases.π₁∘ᴱ        = cwf .CwF.π₁∘
-  cwf-to-cases .Cases.oᴱ          = cwf .CwF.o
-  cwf-to-cases .Cases._⇒ᴱ_        = cwf .CwF._⇒_
-  cwf-to-cases .Cases._·ᴱ_        = cwf .CwF._·_
-  cwf-to-cases .Cases.ƛᴱ_         = cwf .CwF.ƛ_
-  cwf-to-cases .Cases.·[]ᴱ        = cwf .CwF.·[]
-  cwf-to-cases .Cases.ƛ[]ᴱ        = cwf .CwF.ƛ[]
+  cwf-to-cases .Cases.idᴱ   = cwf .CwF.id
+  cwf-to-cases .Cases._∘ᴱ_  = cwf .CwF._∘_
+  cwf-to-cases .Cases.id∘ᴱ  = cwf .CwF.id∘
+  cwf-to-cases .Cases.∘idᴱ  = cwf .CwF.∘id
+  cwf-to-cases .Cases.∘∘ᴱ   = cwf .CwF.∘∘
+  cwf-to-cases .Cases._[_]ᴱ = cwf .CwF._[_]
+  cwf-to-cases .Cases.[id]ᴱ = cwf .CwF.[id]
+  cwf-to-cases .Cases.[∘]ᴱ  = cwf .CwF.[∘]
+  cwf-to-cases .Cases.•ᴱ    = cwf .CwF.•
+  cwf-to-cases .Cases.εᴱ    = cwf .CwF.ε
+  cwf-to-cases .Cases.•-ηᴱ  = cwf .CwF.•-η
+  cwf-to-cases .Cases._▷ᴱ_  = cwf .CwF._▷_
+  cwf-to-cases .Cases._,ᴱ_  = cwf .CwF._,_
+  cwf-to-cases .Cases.π₀ᴱ   = cwf .CwF.π₀
+  cwf-to-cases .Cases.π₁ᴱ   = cwf .CwF.π₁
+  cwf-to-cases .Cases.▷-β₀ᴱ = cwf .CwF.▷-β₀
+  cwf-to-cases .Cases.▷-β₁ᴱ = cwf .CwF.▷-β₁
+  cwf-to-cases .Cases.▷-ηᴱ  = cwf .CwF.▷-η
+  cwf-to-cases .Cases.π₀∘ᴱ  = cwf .CwF.π₀∘
+  cwf-to-cases .Cases.π₁∘ᴱ  = cwf .CwF.π₁∘
+  cwf-to-cases .Cases.oᴱ    = cwf .CwF.o
+  cwf-to-cases .Cases._⇒ᴱ_  = cwf .CwF._⇒_
+  cwf-to-cases .Cases._·ᴱ_  = cwf .CwF._·_
+  cwf-to-cases .Cases.ƛᴱ_   = cwf .CwF.ƛ_
+  cwf-to-cases .Cases.·[]ᴱ  = cwf .CwF.·[]
+  cwf-to-cases .Cases.ƛ[]ᴱ  = cwf .CwF.ƛ[]
 
   rec-con = elim-con cwf-to-cases
   rec-ty  = elim-ty  cwf-to-cases
   rec-tm  = elim-tm  cwf-to-cases
   rec-tms = elim-tms cwf-to-cases
+
 open Recursor public
-```
+
+-- Inlining lets us define rewrite rules with 'rec-con' and 'rec-ty' on the LHS
+{-# INLINE rec-con #-}
+{-# INLINE rec-ty #-}
+```  
