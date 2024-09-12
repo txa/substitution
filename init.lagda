@@ -172,10 +172,15 @@ constructors and the corresponding naturality laws:
 We now want to show that our recursive substitution syntax obeys the CwF laws,
 or in other words, that any CwF can be interpreted into our syntax.
 
+%if False
 \begin{code}
 open import subst
 open import laws
 
+\end{code}
+%endif
+
+\begin{code}
 module CwF = CwF-simple
 
 \end{code}
@@ -214,7 +219,7 @@ To avoid this, we instead must fix the sort to |T|.
 _⊨_ = _⊨[ T ]_ 
 
 \end{code}
-%ifdef False
+%if False
 \begin{code}
 _⊢_ = _⊢[ T ]_
 
@@ -295,7 +300,7 @@ ways of weakening variables.
 
 \end{code}
 
-%ifdef False
+%if False
 \begin{code}
   ⊑∘ {xs = ε} = refl
   ⊑∘ {xs = xs , x} = cong₂ _,_ ⊑∘ refl
