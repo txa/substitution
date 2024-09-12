@@ -24,7 +24,7 @@ a CwF is given by
 \begin{itemize}
 \item a category of contexts,
 \item a presheaf to model types (i.e. a contravariant functor from the
-  category of context to Set),
+  category of contexts to |Set|),
 \item a dependent presheaf for terms over the type presheaf (i.e. a presheaf
   over the category of elements of the type presheaf),
 \item A terminal object (empty context) and context extension.
@@ -49,7 +49,7 @@ definition of substitution gives rise to a simply typed CwF (section
 Quotient Inductive Type in Cubical Agda but to simplify our
 development
 \footnote{Cubical Agda still lacks some essential automation,
-  e.g. integrating no-confusion properties into pattern matching.}
+  e.g. integrating no-confusion properties with pattern matching.}
 we just postulate the existence of this QIIT in Agda (with
 the associated rewriting rules). By initiality there is an evaluation
 functor from the initial CwF to the recursively defined CwF (defined
@@ -198,18 +198,205 @@ stlc .CwF.id  = record {sort = V; tms = id}
 \end{spec}
 
 Unfortunately, this approach quickly breaks. The CwF laws force us to provide a 
-single implementation of the morphism to the terminal object/
-weakening-from-the-empty-context along with its eta-law. 
+unique morphism to the terminal object/weakening-from-the-empty-context.
 \begin{spec}
 stlc .CwF.• = •
-stlc .CwF.ε = record {sort = {!!}; tms = ε}
-stlc .CwF.•-η {δ = record {sort = q; tms = ε}} = {!!}
+stlc .CwF.ε = record {sort = ?; tms = ε}
+stlc .CwF.•-η {δ = record {sort = q; tms = ε}} = ?
 \end{spec}
-Our |_⊨_| record is just too flexible here. It allows two distinct 
+Our |_⊨_| record is simply too flexible here. It allows two distinct 
 implementations: |record {sort = V; tms = ε}| and |record {sort = T; tms = ε}|. 
 We are stuck!
 
-% TODO
+To avoid this, we instead must fix the sort to |T|.
+
+\begin{code}
+_⊨_ = _⊨[ T ]_ 
+
+\end{code}
+%ifdef False
+\begin{code}
+_⊢_ = _⊢[ T ]_
+
+π₀ : Δ ⊨[ q ] (Γ ▷ A) → Δ ⊨[ q ] Γ
+π₀ (δ , M) = δ
+
+π₁ : Δ ⊨[ q ] (Γ ▷ A) → Δ ⊢[ q ] A
+π₁ (δ , M) = M
+
+tm*⊑ : q ⊑ s → Γ ⊨[ q ] Δ → Γ ⊨[ s ] Δ
+tm*⊑ q⊑s ε = ε
+tm*⊑ q⊑s (σ , x) = tm*⊑ q⊑s σ , tm⊑ q⊑s x
+
+interleaved mutual
+  ⊑∘ : tm*⊑ v⊑t xs ∘ ys ≡ xs ∘ ys
+  ∘⊑ : ∀ {xs : Δ ⊨[ T ] Γ} {ys : Θ ⊨[ V ] Δ} → xs ∘ tm*⊑ v⊑t ys ≡ xs ∘ ys
+  v[⊑] : i [ tm*⊑ v⊑t ys ] ≡ tm⊑ v⊑t i [ ys ]
+  t[⊑] : t [ tm*⊑ v⊑t ys ] ≡ t [ ys ]
+  ⊑⁺ : tm*⊑ ⊑t xs ⁺ A ≡ tm*⊑ v⊑t (xs ⁺ A)
+  ⊑^ : tm*⊑ v⊑t xs ^ A ≡ tm*⊑ v⊑t (xs ^ A)
+
+\end{code}
+%endif
+
+\end{code}
+\begin{code}
+  stlc : CwF-simple
+  stlc .CwF.Con = Con
+  stlc .CwF._⊨_ = _⊨_
+
+  stlc .CwF.•           = •
+  stlc .CwF.ε           = ε
+  stlc .CwF.•-η {δ = ε} = refl 
+
+  stlc .CwF._∘_ = _∘_
+  stlc .CwF.∘∘  = sym ∘∘
+\end{code}
+
+The lack of flexibility to choose the sort does, however, make identity a little 
+trickier. |id| doesn't fit directly as it produces
+renamings |Γ ⊨[ V ] Γ| - we need the equivalent substitution |Γ ⊨[ T ] Γ|. 
+Technically, |id-poly| would suit this purpose but for reasons that will become 
+clear soon, we take a slightly more indirect approach.
+\footnote{Also, |id-poly| was ultimately just an implementation detail 
+to satisfy the termination checker, so we'd rather not rely on it here.}
+
+We first extend |tm⊑| to sequences of variables/terms:
+\begin{spec}
+  tm*⊑ : q ⊑ s → Γ ⊨[ q ] Δ → Γ ⊨[ s ] Δ
+  tm*⊑ q⊑s ε = ε
+  tm*⊑ q⊑s (σ , x) = tm*⊑ q⊑s σ , tm⊑ q⊑s x
+\end{spec}
+And prove various lemmas about how |tm*⊑| coercions can be lifted outside of
+our substitution operators:
+\begin{spec}
+  ⊑∘   : tm*⊑ v⊑t xs ∘ ys ≡ xs ∘ ys
+  ∘⊑   : xs ∘ tm*⊑ v⊑t ys ≡ xs ∘ ys
+  v[⊑] : i [ tm*⊑ v⊑t ys ] ≡ tm⊑ v⊑t i [ ys ]
+  t[⊑] : t [ tm*⊑ v⊑t ys ] ≡ t [ ys ]
+  ⊑⁺   : tm*⊑ ⊑t xs ⁺ A ≡ tm*⊑ v⊑t (xs ⁺ A)
+  ⊑^   : tm*⊑ v⊑t xs ^ A ≡ tm*⊑ v⊑t (xs ^ A)
+\end{spec}
+Most of these are proofs come out easily by induction on terms and 
+substitutions and we skip over them.
+Perhaps worth noting though is that |⊑⁺| requires one new law relating our two
+ways of weakening variables.
+\begin{code}
+  suc[id⁺] : i [ id ⁺ A ] ≡ suc i A
+  suc[id⁺] {i = i} {A = A} =
+    i [ id ⁺ A ]
+    ≡⟨ ⁺-nat[]v {i = i} ⟩ 
+    suc (i [ id ]) A
+    ≡⟨ cong (λ j → suc j A) [id] ⟩
+    suc i A ∎
+
+  ⊑⁺ {xs = ε}      = refl
+  ⊑⁺ {xs = xs , x} = cong₂ _,_ ⊑⁺ (cong (`_) suc[id⁺])
+
+\end{code}
+
+%ifdef False
+\begin{code}
+  ⊑∘ {xs = ε} = refl
+  ⊑∘ {xs = xs , x} = cong₂ _,_ ⊑∘ refl
+
+  ∘⊑ {xs = ε} = refl
+  ∘⊑ {xs = xs , x} = cong₂ _,_ ∘⊑ (t[⊑] {t = x})
+
+  v[⊑] {i = zero}    {ys = ys , y} = refl
+  v[⊑] {i = suc i _} {ys = ys , y} = v[⊑] {i = i}
+
+  ⊑^ = cong₂ _,_ ⊑⁺ refl
+
+  t[⊑] {t = ` i}           = v[⊑] {i = i}
+  t[⊑] {t = t · u}         = cong₂ _·_ (t[⊑] {t = t}) (t[⊑] {t = u})
+  t[⊑] {t = ƛ t} {ys = ys} =
+    ƛ t [ tm*⊑ ⊑t ys ^ _ ]
+    ≡⟨ cong (λ ρ → ƛ t [ ρ ]) ⊑^ ⟩
+    ƛ t [ tm*⊑ ⊑t (ys ^ _) ] 
+    ≡⟨ cong ƛ_ (t[⊑] {t = t}) ⟩
+     ƛ t [ ys ^ _ ] ∎
+\end{code}
+%endif
+
+We can now build an identity substitution by applying this coercion to the 
+identity renaming.
+\begin{code}
+  stlc .CwF.id = tm*⊑ v⊑t id
+\end{code}
+Our left and right identity laws now take the form |tm*⊑ v⊑t id ∘ δ ≡ δ|
+and |δ ∘ tm*⊑ v⊑t id ≡ δ|. This is where we can take full advantage of the 
+|tm*⊑| machinery: the lemmas let us reuse our existing |id∘|/|∘id| proofs!
+\begin{code}
+  stlc .CwF.id∘ {δ = δ} = 
+    tm*⊑ v⊑t id ∘ δ
+    ≡⟨ ⊑∘ ⟩
+    id ∘ δ
+    ≡⟨ id∘ ⟩
+    δ ∎
+  stlc .CwF.∘id {δ = δ} =
+    δ ∘ tm*⊑ v⊑t id
+    ≡⟨ ∘⊑ ⟩
+    δ ∘ id
+    ≡⟨ ∘id ⟩
+    δ ∎
+\end{code}
+
+Similarly to substitutions, we must fix the sort of our presheaf on contexts/
+terms to |T| (in this case, so we can prove the identity law: applying the
+identity substitution to a variable |i| produces the distinct term |` i|).
+
+\begin{spec}
+  _⊢_ = _⊢[ T ]_
+\end{spec}
+\begin{code}
+  stlc .CwF.Ty           = Ty
+  stlc .CwF._⊢_          = _⊢_
+  stlc .CwF._[_]         = _[_]
+  stlc .CwF.[∘] {t = t}  = sym ([∘] {x = t})
+  stlc .CwF.[id] {t = t} =
+    t [ tm*⊑ v⊑t id ]
+    ≡⟨ t[⊑] {t = t} ⟩
+    t [ id ]
+    ≡⟨ [id] ⟩
+    t ∎
+\end{code}
+
+Context extension and the associated laws are easy. We define projections 
+|π₀ (δ , t) = δ| and |π₁ (δ , t) = t| standalone as these will be useful in the 
+next section also.
+
+\begin{code}
+  stlc .CwF._▷_ = _▷_
+  stlc .CwF._,_ = _,_
+  stlc .CwF.π₀ = π₀
+  stlc .CwF.π₁ = π₁
+  stlc .CwF.▷-β₀ = refl
+  stlc .CwF.▷-β₁ = refl
+  stlc .CwF.▷-η {δ = xs , x} = refl
+  stlc .CwF.π₀∘ {θ = xs , x} = refl
+  stlc .CwF.π₁∘ {θ = xs , x} = refl
+\end{code}
+
+Finally, we can deal with the cases specific to simply typed $\lambda$-calculus.
+Interestingly, the beta-rule for substitutions applied to lambdas is somewhat
+non-trivial due to differing implementations of |_^_|.
+
+\begin{code}
+  stlc .CwF.o = o
+  stlc .CwF._⇒_ = _⇒_
+  stlc .CwF._·_ = _·_
+  stlc .CwF.ƛ_ = ƛ_
+  stlc .CwF.·[] = refl
+  stlc .CwF.ƛ[] {A = A} {t = x} {δ = ys} =
+    ƛ x [ ys ^ A ]
+    ≡⟨ cong (λ ρ → ƛ x [ ρ ^ A ]) (sym ∘id) ⟩
+    ƛ x [ (ys ∘ id) ^ A ]
+    ≡⟨ cong (λ ρ → ƛ x [ ρ , ` zero ]) (sym ⁺-nat∘) ⟩ 
+    ƛ x [ ys ∘ id ⁺ A , ` zero ]
+    ≡⟨ cong (λ ρ → ƛ x [ ρ , ` zero ]) (sym (∘⊑ {xs = ys}  {ys = id ⁺ _})) ⟩
+    ƛ x [ ys ∘ tm*⊑ v⊑t (id ⁺ A) , ` zero ] ∎
+\end{code}
 
 \subsection{Proving initiality}
 \label{sec:proving-initiality}
@@ -223,3 +410,4 @@ postulates and rewrite rules instead of a Cubical Agda QIIT because of
 technical limitations mentioned previously.
 
 % TODO
+ 

@@ -177,7 +177,7 @@ module SecondAttempt where
     ≡⟨ cong (λ ρ → ƛ x [ ρ , ` zero ]) (∘id⁺ {A = A} {xs = ys}) ⟩ 
     ƛ x [ ys ∘ id ⁺ A , ` zero ]
     ≡⟨ cong (λ ρ → ƛ x [ ρ , ` zero ]) (sym (∘⊑ {xs = ys} {ys = id ⁺ A})) ⟩
-    ƛ x [ ys ∘ tm*⊑ v⊑t (id-poly ⁺ A) , ` zero ] ∎
+    ƛ x [ ys ∘ tm*⊑ v⊑t (id ⁺ A) , ` zero ] ∎
   
   -- Conversion to and from the initial CwF
   
