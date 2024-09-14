@@ -97,6 +97,54 @@ recursive definition of substitution for dependent type theory which
 may have interesting applications for the coherence problem,
 i.e. interpreting dependent types in higher categories. 
 
+\subsection{In a nutshell}
+\label{sec:nutshell}
+
+When working with substitution for a calculus with binders we find
+that you have to differentiate between renamings (|Δ ⊨v Γ|) where you only
+substitute variables by variables (|Γ ∋ A|) and proper substitutions (|Δ ⊨ Γ|) where you
+replace variables by terms (|Γ ⊢ A|). This results into having to define
+several similar operations
+\begin{spec}
+  _v[_]v  : Γ ∋ A   → Δ ⊨v Γ  → Δ ∋ A
+  _v[_]   : Γ ∋ A   → Δ ⊨ Γ   → Δ ⊢ A
+  _[_]v   : Γ ⊢ A   → Δ ⊨v Γ  → Δ ⊢ A
+  _[_]    :  Γ ⊢ A  → Δ ⊨ Γ   → Δ ⊢ A
+\end{spec}
+And indeed the operations on terms depend on the operations on
+variables. This duplication is getting worse when we prove properties
+of substitution like the functor law:
+\begin{spec}
+ x [ xs ∘ ys ] ≡ x [ xs ] [ ys ]
+\end{spec}
+Since all components |x|,|xs|,|ys| can be either variables/renamings
+and terms/substitutions we could consider 8 possibilities of which we
+actually need 4 and this affects also the lemmas we need to prove. Our
+solution is to introduce a type of sorts with |V : Sort| for
+variables/renamings and |T : Sort| for terms substitutions and we only
+need one operation
+\begin{spec}
+_[_] : Γ ⊢[ q ] A → Δ ⊨[ r ] Γ → Δ ⊢[ q ⊔ r ] A  
+\end{spec}
+where |q , r : Sort| and |q ⊔ r| is the least upper bound in the
+lattice of sorts. We also only need to prove one variant of the
+functor law, here we rely on the fact that |_ ⊔_| is associative.
+We manage to convince agda's termination checker that |V| is
+structurally smaller than |T| and as a consequence the highly mutually
+recursive proof is accepted by agda.
+
+We also relate the recursive definition of substitution to a
+specification using a quotient inductive type where substitution is a
+term former. Our specification is that the substitution laws
+correspond to the equations of a simply typed category with families
+(CwF) --- this is a variant of a category with families where the
+types do not depend on a context. We show that the recursive
+definition of substitution leads to a simply typed CwF which is
+isomorphic to the specified initial one. This can be viewed as a
+normalisation result where the usual $\lambda$-terms without explicit
+substitution are the \emph{substitution normal forms}.
+
+
 \subsection{Related work}
 \label{sec:related-work}
 
@@ -173,10 +221,23 @@ a literate Agda file. Different chapters are in different modules to
 avoid name clashes, e.g. preliminary definitions from section \ref{sec:naive-approach}
 are redefined later.
 
+\subsection{Structure of the paper}
+\label{sec:structure-paper}
+
+First we motivate the problem by explaining tha naive approach (section
+\ref{sec:naive-approach}) and then we factor the operations using sorts
+(section \ref{sec:fact-with-sorts}. We use this to prove the
+categorical laws
+without repetitions (section \ref{sec:laws}). In section
+\ref{sec:initiality} we introduce simply typed CwFs and use our
+previous proofs to show  that the
+recursive definition is initial (i.e. it is isomorphic to the quotient
+inductive type).
+
 %include naive.lagda
 %include subst.lagda
 %include laws.lagda
-%include init.lagda
+%%include init.lagda
 
 \section{Conclusions and further work}
 \label{sec:concl-furth-work}
