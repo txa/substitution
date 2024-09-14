@@ -237,7 +237,7 @@ inductive type).
 %include naive.lagda
 %include subst.lagda
 %include laws.lagda
-%%include init.lagda
+%include init.lagda
 
 \section{Conclusions and further work}
 \label{sec:concl-furth-work}
