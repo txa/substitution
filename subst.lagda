@@ -155,9 +155,17 @@ v⊑ {T} = v⊑t
 
 To improve readability we turn the equations  (|⊔⊔| , |⊔v|) into
 rewrite rules: by declaring
+
+\begin{spec}
+{-# REWRITE \sqcup\!\sqcup \; \sqcup\mathrm{v} \; #-}
+\end{spec}
+
+%if False
 \begin{code}
-{-# REWRITE ⊔⊔ ⊔v  #-} 
+{-# REWRITE ⊔⊔ ⊔v #-} 
 \end{code}
+%endif
+
 we introduce additional definitional equalities, i.e.
 |q ⊔ (r ⊔ s) = (q ⊔ r) ⊔ s| and |q ⊔ V = q| are now used by the type
 checker.

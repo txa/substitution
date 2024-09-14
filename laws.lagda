@@ -136,8 +136,17 @@ id∘′ : Sort → {xs : Γ ⊨[ r ] Δ}
   → id ∘ xs ≡ xs
 
 id∘ = id∘′ V
+\end{code}
+
+\begin{spec}
+{-# INLINE id \circ \; #-}
+\end{spec}
+
+%if False
+\begin{code}
 {-# INLINE id∘ #-}
 \end{code}
+%endif
 
 To prove it we need the $\beta$-laws for |zero[_]| and |_⁺_|:
 \begin{code}
