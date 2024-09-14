@@ -422,7 +422,7 @@ between the LHS and RHS types.
 
 %if False
 \begin{code}
-open import Level
+open import Level hiding (suc)
 
 infix 4 _≡[_]≡_
 
@@ -726,7 +726,6 @@ The inverse operation to inject our syntax back into the initial CwF comes out
 easily be recursing on our substitution-normal forms.
 
 \begin{code}
-
 ⌜_⌝ : Γ ⊢[ q ] A → Γ ⊢ᴵ A
 ⌜ zero ⌝    = zeroᴵ
 ⌜ suc i B ⌝ = sucᴵ ⌜ i ⌝ B
@@ -739,4 +738,140 @@ easily be recursing on our substitution-normal forms.
 ⌜ δ , x ⌝* = ⌜ δ ⌝* ,ᴵ ⌜ x ⌝
 \end{code}
 
-% TODO: Integrate completeness and stability proofs
+We have implemented both directions of the isomorphism. Now to show this truly
+is an isomorphism, we must prove that |norm| and |⌜_⌝| are mutual inverses -
+i.e. stability |norm ⌜ t ⌝ ≡ t| and completeness |⌜ norm t ⌝ ≡ t|.
+
+We start with stability, as it is considerably easier. There are just a couple
+details worth mentioning:
+\begin{itemize}
+  \item To deal with variables in the |`_| case, we phrase the lemma is a 
+  slightly more general way, taking expressions of any sort and coercing them up 
+  to sort |T| on the RHS.
+  \item The case for variables relies on a bit of coercion manipulation and our 
+  earlier lemma relating |suc i B| and |i [ id ⁺ B ]|.
+
+\begin{code}
+stab : norm ⌜ x ⌝ ≡ tm⊑ ⊑t x
+stab {x = zero} = refl
+stab {x = suc i B} =
+  norm ⌜ i ⌝ [ tm*⊑ v⊑t (id ⁺ B) ]
+  ≡⟨ t[⊑] {t = norm ⌜ i ⌝} ⟩
+  norm ⌜ i ⌝ [ id ⁺ B ]
+  ≡⟨ cong (λ j → suc[ _ ] j B) (stab {x = i}) ⟩
+  ` i [ id ⁺ B ]
+  ≡⟨ cong `_ suc[id⁺] ⟩
+  ` suc i B ∎
+stab {x = ` i} = stab {x = i}
+stab {x = t · u} = cong₂ _·_ (stab {x = t}) (stab {x = u})
+stab {x = ƛ t} = cong ƛ_ (stab {x = t})
+\end{code}
+
+To prove completeness, we must instead induct on the initial CwF itself, which
+means there are many more cases. The idea behind the proof is still simple
+though: the bulk of the work is proving all our recursively-defined syntax 
+operations are preserved by |⌜_⌝|.
+
+Preservation of projections out of sequences of terms reduce to the associated 
+beta-laws of the initial CwF.
+
+\begin{code}
+⌜π₀⌝ : ∀ {δ : Δ ⊨ (Γ ▷ A)}
+     → ⌜ π₀ δ ⌝* ≡ π₀ᴵ ⌜ δ ⌝*
+⌜π₀⌝ {δ = δ , x} = sym ▷-β₀ᴵ
+
+⌜π₁⌝ : ∀ {δ : Δ ⊨ (Γ ▷ A)}
+     → ⌜ π₁ δ ⌝ ≡ π₁ᴵ ⌜ δ ⌝*
+⌜π₁⌝ {δ = δ , x} = sym ▷-β₁ᴵ
+\end{code}
+
+\begin{code}
+⌜zero⌝ : ⌜ zero[_] {Γ = Γ} {A = A} q ⌝ ≡ zeroᴵ
+⌜zero⌝ {q = V} = refl
+⌜zero⌝ {q = T} = refl
+\end{code}
+
+Preservation proofs for |_[_]|, |_^_|, |_⁺_|, |id| and |suc[_]| are all mutually 
+inductive, mirroring their original recursive definitions. We must stay
+polymorphic over sorts and again use our dummy |Sort| argument trick in |⌜id⌝| 
+to keep Agda's termination checker happy.
+
+\begin{code}
+⌜[]⌝  : ⌜ x [ ys ] ⌝ ≡ ⌜ x ⌝ [ ⌜ ys ⌝* ]ᴵ
+⌜^⌝   : ∀ {xs : Δ ⊨[ q ] Γ} → ⌜ xs ^ A ⌝* ≡ ⌜ xs ⌝* ^ᴵ A
+⌜⁺⌝   : ⌜ xs ⁺ A ⌝* ≡ ⌜ xs ⌝* ∘ᴵ wkᴵ
+⌜id⌝  : ⌜ id {Γ = Γ} ⌝* ≡ idᴵ
+⌜suc⌝ : ⌜ suc[ q ] x B ⌝ ≡ ⌜ x ⌝ [ wkᴵ ]ᴵ
+
+⌜id⌝′ : Sort → ⌜ id {Γ = Γ} ⌝* ≡ idᴵ
+⌜id⌝ = ⌜id⌝′ V
+{-# INLINE ⌜id⌝ #-}
+\end{code}
+
+To complete these proofs, we also need beta-laws about substitutions for
+our initial CwF, so we derive these now.
+
+\begin{code}
+zero[]ᴵ : zeroᴵ [ δᴵ ,ᴵ tᴵ ]ᴵ ≡ tᴵ
+zero[]ᴵ {δᴵ = δᴵ} {tᴵ = tᴵ} =
+  zeroᴵ [ δᴵ ,ᴵ tᴵ ]ᴵ
+  ≡⟨ sym π₁∘ᴵ ⟩
+  π₁ᴵ (idᴵ ∘ᴵ (δᴵ ,ᴵ tᴵ))
+  ≡⟨ cong π₁ᴵ id∘ᴵ ⟩
+  π₁ᴵ (δᴵ ,ᴵ tᴵ)
+  ≡⟨ ▷-β₁ᴵ ⟩
+  tᴵ ∎
+
+suc[]ᴵ : sucᴵ tᴵ B [ δᴵ ,ᴵ uᴵ ]ᴵ ≡ tᴵ [ δᴵ ]ᴵ
+suc[]ᴵ {tᴵ = tᴵ} {B = B} {δᴵ = δᴵ} {uᴵ = uᴵ} =
+  sucᴵ tᴵ B [ δᴵ ,ᴵ uᴵ ]ᴵ
+  ≡⟨ [∘]ᴵ ⟩
+  tᴵ [ wkᴵ ∘ᴵ δᴵ ,ᴵ uᴵ ]ᴵ
+  ≡⟨ cong (tᴵ [_]ᴵ) (sym π₀∘ᴵ) ⟩
+  tᴵ [ π₀ᴵ (idᴵ ∘ᴵ (δᴵ ,ᴵ uᴵ)) ]ᴵ
+  ≡⟨ cong (λ ρ → tᴵ [ π₀ᴵ ρ ]ᴵ) id∘ᴵ ⟩
+  tᴵ [ π₀ᴵ (δᴵ ,ᴵ uᴵ) ]ᴵ
+  ≡⟨ cong (tᴵ [_]ᴵ) ▷-β₀ᴵ ⟩
+  tᴵ [ δᴵ ]ᴵ ∎ 
+
+,[]ᴵ : (δᴵ ,ᴵ tᴵ) ∘ᴵ σᴵ ≡ (δᴵ ∘ᴵ σᴵ) ,ᴵ (tᴵ [ σᴵ ]ᴵ)
+,[]ᴵ {δᴵ = δᴵ} {tᴵ = tᴵ} {σᴵ = σᴵ} =
+  (δᴵ ,ᴵ tᴵ) ∘ᴵ σᴵ
+  ≡⟨ sym (▷-ηᴵ {δᴵ = (δᴵ ,ᴵ tᴵ) ∘ᴵ σᴵ}) ⟩
+  π₀ᴵ ((δᴵ ,ᴵ tᴵ) ∘ᴵ σᴵ) ,ᴵ π₁ᴵ ((δᴵ ,ᴵ tᴵ) ∘ᴵ σᴵ)
+  ≡⟨ cong (_,ᴵ π₁ᴵ ((δᴵ ,ᴵ tᴵ) ∘ᴵ σᴵ)) π₀∘ᴵ ⟩
+  (π₀ᴵ (δᴵ ,ᴵ tᴵ) ∘ᴵ σᴵ) ,ᴵ π₁ᴵ ((δᴵ ,ᴵ tᴵ) ∘ᴵ σᴵ)
+  ≡⟨ cong (λ ρ → (ρ ∘ᴵ σᴵ) ,ᴵ π₁ᴵ ((δᴵ ,ᴵ tᴵ) ∘ᴵ σᴵ)) ▷-β₀ᴵ ⟩
+  (δᴵ ∘ᴵ σᴵ) ,ᴵ π₁ᴵ ((δᴵ ,ᴵ tᴵ) ∘ᴵ σᴵ)
+  ≡⟨ cong ((δᴵ ∘ᴵ σᴵ) ,ᴵ_) π₁∘ᴵ ⟩
+  (δᴵ ∘ᴵ σᴵ) ,ᴵ (π₁ᴵ (δᴵ ,ᴵ tᴵ) [ σᴵ ]ᴵ)
+  ≡⟨ cong (λ ρ → (δᴵ ∘ᴵ σᴵ) ,ᴵ (ρ [ σᴵ ]ᴵ)) ▷-β₁ᴵ ⟩
+  (δᴵ ∘ᴵ σᴵ) ,ᴵ (tᴵ [ σᴵ ]ᴵ) ∎
+\end{code}
+
+We can now proceed with the proofs:
+
+\begin{code}
+⌜[]⌝ {x = zero} {ys = ys , y} = sym (zero[]ᴵ {δᴵ = ⌜ ys ⌝*})
+⌜[]⌝ {x = suc i B} {ys = ys , y} =
+  ⌜ i [ ys ] ⌝
+  ≡⟨ ⌜[]⌝ {x = i} ⟩
+  ⌜ i ⌝ [ ⌜ ys ⌝* ]ᴵ
+  ≡⟨ sym suc[]ᴵ ⟩
+  sucᴵ ⌜ i ⌝ B [ ⌜ ys ⌝* ,ᴵ ⌜ y ⌝ ]ᴵ ∎
+⌜[]⌝ {x = ` i} {ys = ys} = {!   !}
+⌜[]⌝ {x = t · u} {ys = ys} = {!   !}
+⌜[]⌝ {x = ƛ t} {ys = ys} = {!   !}
+
+⌜^⌝ {q = q} = cong₂ _,ᴵ_ ⌜⁺⌝ (⌜zero⌝ {q = q})
+
+⌜⁺⌝ {xs = ε} = sym •-ηᴵ
+⌜⁺⌝ {xs = xs , x} {A = A} = 
+  ⌜ xs ⁺ A ⌝* ,ᴵ ⌜ suc[ _ ] x A ⌝
+  ≡⟨ cong₂ _,ᴵ_ ⌜⁺⌝ (⌜suc⌝ {x = x}) ⟩
+  (⌜ xs ⌝* ∘ᴵ wkᴵ) ,ᴵ (⌜ x ⌝ [ wkᴵ ]ᴵ)
+  ≡⟨ sym {!∘[]!} ⟩
+  (⌜ xs ⌝* ,ᴵ ⌜ x ⌝) ∘ᴵ wkᴵ ∎
+\end{code}
+
+% ⌝ODO: Integrate completeness and stability proofs
