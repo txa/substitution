@@ -210,8 +210,8 @@
 
 %format suc[id⁺] = "\mathrm{suc}[\mathrm{id}^{+}]"
 
-%format 𝕄 = "\textbf{M}"
-%format 𝔹 = "\textbf{B}"
+%format 𝕄 = "\mathbb{M}"
+%format 𝔹 = "\mathbb{B}"
 %format compl-𝕄 = "\mathrm{compl}\texttt{-}" 𝕄
 %format compl-𝔹 = "\mathrm{compl}\texttt{-}" 𝔹
 
@@ -230,7 +230,7 @@
 
 %format ⌜    = "\ulcorner"
 %format ⌝    = "\urcorner"
-%format ⌝*   = ⌝ *
+%format ⌝*   = ⌝ "\mathrm{*}"
 %format ⌜_⌝  = ⌜ "\_" ⌝ 
 %format ⌜_⌝* = ⌜ "\_" ⌝*
 
@@ -241,7 +241,7 @@
 %format ⌜⁺⌝ = ⌜ ⁺ ⌝
 %format ⌜id⌝ = ⌜ id ⌝
 %format ⌜suc⌝ = ⌜ suc ⌝
-%format ⌜id⌝′ = ⌜id⌝ ^{\prime}
+%format ⌜id⌝′ = ⌜id⌝ "^{\prime}"
 %format ⌜[]⌝  = ⌜ [] ⌝
 %format ⌜⊑⌝   = ⌜ ⊑ ⌝
 %format ⌜⊑⌝*  = ⌜ ⊑ ⌝*

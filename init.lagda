@@ -1095,7 +1095,7 @@ compl-𝔹 .·[]ᴱ  = duip
 compl-𝔹 .ƛ[]ᴱ  = duip
 \end{code}
 
-And completeness is just call to the eliminator away.
+And completeness is just one call to the eliminator away.
 
 \begin{code}
 compl : ⌜ norm tᴵ ⌝ ≡ tᴵ
