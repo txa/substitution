@@ -1,9 +1,10 @@
 %if False
 \begin{code}
-{-# OPTIONS --rewriting #-}
+{-# OPTIONS --rewriting --injective-type-constructors #-}
 module init where
 
 open import Relation.Binary.PropositionalEquality hiding ([_])
+open import Data.Unit
 open  ≡-Reasoning public
 {-# BUILTIN REWRITE _≡_ #-}
 \end{code}
@@ -587,24 +588,24 @@ module Eliminator {𝕄} (𝔹 : Branches 𝕄) where
   elim-ty (A ⇒ B) = (elim-ty A) ⇒ᴱ (elim-ty B) 
 
   postulate
-    elim-tm  : ∀ M → Tmᴱ (elim-con Γ) (elim-ty A) M
-    elim-tms : ∀ δ → Tmsᴱ (elim-con Δ) (elim-con Γ) δ
+    elim-cwf  : ∀ tᴵ → Tmᴱ (elim-con Γ) (elim-ty A) tᴵ
+    elim-cwf* : ∀ δᴵ → Tmsᴱ (elim-con Δ) (elim-con Γ) δᴵ
 
-    elim-tms-idβ : elim-tms (idᴵ {Γ}) ≡ idᴱ
-    elim-tms-∘β  : elim-tms (σᴵ ∘ᴵ δᴵ) ≡ elim-tms σᴵ ∘ᴱ elim-tms δᴵ
+    elim-cwf*-idβ : elim-cwf* (idᴵ {Γ}) ≡ idᴱ
+    elim-cwf*-∘β  : elim-cwf* (σᴵ ∘ᴵ δᴵ) ≡ elim-cwf* σᴵ ∘ᴱ elim-cwf* δᴵ
 
-    elim-tms-[]β : elim-tm (tᴵ [ δᴵ ]ᴵ) ≡ elim-tm tᴵ [ elim-tms δᴵ ]ᴱ
+    elim-cwf*-[]β : elim-cwf (tᴵ [ δᴵ ]ᴵ) ≡ elim-cwf tᴵ [ elim-cwf* δᴵ ]ᴱ
 
-    elim-tms-εβ  : elim-tms (εᴵ {Δ = Δ}) ≡ εᴱ
-    elim-tms-,β  : elim-tms (δᴵ ,ᴵ tᴵ) ≡ (elim-tms δᴵ ,ᴱ elim-tm tᴵ)
-    elim-tms-π₀β : elim-tms (π₀ᴵ δᴵ) ≡ π₀ᴱ (elim-tms δᴵ)
-    elim-tms-π₁β : elim-tm (π₁ᴵ δᴵ) ≡ π₁ᴱ (elim-tms δᴵ)
+    elim-cwf*-εβ  : elim-cwf* (εᴵ {Δ = Δ}) ≡ εᴱ
+    elim-cwf*-,β  : elim-cwf* (δᴵ ,ᴵ tᴵ) ≡ (elim-cwf* δᴵ ,ᴱ elim-cwf tᴵ)
+    elim-cwf*-π₀β : elim-cwf* (π₀ᴵ δᴵ) ≡ π₀ᴱ (elim-cwf* δᴵ)
+    elim-cwf*-π₁β : elim-cwf (π₁ᴵ δᴵ) ≡ π₁ᴱ (elim-cwf* δᴵ)
 
-    elim-tm-·β : elim-tm (tᴵ ·ᴵ uᴵ) ≡ elim-tm tᴵ ·ᴱ elim-tm uᴵ
-    elim-tm-ƛβ : elim-tm (ƛᴵ tᴵ) ≡ ƛᴱ elim-tm tᴵ
+    elim-cwf-·β : elim-cwf (tᴵ ·ᴵ uᴵ) ≡ elim-cwf tᴵ ·ᴱ elim-cwf uᴵ
+    elim-cwf-ƛβ : elim-cwf (ƛᴵ tᴵ) ≡ ƛᴱ elim-cwf tᴵ
 
-  {-# REWRITE elim-tms-idβ elim-tms-∘β elim-tms-[]β elim-tms-εβ elim-tms-,β 
-              elim-tms-π₀β elim-tms-π₁β elim-tm-·β elim-tm-ƛβ #-}
+  {-# REWRITE elim-cwf*-idβ elim-cwf*-∘β elim-cwf*-[]β elim-cwf*-εβ elim-cwf*-,β 
+              elim-cwf*-π₀β elim-cwf*-π₁β elim-cwf-·β elim-cwf-ƛβ #-}
 open Eliminator public
 
 \end{code}
@@ -681,8 +682,8 @@ module Recursor (cwf : CwF-simple) where
 \begin{code}
   rec-con = elim-con cwf-to-branches
   rec-ty  = elim-ty  cwf-to-branches
-  rec-tm  = elim-tm  cwf-to-branches
-  rec-tms = elim-tms cwf-to-branches
+  rec-tm  = elim-cwf  cwf-to-branches
+  rec-tms = elim-cwf* cwf-to-branches
 
 open Recursor public
 \end{code}
@@ -768,9 +769,24 @@ stab {x = ƛ t} = cong ƛ_ (stab {x = t})
 \end{code}
 
 To prove completeness, we must instead induct on the initial CwF itself, which
-means there are many more cases. The idea behind the proof is still simple
-though: the bulk of the work is proving all our recursively-defined syntax 
-operations are preserved by |⌜_⌝|.
+means there are many more cases. We start with the motive:
+
+%if False
+\begin{code}
+open Motive public
+\end{code}
+%endif
+
+\begin{code}
+compl-𝕄 : Motive
+compl-𝕄 .Conᴱ _ = ⊤
+compl-𝕄 .Tyᴱ  _ = ⊤
+compl-𝕄 .Tmᴱ _ _ tᴵ = ⌜ norm tᴵ ⌝ ≡ tᴵ
+compl-𝕄 .Tmsᴱ _ _ δᴵ = ⌜ norm* δᴵ ⌝* ≡ δᴵ
+\end{code}
+
+To show these identities, we need to prove that our various recursively-defined
+syntax operations are preserved by |⌜_⌝|.
 
 Preservation of projections out of sequences of terms reduce to the associated 
 beta-laws of the initial CwF.
@@ -808,8 +824,8 @@ to keep Agda's termination checker happy.
 {-# INLINE ⌜id⌝ #-}
 \end{code}
 
-To complete these proofs, we also need beta-laws about substitutions for
-our initial CwF, so we derive these now.
+To complete these proofs, we also need beta-laws about our initial CwF
+substitutions, so we derive these now.
 
 \begin{code}
 zero[]ᴵ : zeroᴵ [ δᴵ ,ᴵ tᴵ ]ᴵ ≡ tᴵ
@@ -849,7 +865,19 @@ suc[]ᴵ {tᴵ = tᴵ} {B = B} {δᴵ = δᴵ} {uᴵ = uᴵ} =
   (δᴵ ∘ᴵ σᴵ) ,ᴵ (tᴵ [ σᴵ ]ᴵ) ∎
 \end{code}
 
-We can now proceed with the proofs:
+We also need a couple lemmas about how |⌜_⌝| ignores sort coercions.
+
+\begin{code}
+⌜⊑⌝ : ∀ {x : Γ ⊢[ q ] A} → ⌜ tm⊑ ⊑t x ⌝ ≡ ⌜ x ⌝
+⌜⊑⌝ {q = V} = refl
+⌜⊑⌝ {q = T} = refl
+
+⌜⊑⌝* : ⌜ tm*⊑ ⊑t xs ⌝* ≡ ⌜ xs ⌝*
+⌜⊑⌝* {xs = ε} = refl
+⌜⊑⌝* {xs = xs , x} = cong₂ _,ᴵ_ ⌜⊑⌝* (⌜⊑⌝ {x = x})
+\end{code}
+
+We can now (finally) proceed with the proofs:
 
 \begin{code}
 ⌜[]⌝ {x = zero} {ys = ys , y} = sym (zero[]ᴵ {δᴵ = ⌜ ys ⌝*})
@@ -859,9 +887,26 @@ We can now proceed with the proofs:
   ⌜ i ⌝ [ ⌜ ys ⌝* ]ᴵ
   ≡⟨ sym suc[]ᴵ ⟩
   sucᴵ ⌜ i ⌝ B [ ⌜ ys ⌝* ,ᴵ ⌜ y ⌝ ]ᴵ ∎
-⌜[]⌝ {x = ` i} {ys = ys} = {!   !}
-⌜[]⌝ {x = t · u} {ys = ys} = {!   !}
-⌜[]⌝ {x = ƛ t} {ys = ys} = {!   !}
+⌜[]⌝ {x = ` i} {ys = ys} = 
+  ⌜ tm⊑ ⊑t (i [ ys ]) ⌝
+  ≡⟨ ⌜⊑⌝ {x = i [ ys ]} ⟩
+  ⌜ i [ ys ] ⌝
+  ≡⟨ ⌜[]⌝ {x = i} ⟩
+  ⌜ i ⌝ [ ⌜ ys ⌝* ]ᴵ ∎
+⌜[]⌝ {x = t · u} {ys = ys} = 
+  ⌜ t [ ys ] ⌝ ·ᴵ ⌜ u [ ys ] ⌝
+  ≡⟨ cong₂ _·ᴵ_ (⌜[]⌝ {x = t}) (⌜[]⌝ {x = u}) ⟩
+  ⌜ t ⌝ [ ⌜ ys ⌝* ]ᴵ ·ᴵ ⌜ u ⌝ [ ⌜ ys ⌝* ]ᴵ
+  ≡⟨ sym ·[]ᴵ ⟩
+  (⌜ t ⌝ ·ᴵ ⌜ u ⌝) [ ⌜ ys ⌝* ]ᴵ ∎
+⌜[]⌝ {x = ƛ t} {ys = ys} = 
+  ƛᴵ ⌜ t [ ys ^ _ ] ⌝
+  ≡⟨ cong ƛᴵ_ (⌜[]⌝ {x = t}) ⟩
+  ƛᴵ ⌜ t ⌝ [ ⌜ ys ^ _ ⌝* ]ᴵ
+  ≡⟨ cong (λ ρ → ƛᴵ ⌜ t ⌝ [ ρ ]ᴵ) ⌜^⌝ ⟩
+  ƛᴵ ⌜ t ⌝ [ ⌜ ys ⌝* ^ᴵ _ ]ᴵ
+  ≡⟨ sym ƛ[]ᴵ ⟩
+  (ƛᴵ ⌜ t ⌝) [ ⌜ ys ⌝* ]ᴵ ∎
 
 ⌜^⌝ {q = q} = cong₂ _,ᴵ_ ⌜⁺⌝ (⌜zero⌝ {q = q})
 
@@ -870,8 +915,146 @@ We can now proceed with the proofs:
   ⌜ xs ⁺ A ⌝* ,ᴵ ⌜ suc[ _ ] x A ⌝
   ≡⟨ cong₂ _,ᴵ_ ⌜⁺⌝ (⌜suc⌝ {x = x}) ⟩
   (⌜ xs ⌝* ∘ᴵ wkᴵ) ,ᴵ (⌜ x ⌝ [ wkᴵ ]ᴵ)
-  ≡⟨ sym {!∘[]!} ⟩
+  ≡⟨ sym ,[]ᴵ ⟩
   (⌜ xs ⌝* ,ᴵ ⌜ x ⌝) ∘ᴵ wkᴵ ∎
+
+⌜id⌝′ {Γ = •} _ = sym •-ηᴵ
+⌜id⌝′ {Γ = Γ ▷ A} _ = 
+  ⌜ id ⁺ A ⌝* ,ᴵ zeroᴵ
+  ≡⟨ cong (_,ᴵ zeroᴵ) ⌜⁺⌝ ⟩
+  ⌜ id ⌝* ^ᴵ A
+  ≡⟨ cong (_^ᴵ A) ⌜id⌝ ⟩
+  idᴵ ^ᴵ A
+  ≡⟨ cong (_,ᴵ zeroᴵ) id∘ᴵ ⟩
+  wkᴵ ,ᴵ zeroᴵ
+  ≡⟨ ▷-ηᴵ ⟩
+  idᴵ ∎
+
+⌜suc⌝ {q = V} = refl
+⌜suc⌝ {q = T} {x = t} {B = B} =
+  ⌜ t [ id ⁺ B ] ⌝
+  ≡⟨ ⌜[]⌝ {x = t} ⟩
+  ⌜ t ⌝ [ ⌜ id ⁺ B ⌝* ]ᴵ
+  ≡⟨ cong (⌜ t ⌝ [_]ᴵ) ⌜⁺⌝ ⟩
+  ⌜ t ⌝ [ ⌜ id ⌝* ∘ᴵ wkᴵ ]ᴵ
+  ≡⟨ cong (λ ρ → ⌜ t ⌝ [ ρ ∘ᴵ wkᴵ ]ᴵ) ⌜id⌝ ⟩
+  ⌜ t ⌝ [ idᴵ ∘ᴵ wkᴵ ]ᴵ
+  ≡⟨ cong (⌜ t ⌝ [_]ᴵ) id∘ᴵ ⟩
+  ⌜ t ⌝ [ wkᴵ ]ᴵ ∎
 \end{code}
 
-% ⌝ODO: Integrate completeness and stability proofs
+We also prove preservation of composition.
+
+\begin{code}
+⌜∘⌝ : ⌜ xs ∘ ys ⌝* ≡ ⌜ xs ⌝* ∘ᴵ ⌜ ys ⌝*
+⌜∘⌝ {xs = ε} = sym •-ηᴵ
+⌜∘⌝ {xs = xs , x} {ys = ys} = 
+  ⌜ xs ∘ ys ⌝* ,ᴵ ⌜ x [ ys ] ⌝
+  ≡⟨ cong₂ _,ᴵ_ ⌜∘⌝ (⌜[]⌝ {x = x}) ⟩
+  (⌜ xs ⌝* ∘ᴵ ⌜ ys ⌝*) ,ᴵ (⌜ x ⌝ [ ⌜ ys ⌝* ]ᴵ)
+  ≡⟨ sym ,[]ᴵ ⟩
+  (⌜ xs ⌝* ,ᴵ ⌜ x ⌝) ∘ᴵ ⌜ ys ⌝* ∎
+\end{code}
+
+The main cases of |Branches compl-𝕄| can now be proved by just applying the 
+preservation lemmas and the IHs.
+
+%if False
+\begin{code}
+duip : ∀ {A B : Set ℓ} {x y : A} {z w : B} {p q} {r : (x ≡ y) ≡ (z ≡ w)}
+      → p ≡[ r ]≡ q
+duip {p = refl} {q = refl} {r = refl} = refl
+
+open Branches public
+\end{code}
+%endif
+
+\begin{code}
+compl-𝔹 : Branches compl-𝕄
+compl-𝔹 .idᴱ = 
+  ⌜ tm*⊑ v⊑t id ⌝*
+  ≡⟨ ⌜⊑⌝* ⟩
+  ⌜ id ⌝*
+  ≡⟨ ⌜id⌝ ⟩
+  idᴵ ∎
+compl-𝔹 ._∘ᴱ_ {σᴵ = σᴵ} {δᴵ = δᴵ} σᴱ δᴱ = 
+  ⌜ norm* σᴵ ∘ norm* δᴵ ⌝*
+  ≡⟨ ⌜∘⌝ ⟩
+  ⌜ norm* σᴵ ⌝* ∘ᴵ ⌜ norm* δᴵ ⌝*
+  ≡⟨ cong₂ _∘ᴵ_ σᴱ δᴱ ⟩
+  σᴵ ∘ᴵ δᴵ ∎
+compl-𝔹 ._[_]ᴱ {tᴵ = tᴵ} {δᴵ = δᴵ} tᴱ δᴱ = 
+  ⌜ norm tᴵ [ norm* δᴵ ] ⌝
+  ≡⟨ ⌜[]⌝ {x = norm tᴵ} ⟩
+  ⌜ norm tᴵ ⌝ [ ⌜ norm* δᴵ ⌝* ]ᴵ
+  ≡⟨ cong₂ _[_]ᴵ tᴱ δᴱ ⟩
+  tᴵ [ δᴵ ]ᴵ ∎
+compl-𝔹 .•ᴱ = tt
+compl-𝔹 .εᴱ = refl
+compl-𝔹 ._▷ᴱ_ _ _ = tt
+compl-𝔹 ._,ᴱ_ δᴱ tᴱ = cong₂ _,ᴵ_ δᴱ tᴱ
+compl-𝔹 .π₀ᴱ {δᴵ = δᴵ} δᴱ = 
+  ⌜ π₀ (norm* δᴵ) ⌝*
+  ≡⟨ ⌜π₀⌝ ⟩
+  π₀ᴵ ⌜ norm* δᴵ ⌝*
+  ≡⟨ cong π₀ᴵ δᴱ ⟩
+  π₀ᴵ δᴵ ∎
+compl-𝔹 .π₁ᴱ {δᴵ = δᴵ} δᴱ = 
+  ⌜ π₁ (norm* δᴵ) ⌝
+  ≡⟨ ⌜π₁⌝ ⟩
+  π₁ᴵ ⌜ norm* δᴵ ⌝*
+  ≡⟨ cong π₁ᴵ δᴱ ⟩
+  π₁ᴵ δᴵ ∎
+compl-𝔹 .oᴱ = tt
+compl-𝔹 ._⇒ᴱ_ _ _ = tt
+compl-𝔹 ._·ᴱ_ tᴱ uᴱ = cong₂ _·ᴵ_ tᴱ uᴱ
+compl-𝔹 .ƛᴱ_ tᴱ = cong (ƛᴵ_) tᴱ
+\end{code}
+
+The remaining cases correspond to the CwF equations, which are required to hold 
+for whatever type family we eliminate the initial CwF into so congruence of 
+|_≡_| is retained. For our completeness proof, all of these cases become
+higher-dimensional identities, equating different proof trees for completeness
+instantiated with the LHS/RHS terms/substitutions. 
+
+In a univalent type theory we might try and carefully introduce additional 
+coherences to our initial CwF to try and make these identities provable without 
+the sledgehammer of set truncation (which would prevent eliminating the initial 
+CwF into any non-set).
+
+As we are working in vanilla Agda, we'll take a simpler approach, and rely on 
+UIP.
+
+\spec{code}
+duip : ∀ {A B : Set ℓ} {x y : A} {z w : B} {p q} {r : (x ≡ y) ≡ (z ≡ w)}
+      → p ≡[ r ]≡ q
+duip {p = refl} {q = refl} {r = refl} = refl
+\spec{code}
+
+It is probably worth noting that this implementation of (dependent) UIP relies 
+on type constructor injectivity. We could use a weaker version which takes an 
+additional proof of |x ≡ z| instead, but this would be clunkier to use; Agda
+has no hope of inferring such a proof by unification.
+
+\begin{code}
+compl-𝔹 .id∘ᴱ  = duip
+compl-𝔹 .∘idᴱ  = duip
+compl-𝔹 .∘∘ᴱ   = duip
+compl-𝔹 .[id]ᴱ = duip
+compl-𝔹 .[∘]ᴱ  = duip
+compl-𝔹 .•-ηᴱ  = duip
+compl-𝔹 .▷-β₀ᴱ = duip
+compl-𝔹 .▷-β₁ᴱ = duip
+compl-𝔹 .▷-ηᴱ  = duip
+compl-𝔹 .π₀∘ᴱ  = duip
+compl-𝔹 .π₁∘ᴱ  = duip
+compl-𝔹 .·[]ᴱ  = duip
+compl-𝔹 .ƛ[]ᴱ  = duip
+\end{code}
+
+And completeness is just call to the eliminator away.
+
+\begin{code}
+compl : ⌜ norm tᴵ ⌝ ≡ tᴵ
+compl {tᴵ = tᴵ} = elim-cwf compl-𝔹 tᴵ
+\end{code}
