@@ -228,7 +228,7 @@ First we motivate the problem by explaining tha naive approach (section
 \ref{sec:naive-approach}) and then we factor the operations using sorts
 (section \ref{sec:fact-with-sorts}. We use this to prove the
 categorical laws
-without repetitions (section \ref{sec:laws}). In section
+without repetitions (section \ref{sec:proving-laws}). In section
 \ref{sec:initiality} we introduce simply typed CwFs and use our
 previous proofs to show  that the
 recursive definition is initial (i.e. it is isomorphic to the quotient
