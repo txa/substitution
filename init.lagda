@@ -23,10 +23,10 @@ For the categorically minded we can summarize:
   understand the rest of the paper.}
 a CwF is given by
 \begin{itemize}
-\item a category of contexts,
-\item a presheaf to model types (i.e. a contravariant functor from the
+\item A category of contexts,
+\item A presheaf to model types (i.e. a contravariant functor from the
   category of contexts to |Set|),
-\item a dependent presheaf for terms over the type presheaf (i.e. a presheaf
+\item A dependent presheaf for terms over the type presheaf (i.e. a presheaf
   over the category of elements of the type presheaf),
 \item A terminal object (empty context) and context extension.
   Context extension corresponds to demanding that the term presheaf is
@@ -47,8 +47,8 @@ additional structure to model simply typed $\lambda$-calculus (section
 \ref{sec:simply-typed-cwfs}) and then we show that the recursive
 definition of substitution gives rise to a simply typed CwF (section
 \ref{sec:cwf-recurs-subst}). We can define the initial CwF as a
-Quotient Inductive Type in Cubical Agda but to simplify our
-development
+Quotient Inductive Type. To simplify our development, rather than using a
+Cubical Agda HIT,
 \footnote{Cubical Agda still lacks some essential automation,
   e.g. integrating no-confusion properties with pattern matching.}
 we just postulate the existence of this QIIT in Agda (with
@@ -170,8 +170,10 @@ constructors and the corresponding naturality laws:
 \subsection{The CwF of recursive substitutions}
 \label{sec:cwf-recurs-subst}
 
-We now want to show that our recursive substitution syntax obeys the CwF laws,
-or in other words, that any CwF can be interpreted into our syntax.
+We now aim to show that our recursive substitution syntax obeys the CwF laws.
+As we shall see later, this will also be more-or-less enough to implement the 
+"normalisation" direction of our initial CwF |≃| recursive sub syntax 
+isomorphism.
 
 %if False
 \begin{code}
@@ -190,9 +192,10 @@ is-cwf : CwF-simple
 is-cwf .CwF.Con = Con
 \end{spec}
 
-We now need to decide how to interpret morphisms/substitutions. In our first 
-attempt, we tried to pair renamings/substitutions with their sorts and stay 
-polymorphic:
+We now need to decide which type family to interpret substitutions into. 
+In our first attempt, we tried to pair renamings/substitutions with their sorts 
+and stay polymorphic:
+
 \begin{spec}
 record _⊨_ (Δ : Con) (Γ : Con) : Set where
   field
@@ -204,17 +207,20 @@ is-cwf .CwF.id  = record {sort = V; tms = id}
 \end{spec}
 
 Unfortunately, this approach quickly breaks. The CwF laws force us to provide a 
-unique morphism to the terminal object/weakening-from-the-empty-context.
+unique morphism to the terminal context (i.e. a unique weakening from the empty 
+context).
+
 \begin{spec}
 is-cwf .CwF.• = •
 is-cwf .CwF.ε = record {sort = ?; tms = ε}
 is-cwf .CwF.•-η {δ = record {sort = q; tms = ε}} = ?
 \end{spec}
+
 Our |_⊨_| record is simply too flexible here. It allows two distinct 
 implementations: |record {sort = V; tms = ε}| and |record {sort = T; tms = ε}|. 
 We are stuck!
 
-To avoid this, we instead must fix the sort to |T|.
+To avoid this, we instead fix the sort to |T|.
 
 \begin{code}
 _⊨_ = _⊨[ T ]_ 
@@ -261,11 +267,11 @@ interleaved mutual
 
 The lack of flexibility to choose the sort does, however, make identity a little 
 trickier. |id| doesn't fit directly as it produces
-renamings |Γ ⊨[ V ] Γ| - we need the equivalent substitution |Γ ⊨[ T ] Γ|. 
+renamings |Γ ⊨[ V ] Γ|; we need the equivalent substitution |Γ ⊨[ T ] Γ|. 
 Technically, |id-poly| would suit this purpose but for reasons that will become 
 clear soon, we take a slightly more indirect approach.
 \footnote{Also, |id-poly| was ultimately just an implementation detail 
-to satisfy the termination checker, so we'd rather not rely on it here.}
+to satisfy the termination checker, so we'd rather not rely on it.}
 
 We first extend |tm⊑| to sequences of variables/terms:
 \begin{spec}
@@ -283,10 +289,12 @@ our substitution operators:
   ⊑⁺   : tm*⊑ ⊑t xs ⁺ A ≡ tm*⊑ v⊑t (xs ⁺ A)
   ⊑^   : tm*⊑ v⊑t xs ^ A ≡ tm*⊑ v⊑t (xs ^ A)
 \end{spec}
+
 Most of these are proofs come out easily by induction on terms and 
 substitutions and we skip over them.
 Perhaps worth noting though is that |⊑⁺| requires one new law relating our two
 ways of weakening variables.
+
 \begin{code}
   suc[id⁺] : i [ id ⁺ A ] ≡ suc i A
   suc[id⁺] {i = i} {A = A} =
@@ -298,7 +306,6 @@ ways of weakening variables.
 
   ⊑⁺ {xs = ε}      = refl
   ⊑⁺ {xs = xs , x} = cong₂ _,_ ⊑⁺ (cong (`_) suc[id⁺])
-
 \end{code}
 
 %if False
@@ -327,12 +334,15 @@ ways of weakening variables.
 
 We can now build an identity substitution by applying this coercion to the 
 identity renaming.
+
 \begin{code}
   is-cwf .CwF.id = tm*⊑ v⊑t id
 \end{code}
-Our left and right identity laws now take the form |tm*⊑ v⊑t id ∘ δ ≡ δ|
+
+The left and right identity CwF laws now take the form |tm*⊑ v⊑t id ∘ δ ≡ δ|
 and |δ ∘ tm*⊑ v⊑t id ≡ δ|. This is where we can take full advantage of the 
-|tm*⊑| machinery: the lemmas let us reuse our existing |id∘|/|∘id| proofs!
+|tm*⊑| machinery; these lemmas let us reuse our existing |id∘|/|∘id| proofs!
+
 \begin{code}
   is-cwf .CwF.id∘ {δ = δ} = 
     tm*⊑ v⊑t id ∘ δ
@@ -348,8 +358,8 @@ and |δ ∘ tm*⊑ v⊑t id ≡ δ|. This is where we can take full advantage of
     δ ∎
 \end{code}
 
-Similarly to substitutions, we must fix the sort of our presheaf on contexts/
-terms to |T| (in this case, so we can prove the identity law: applying the
+Similarly to substitutions, we must fix the sort of our terms to |T| 
+(in this case, so we can prove the identity law - note that applying the 
 identity substitution to a variable |i| produces the distinct term |` i|).
 
 \begin{spec}
@@ -404,17 +414,14 @@ differing implementations of |_^_|.
     ƛ x [ ys ∘ tm*⊑ v⊑t (id ⁺ A) , ` zero ] ∎
 \end{code}
 
-\subsection{Proving initiality}
-\label{sec:proving-initiality}
+We have shown our recursive substitution syntax satisfies the CwF laws, but we
+want to go a step further and show initiality: that our syntax is isomoprhic to
+the initial CwF.
 
-We have now proved that we can interpret any simply-typed CwF into our syntax 
-with  recursive substitutions. but this is not yet sufficient for proving 
-initiality (that our syntax is isomorphic to the initial CwF).
-
-To show this isomorphism, we must first define the initial CwF and it's 
-elimination principle. We use postulates and rewrite rules instead of a Cubical 
-Agda QIIT because of  technical limitations mentioned previously.
-We reuse our existing datatypes for contexts and types because terms do not 
+An important first step is to actually define the initial CwF (and its
+eliminator). We use postulates and rewrite rules instead of a Cubical 
+Agda QIIT because of technical limitations mentioned previously.
+We also reuse our existing datatypes for contexts and types because terms do not 
 occur inside types in STLC.
 
 To state the dependent equations between outputs of the eliminator, we need
@@ -610,11 +617,10 @@ open Eliminator public
 
 \end{code}
 
-We are now very close to a normalisation function from terms stated in terms
-of the initial CwF to terms in our recursive substitution syntax. All we need
-is a way to connect our notion of "being a CwF" with our initial CwF's 
+Normalisation from the initial CwF into substitution normal forms now only
+needs a way to connect our notion of "being a CwF" with our initial CwF's 
 eliminator: specifically, that any set of type families obeying the CwF laws
-gives rise to a |Motive| and set of |Branches|.
+gives rise to a |Motive| and associated set of |Branches|.
 
 The one extra ingredient we need to make this work out neatly is to introduce
 a new reduction for |cong|:
@@ -739,9 +745,13 @@ easily be recursing on our substitution-normal forms.
 ⌜ δ , x ⌝* = ⌜ δ ⌝* ,ᴵ ⌜ x ⌝
 \end{code}
 
+\subsection{Proving initiality}
+\label{sec:proving-initiality}
+
 We have implemented both directions of the isomorphism. Now to show this truly
-is an isomorphism, we must prove that |norm| and |⌜_⌝| are mutual inverses -
-i.e. stability |norm ⌜ t ⌝ ≡ t| and completeness |⌜ norm t ⌝ ≡ t|.
+is an isomorphism and not just a pair of functions, we must prove that |norm| 
+and |⌜_⌝| are mutual inverses - i.e. stability |norm ⌜ t ⌝ ≡ t| and 
+completeness |⌜ norm t ⌝ ≡ t|.
 
 We start with stability, as it is considerably easier. There are just a couple
 details worth mentioning:
@@ -751,6 +761,7 @@ details worth mentioning:
   to sort |T| on the RHS.
   \item The case for variables relies on a bit of coercion manipulation and our 
   earlier lemma relating |suc i B| and |i [ id ⁺ B ]|.
+\end{itemize}
 
 \begin{code}
 stab : norm ⌜ x ⌝ ≡ tm⊑ ⊑t x
@@ -943,7 +954,7 @@ We can now (finally) proceed with the proofs:
   ⌜ t ⌝ [ wkᴵ ]ᴵ ∎
 \end{code}
 
-We also prove preservation of composition.
+We also prove preservation of substitution composition.
 
 \begin{code}
 ⌜∘⌝ : ⌜ xs ∘ ys ⌝* ≡ ⌜ xs ⌝* ∘ᴵ ⌜ ys ⌝*
@@ -1032,9 +1043,10 @@ duip {p = refl} {q = refl} {r = refl} = refl
 \spec{code}
 
 It is probably worth noting that this implementation of (dependent) UIP relies 
-on type constructor injectivity. We could use a weaker version which takes an 
-additional proof of |x ≡ z| instead, but this would be clunkier to use; Agda
-has no hope of inferring such a proof by unification.
+on type constructor injectivity (specifically, injectivity of |_≡_|). 
+We could use a weaker version which takes an additional proof of |x ≡ z| 
+instead, but this would be clunkier to use; Agda has no hope of inferring such a
+proof by unification.
 
 \begin{code}
 compl-𝔹 .id∘ᴱ  = duip
