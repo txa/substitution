@@ -154,7 +154,7 @@ We extensively use variable declarations to introduce implicit
 quantification (we summarize the variables conventions in passing in
 the text). However, implicit variables are not available in records,
 which makes the definitions in section \ref{sec:initiality} more
-verbose. However, we do use the $∀$-prefix which means that we don't
+verbose. However, we do use the $\forall{}$-prefix which means that we don't
 have to write the type if it can be inferred, i.e. instead of |{Γ : Con} → ..| we just write
 |∀{Γ} → ..|.
 

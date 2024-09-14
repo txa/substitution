@@ -7,6 +7,8 @@
 %format ∘ = "\ensuremath{\mbox{$\circ$}}"
 %format _∘_ = _ "\ensuremath{\mbox{$\circ$}}" _
 
+%format Set₁ = "\mathrm{Set}_1"
+
 %format ⊤ = "\top"
 %format ⊥ = "\bot"
 
@@ -24,7 +26,11 @@
 %format Πℕ = "{\Pi}{\mathbb N}"
  
 %format ≡ = "\equiv"
+%format _≡_ = "\_\equiv\_"
 %format ≅ = "\cong"
+%format ≡⟨ = "\equiv\!\langle"
+%format ≡⟨⟩ = "\equiv\!\langle\rangle"
+%format ∎ = "\blacksquare"
 
 %format forall = "\forall{}"
 
@@ -67,9 +73,15 @@
 
 %format ↦ = "\mapsto"
 
-%%format [⇒] = "[\rightarrow]"
-%%format ⊢ = "\vdash"
-%%format _⊢_ = "\_\vdash\_"
+%format ⇒ = "\Rightarrow"
+%format _⇒_ = "\_\Rightarrow\_"
+%format `_ = "\texttt{\textasciigrave}\_"
+%format ` = "\texttt{\textasciigrave}"
+
+%format ⊢ = "\vdash"
+%format _⊢_ = "\_\vdash\_"
+%format ∋ = "\ni"
+%format _∋_ = "\_\ni\_"
 
 %format _∨ᶜ_ = "\_\vee^c\_"
 %format ∨ᶜ = "\vee^c"
@@ -107,6 +119,8 @@
 %format ƛ = "\lambda"
 %format ƛ_ = "\lambda\_"
 
+%format _⊢[_]_ = "\_\vdash\![\_]\_"
+%format ⊢[ = "\vdash\!["
 
 %format _⊨[_]_ = "\_\models\![\_]\_"
 %format ⊨[ = "\models\!["
@@ -120,10 +134,23 @@
 %format ^v = "\uparrow\!{\mathrm{v}}"
 %format _^v_ = "\_\uparrow\!{\mathrm{v}}\_"
 
+%format ε = "\varepsilon"
+
+%format ⁺ = "^{+}"
+%format _⁺_ = "\_^{+}\_"
+%format _⁺v_ = "^{+}\!{\mathrm{v}}"
+%format ⁺v = "^{+}\!{\mathrm{v}}"
+%format _⁺_, = "\_^{+}\_,"
+
 %format ^∘ = "\uparrow\!\circ"
 %format ⁺∘ = "{}^+\!\circ"
-%format ⁺-nat∘ = "{}^+\!-nat\!\circ"
+%format ⁺-nat∘ = "{}^+\!-\mathrm{nat}\!\circ"
 
+%format ∘∘ = "\circ\circ"
+%format [∘] = "[\circ]"
+%format ∘id = "\circ\!\mathrm{id}"
+%format id∘ = "\mathrm{id}\circ"
+%format id∘′ = "\mathrm{id}\!\circ^{\prime}"
 
 %format •-η = "\bullet\!-\!\eta"
 %format π₀ = "\pi_0"
@@ -135,3 +162,25 @@
 %format π₁∘ = "\pi_1\!\circ"
 %format ·[] = "\cdot\![]"
 %format ƛ[] = "\lambda[]"
+
+%format ⊔ = "\sqcup"
+%format _⊔_ = "\_\sqcup\_"
+%format ⊔⊔ = "\sqcup\!\sqcup"
+%format ⊔v = "\sqcup\!\mathrm{v}"
+
+%format ⊑ = "\sqsubseteq"
+%format _⊑_ = "\_\sqsubseteq\_"
+%format v⊑t = "\mathrm{v}\!\sqsubseteq\!\mathrm{t}"
+%format ⊑t = "\sqsubseteq\!\mathrm{t}"
+%format v⊑ = "\mathrm{v}\!\sqsubseteq"
+%format tm⊑ = "\mathrm{tm}\!\sqsubseteq"
+%format q⊑r = "\mathrm{q}\!\sqsubseteq\!\mathrm{r}"
+%format tm⊑zero = "\mathrm{tm}\!\sqsubseteq\!\mathrm{zero}"
+
+%format ⊑q⊔ = "\sqsubseteq\!\mathrm{q}\!\sqcup"
+%format ⊑⊔r = "\sqsubseteq\!\sqcup\mathrm{r}"
+
+%format ⁺-nat[]v = "^{+}\!\texttt{-}\mathrm{nat}[]\mathrm{v}"
+%format ⁺-nat[] = "^{+}\!\texttt{-}\mathrm{nat}[]"
+
+%format cong₂ = "\mathrm{cong}_{2}"
