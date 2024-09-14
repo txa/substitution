@@ -157,7 +157,7 @@ To improve readability we turn the equations  (|⊔⊔| , |⊔v|) into
 rewrite rules: by declaring
 
 \begin{spec}
-{-# REWRITE \sqcup\!\sqcup \; \sqcup\mathrm{v} \; #-}
+{-# REWRITE $\sqcup\!\sqcup \; \sqcup\mathrm{v} \;$ #-}
 \end{spec}
 
 %if False
