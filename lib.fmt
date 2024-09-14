@@ -4,8 +4,13 @@
 %format → = "\rightarrow"
 %format ∀ = "\forall{}"
 %format λ = "\lambda" 
+
+% Why not just "\circ"?
+
 %format ∘ = "\ensuremath{\mbox{$\circ$}}"
-%format _∘_ = _ "\ensuremath{\mbox{$\circ$}}" _
+%format _∘_ = "\_\ensuremath{\mbox{$\circ$}}\_"
+
+%format ≃ = "\simeq"
 
 %format Set₁ = "\mathrm{Set}_1"
 
@@ -31,6 +36,9 @@
 %format ≡⟨ = "\equiv\!\langle"
 %format ≡⟨⟩ = "\equiv\!\langle\rangle"
 %format ∎ = "\blacksquare"
+%format _≡[_]≡_ = "\_\equiv[\_]\equiv\_"
+%format ≡[ = "\equiv["
+%format ]≡ = "]\equiv"
 
 %format forall = "\forall{}"
 
@@ -66,6 +74,9 @@
 %format Λ = "\Lambda"
 %format η = "\eta"
 %format ω = "\omega"
+%format ℓ = "\ell"
+%format ℓ₁ = "\ell_1"
+%format ℓ₂ = "\ell_2"
 
 %format ℕ = "\mathbb{N}"
 %format ℝ = "\mathbb{R}"
@@ -121,9 +132,11 @@
 
 %format _⊢[_]_ = "\_\vdash\![\_]\_"
 %format ⊢[ = "\vdash\!["
+%format _⊢[ = "\_\vdash\!["
 
 %format _⊨[_]_ = "\_\models\![\_]\_"
 %format ⊨[ = "\models\!["
+%format _⊨[ = "\_\models\!["
 
 %format _▷_ = "\_\rhd\_"
 %format ▷ = "\rhd"
@@ -146,7 +159,7 @@
 %format ⁺∘ = "{}^+\!\circ"
 %format ⁺-nat∘ = "{}^+\!-\mathrm{nat}\!\circ"
 
-%format ∘∘ = "\circ\circ"
+%format ∘∘ = "\circ\!\circ"
 %format [∘] = "[\circ]"
 %format ∘id = "\circ\!\mathrm{id}"
 %format id∘ = "\mathrm{id}\circ"
@@ -180,7 +193,223 @@
 %format ⊑q⊔ = "\sqsubseteq\!\mathrm{q}\!\sqcup"
 %format ⊑⊔r = "\sqsubseteq\!\sqcup\mathrm{r}"
 
+%format tm*⊑ = "\mathrm{tm*}\!\sqsubseteq"
+%format q⊑s = "\mathrm{q}\!\sqsubseteq\!\mathrm{s}"
+
+%format ⊑∘ = "\sqsubseteq\circ"
+%format ∘⊑ = "\circ\sqsubseteq"
+%format v[⊑] = "\mathrm{v}[\sqsubseteq]"
+%format t[⊑] = "\mathrm{t}[\sqsubseteq]"
+%format ⊑⁺ = "\sqsubseteq^{+}"
+%format ⊑^ = "\sqsubseteq\uparrow"
+
 %format ⁺-nat[]v = "^{+}\!\texttt{-}\mathrm{nat}[]\mathrm{v}"
 %format ⁺-nat[] = "^{+}\!\texttt{-}\mathrm{nat}[]"
 
 %format cong₂ = "\mathrm{cong}_{2}"
+
+%format suc[id⁺] = "\mathrm{suc}[\mathrm{id}^{+}]"
+
+%format 𝕄 = "\textbf{M}"
+%format 𝔹 = "\textbf{B}"
+%format compl-𝕄 = "\mathrm{compl}\texttt{-}" 𝕄
+%format compl-𝔹 = "\mathrm{compl}\texttt{-}" 𝔹
+
+%format elim-cwf- = "\mathrm{elim}\texttt{-}\mathrm{cwf}\texttt{-}"
+%format elim-cwf*- = "\mathrm{elim}\texttt{-}\mathrm{cwf*}\texttt{-}"
+
+%format elim-cwf*-idβ = elim-cwf*- id β
+%format elim-cwf*-∘β  = elim-cwf*- ∘ β
+%format elim-cwf*-[]β = elim-cwf*- [] β
+%format elim-cwf*-εβ  = elim-cwf*- ε β
+%format elim-cwf*-,β  = elim-cwf*- , β
+%format elim-cwf*-π₀β = elim-cwf*- π₀ β
+%format elim-cwf*-π₁β = elim-cwf*- π₁ β
+%format elim-cwf-·β  = elim-cwf- · β
+%format elim-cwf-ƛβ  = elim-cwf- ƛ β
+
+%format ⌜    = "\ulcorner"
+%format ⌝    = "\urcorner"
+%format ⌝*   = ⌝ *
+%format ⌜_⌝  = ⌜ "\_" ⌝ 
+%format ⌜_⌝* = ⌜ "\_" ⌝*
+
+%format ⌜π₀⌝ = ⌜ π₀ ⌝
+%format ⌜π₁⌝ = ⌜ π₁ ⌝
+%format ⌜zero⌝ = ⌜ zero ⌝
+%format ⌜^⌝ = ⌜ ^ ⌝
+%format ⌜⁺⌝ = ⌜ ⁺ ⌝
+%format ⌜id⌝ = ⌜ id ⌝
+%format ⌜suc⌝ = ⌜ suc ⌝
+%format ⌜id⌝′ = ⌜id⌝ ^{\prime}
+%format ⌜[]⌝  = ⌜ [] ⌝
+%format ⌜⊑⌝   = ⌜ ⊑ ⌝
+%format ⌜⊑⌝*  = ⌜ ⊑ ⌝*
+%format ⌜∘⌝   = ⌜ ∘ ⌝
+
+%format .CwF. = "\mathrm{.CwF.}"
+%format .CwF._∘_  = .CwF. _∘_
+%format .CwF._⊢_  = .CwF. _⊢_
+%format .CwF._⊨_  = .CwF. _⊨_
+%format .CwF._▷_  = .CwF. _▷_
+%format .CwF.ε    = .CwF. ε
+%format .CwF.∘∘   = .CwF. ∘∘
+%format .CwF.[∘]  = .CwF. [∘]
+%format .CwF.id∘  = .CwF. id∘
+%format .CwF.∘id  = .CwF. ∘id
+%format .CwF.•-η  = .CwF. •-η
+%format .CwF.▷-β₀ = .CwF. ▷-β₀
+%format .CwF.▷-β₁ = .CwF. ▷-β₁
+%format .CwF.π₀   = .CwF. π₀
+%format .CwF.π₁   = .CwF. π₁
+%format .CwF.▷-η  = .CwF. ▷-η
+%format .CwF.π₀∘  = .CwF. π₀∘
+%format .CwF.π₁∘  = .CwF. π₁∘
+%format .CwF._⇒_  = .CwF. _⇒_
+%format .CwF._·_  = .CwF. _·_
+%format .CwF.ƛ_   = .CwF. ƛ_
+%format .CwF.·[]  = .CwF. ·[]
+%format .CwF.ƛ[]  = .CwF. ƛ[]
+
+%format ᴵ     = "^{\mathrm{I}}"
+%format ⊢ᴵ    = ⊢ ᴵ
+%format _⊢ᴵ_  = "\_" ⊢ᴵ "\_"
+%format ⊨ᴵ    = ⊨ ᴵ
+%format _⊨ᴵ_  = "\_" ⊨ᴵ "\_"
+%format tᴵ    = t ᴵ
+%format uᴵ    = u ᴵ
+%format vᴵ    = v ᴵ
+%format δᴵ    = δ ᴵ
+%format σᴵ    = σ ᴵ
+%format ξᴵ    = ξ ᴵ
+%format idᴵ   = id ᴵ
+%format ∘ᴵ    = ∘ ᴵ
+%format _∘ᴵ_  = "\_" ∘ᴵ "\_"
+%format id∘ᴵ  = id∘ ᴵ
+%format ∘idᴵ  = ∘id ᴵ
+%format ∘∘ᴵ   = ∘∘ ᴵ
+%format ]ᴵ    = ] ᴵ
+%format _[_]ᴵ = _[_] ᴵ
+%format [id]ᴵ = [id] ᴵ
+%format [∘]ᴵ  = [∘] ᴵ
+%format εᴵ    = ε ᴵ
+%format ,ᴵ    = , ᴵ
+%format _,ᴵ_  = "\_" ,ᴵ "\_"
+%format π₀ᴵ   = π₀ ᴵ
+%format π₁ᴵ   = π₁ ᴵ
+%format •-ηᴵ  = •-η ᴵ
+%format ▷-β₀ᴵ = ▷-β₀ ᴵ
+%format ▷-β₁ᴵ = ▷-β₁ ᴵ
+%format ▷-ηᴵ  = ▷-η ᴵ
+%format π₀∘ᴵ  = π₀∘ ᴵ
+%format π₁∘ᴵ  = π₁∘ ᴵ
+%format wkᴵ   = wk ᴵ
+%format zeroᴵ = zero ᴵ
+%format ^ᴵ    = ^ ᴵ
+%format _^ᴵ_  = "\_" ^ᴵ "\_"
+%format ·ᴵ    = · ᴵ
+%format _·ᴵ_  = "\_" ·ᴵ "\_"
+%format ƛᴵ    = ƛ ᴵ
+%format ƛᴵ_   = ƛᴵ "\_"  
+%format ·[]ᴵ  = ·[] ᴵ
+%format ƛ[]ᴵ  = ƛ[] ᴵ
+%format sucᴵ  = suc ᴵ
+
+%format zero[]ᴵ = zero[] ᴵ
+%format suc[]ᴵ  = suc[]  ᴵ
+%format ,[]ᴵ    = ,[]    ᴵ
+%format [_]ᴵ    = [_]    ᴵ
+%format _,ᴵ     = _,     ᴵ
+%format ,ᴵ_     = ,_     ᴵ
+%format _^ᴵ     = _^     ᴵ
+
+%format ᴱ = "^{\mathrm{E}}"
+%format Conᴱ  = Con ᴱ
+%format Tyᴱ   = Ty ᴱ
+%format Tmᴱ   = Tm ᴱ
+%format Tmsᴱ  = Tms ᴱ
+%format Γᴱ    = Γ ᴱ
+%format Δᴱ    = Δ ᴱ
+%format θᴱ    = θ ᴱ
+%format Ξᴱ    = Ξ ᴱ
+%format Aᴱ    = A ᴱ
+%format Bᴱ    = B ᴱ
+%format Cᴱ    = C ᴱ
+%format Dᴱ    = D ᴱ
+%format •ᴱ    = • ᴱ
+%format ▷ᴱ    = ▷ ᴱ
+%format _▷ᴱ_  = "\_" ▷ᴱ "\_"
+%format oᴱ    = o ᴱ
+%format ⇒ᴱ    = ⇒ ᴱ 
+%format _⇒ᴱ_  = "\_" ⇒ᴱ "\_"
+%format tᴱ    = t ᴱ
+%format uᴱ    = u ᴱ
+%format vᴱ    = v ᴱ
+%format δᴱ    = δ ᴱ
+%format σᴱ    = σ ᴱ
+%format ξᴱ    = ξ ᴱ
+%format idᴱ   = id ᴱ
+%format ∘ᴱ    = ∘ ᴱ
+%format _∘ᴱ_  = "\_" ∘ᴱ "\_"
+%format id∘ᴱ  = id∘ ᴱ
+%format ∘idᴱ  = ∘id ᴱ
+%format ∘∘ᴱ   = ∘∘ ᴱ
+%format ]ᴱ    = ] ᴱ
+%format _[_]ᴱ = _[_] ᴱ
+%format [id]ᴱ = [id] ᴱ
+%format [∘]ᴱ  = [∘] ᴱ
+%format εᴱ    = ε ᴱ
+%format ,ᴱ    = , ᴱ
+%format _,ᴱ_  = "\_" ,ᴱ "\_"
+%format π₀ᴱ   = π₀ ᴱ
+%format π₁ᴱ   = π₁ ᴱ
+%format •-ηᴱ  = •-η ᴱ
+%format ▷-β₀ᴱ = ▷-β₀ ᴱ
+%format ▷-β₁ᴱ = ▷-β₁ ᴱ
+%format ▷-ηᴱ  = ▷-η ᴱ
+%format π₀∘ᴱ  = π₀∘ ᴱ
+%format π₁∘ᴱ  = π₁∘ ᴱ
+%format wkᴱ   = wk ᴱ
+%format zeroᴱ = zero ᴱ
+%format ^ᴱ    = ^ ᴱ
+%format _^ᴱ_  = "\_" ^ᴱ "\_"
+%format ·ᴱ    = · ᴱ
+%format _·ᴱ_  = "\_" ·ᴱ "\_"
+%format ƛᴱ    = ƛ ᴱ
+%format ƛᴱ_   = ƛᴱ "\_"  
+%format ·[]ᴱ  = ·[] ᴱ
+%format ƛ[]ᴱ  = ƛ[] ᴱ
+
+%format .Conᴱ  = "\mathrm{.}" Conᴱ
+%format .Tyᴱ   = "\mathrm{.}" Tyᴱ
+%format .Tmᴱ   = "\mathrm{.}" Tmᴱ
+%format .Tmsᴱ  = "\mathrm{.}" Tmsᴱ
+%format .idᴱ   = "\mathrm{.}" idᴱ
+%format ._∘ᴱ_  = "\mathrm{.}" _∘ᴱ_
+%format .id∘ᴱ  = "\mathrm{.}" id∘ᴱ
+%format .∘idᴱ  = "\mathrm{.}" ∘idᴱ
+%format .∘∘ᴱ   = "\mathrm{.}" ∘∘ᴱ
+%format ._[_]ᴱ = "\mathrm{.}" _[_]ᴱ
+%format .[∘]ᴱ  = "\mathrm{.}" [∘]ᴱ
+%format .•ᴱ    = "\mathrm{.}" •ᴱ
+%format .εᴱ    = "\mathrm{.}" εᴱ
+%format .•-ηᴱ  = "\mathrm{.}" •-ηᴱ
+%format ._▷ᴱ_  = "\mathrm{.}" _▷ᴱ_
+%format ._,ᴱ_  = "\mathrm{.}" _,ᴱ_
+%format .π₀ᴱ   = "\mathrm{.}" π₀ᴱ
+%format .π₁ᴱ   = "\mathrm{.}" π₁ᴱ
+%format .▷-β₀ᴱ = "\mathrm{.}" ▷-β₀ᴱ
+%format .▷-β₁ᴱ = "\mathrm{.}" ▷-β₁ᴱ
+%format .▷-ηᴱ  = "\mathrm{.}" ▷-ηᴱ
+%format .π₀∘ᴱ  = "\mathrm{.}" π₀∘ᴱ
+%format .π₁∘ᴱ  = "\mathrm{.}" π₁∘ᴱ
+%format .oᴱ    = "\mathrm{.}" oᴱ
+%format ._⇒ᴱ_  = "\mathrm{.}" _⇒ᴱ_
+%format ._·ᴱ_  = "\mathrm{.}" _·ᴱ_
+%format .ƛᴱ_   = "\mathrm{.}" ƛᴱ_
+%format .·[]ᴱ  = "\mathrm{.}" ·[]ᴱ
+%format .ƛ[]ᴱ  = "\mathrm{.}" ƛ[]ᴱ
+%format .[id]ᴱ = "\mathrm{.}" [id]ᴱ
+
+%format Con≡   = Con ≡
+%format Ty≡    = Ty ≡

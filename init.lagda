@@ -179,7 +179,6 @@ isomorphism.
 \begin{code}
 open import subst
 open import laws
-
 \end{code}
 %endif
 
@@ -251,7 +250,6 @@ interleaved mutual
 \end{code}
 %endif
 
-\end{code}
 \begin{code}
   is-cwf : CwF-simple
   is-cwf .CwF.Con = Con
@@ -518,7 +516,7 @@ module _ (𝕄 : Motive) where
   variable
     Γᴱ Δᴱ θᴱ Ξᴱ : Conᴱ Γ
     Aᴱ Bᴱ Cᴱ Dᴱ : Tyᴱ A
-    Mᴱ Nᴱ Lᴱ : Tmᴱ Γᴱ Aᴱ tᴵ
+    tᴱ uᴱ vᴱ : Tmᴱ Γᴱ Aᴱ tᴵ
     δᴱ σᴱ ξᴱ : Tmsᴱ Δᴱ Γᴱ δᴵ
 
   record Branches : Set₁ where
@@ -539,8 +537,8 @@ module _ (𝕄 : Motive) where
 
       _[_]ᴱ : Tmᴱ Γᴱ Aᴱ tᴵ → Tmsᴱ Δᴱ Γᴱ δᴵ → Tmᴱ Δᴱ Aᴱ (tᴵ [ δᴵ ]ᴵ)
       
-      [id]ᴱ : Mᴱ [ idᴱ ]ᴱ ≡[ cong (Tmᴱ Γᴱ Aᴱ) [id]ᴵ ]≡ Mᴱ
-      [∘]ᴱ  : Mᴱ [ σᴱ ]ᴱ [ δᴱ ]ᴱ ≡[ cong (Tmᴱ θᴱ Aᴱ) [∘]ᴵ ]≡ Mᴱ [ σᴱ ∘ᴱ δᴱ ]ᴱ
+      [id]ᴱ : tᴱ [ idᴱ ]ᴱ ≡[ cong (Tmᴱ Γᴱ Aᴱ) [id]ᴵ ]≡ tᴱ
+      [∘]ᴱ  : tᴱ [ σᴱ ]ᴱ [ δᴱ ]ᴱ ≡[ cong (Tmᴱ θᴱ Aᴱ) [∘]ᴵ ]≡ tᴱ [ σᴱ ∘ᴱ δᴱ ]ᴱ
 
       •ᴱ : Conᴱ •
       εᴱ : Tmsᴱ Δᴱ •ᴱ εᴵ
@@ -552,8 +550,8 @@ module _ (𝕄 : Motive) where
       π₀ᴱ  : Tmsᴱ Δᴱ (Γᴱ ▷ᴱ Aᴱ) δᴵ → Tmsᴱ Δᴱ Γᴱ (π₀ᴵ δᴵ)
       π₁ᴱ  : Tmsᴱ Δᴱ (Γᴱ ▷ᴱ Aᴱ) δᴵ → Tmᴱ Δᴱ Aᴱ (π₁ᴵ δᴵ)
 
-      ▷-β₀ᴱ : π₀ᴱ (δᴱ ,ᴱ Mᴱ) ≡[ cong (Tmsᴱ Δᴱ Γᴱ) ▷-β₀ᴵ ]≡ δᴱ
-      ▷-β₁ᴱ : π₁ᴱ (δᴱ ,ᴱ Mᴱ) ≡[ cong (Tmᴱ Δᴱ Aᴱ) ▷-β₁ᴵ ]≡ Mᴱ
+      ▷-β₀ᴱ : π₀ᴱ (δᴱ ,ᴱ tᴱ) ≡[ cong (Tmsᴱ Δᴱ Γᴱ) ▷-β₀ᴵ ]≡ δᴱ
+      ▷-β₁ᴱ : π₁ᴱ (δᴱ ,ᴱ tᴱ) ≡[ cong (Tmᴱ Δᴱ Aᴱ) ▷-β₁ᴵ ]≡ tᴱ
       ▷-ηᴱ  : (π₀ᴱ δᴱ ,ᴱ π₁ᴱ δᴱ) ≡[ cong (Tmsᴱ Δᴱ (Γᴱ ▷ᴱ Aᴱ)) ▷-ηᴵ ]≡ δᴱ
       π₀∘ᴱ  : π₀ᴱ (σᴱ ∘ᴱ δᴱ) ≡[ cong (Tmsᴱ θᴱ Γᴱ) π₀∘ᴵ ]≡ π₀ᴱ σᴱ ∘ᴱ δᴱ
       π₁∘ᴱ  : π₁ᴱ (σᴱ ∘ᴱ δᴱ) ≡[ cong (Tmᴱ θᴱ Aᴱ) π₁∘ᴵ ]≡ π₁ᴱ σᴱ [ δᴱ ]ᴱ
@@ -574,12 +572,12 @@ module _ (𝕄 : Motive) where
       _·ᴱ_ : Tmᴱ Γᴱ (Aᴱ ⇒ᴱ Bᴱ) tᴵ → Tmᴱ Γᴱ Aᴱ uᴵ → Tmᴱ Γᴱ Bᴱ (tᴵ ·ᴵ uᴵ)
       ƛᴱ_  : Tmᴱ (Γᴱ ▷ᴱ Aᴱ) Bᴱ tᴵ → Tmᴱ Γᴱ (Aᴱ ⇒ᴱ Bᴱ) (ƛᴵ tᴵ)
       
-      ·[]ᴱ : (Mᴱ ·ᴱ Nᴱ) [ δᴱ ]ᴱ 
+      ·[]ᴱ : (tᴱ ·ᴱ uᴱ) [ δᴱ ]ᴱ 
           ≡[ cong (Tmᴱ Δᴱ Bᴱ) ·[]ᴵ 
-          ]≡ Mᴱ [ δᴱ ]ᴱ ·ᴱ Nᴱ [ δᴱ ]ᴱ
-      ƛ[]ᴱ : (ƛᴱ Mᴱ) [ δᴱ ]ᴱ 
+          ]≡ tᴱ [ δᴱ ]ᴱ ·ᴱ uᴱ [ δᴱ ]ᴱ
+      ƛ[]ᴱ : (ƛᴱ tᴱ) [ δᴱ ]ᴱ 
           ≡[ cong (Tmᴱ Δᴱ (Aᴱ ⇒ᴱ Bᴱ)) ƛ[]ᴵ 
-          ]≡ ƛᴱ (Mᴱ [ δᴱ ^ᴱ Aᴱ ]ᴱ)  
+          ]≡ ƛᴱ (tᴱ [ δᴱ ^ᴱ Aᴱ ]ᴱ)  
 
 module Eliminator {𝕄} (𝔹 : Branches 𝕄) where
   open Motive 𝕄
@@ -610,12 +608,22 @@ module Eliminator {𝕄} (𝔹 : Branches 𝕄) where
 
     elim-cwf-·β : elim-cwf (tᴵ ·ᴵ uᴵ) ≡ elim-cwf tᴵ ·ᴱ elim-cwf uᴵ
     elim-cwf-ƛβ : elim-cwf (ƛᴵ tᴵ) ≡ ƛᴱ elim-cwf tᴵ
+\end{code}
 
+%if False
+\begin{code}
   {-# REWRITE elim-cwf*-idβ elim-cwf*-∘β elim-cwf*-[]β elim-cwf*-εβ elim-cwf*-,β 
               elim-cwf*-π₀β elim-cwf*-π₁β elim-cwf-·β elim-cwf-ƛβ #-}
-open Eliminator public
 
+open Motive public
+open Branches public
+open Eliminator public
 \end{code}
+%endif
+
+\begin{spec}
+TODO: Insert REWRITE rule transformed into LaTeX characters here!
+\end{spec}
 
 Normalisation from the initial CwF into substitution normal forms now only
 needs a way to connect our notion of "being a CwF" with our initial CwF's 
@@ -631,8 +639,17 @@ cong-const : ∀ {A : Set ℓ₁} {B : Set ℓ₂} {x : A} {y z : B} {p : y ≡ 
            → cong (λ _ → x) p ≡ refl
 cong-const {p = refl} = refl
 
+\end{code}
+
+\begin{spec}
+% TODO: REWRITE rule
+\end{spec}
+
+%if False
+\begin{code}
 {-# REWRITE cong-const #-}
 \end{code}
+%endif
 
 This is enables the no-longer-dependent |_≡[_]≡_|s to collapse to |_≡_|s 
 automatically.
@@ -645,43 +662,43 @@ module Recursor (cwf : CwF-simple) where
   rec-tm  : Γ ⊢ᴵ A → cwf .CwF._⊢_ (rec-con Γ) (rec-ty A)
 
   cwf-to-motive : Motive
-  cwf-to-motive .Motive.Conᴱ _     = cwf .CwF.Con
-  cwf-to-motive .Motive.Tyᴱ  _     = cwf .CwF.Ty
-  cwf-to-motive .Motive.Tmᴱ Γ A _  = cwf .CwF._⊢_ Γ A
-  cwf-to-motive .Motive.Tmsᴱ Δ Γ _ = cwf .CwF._⊨_ Δ Γ
+  cwf-to-motive .Conᴱ _     = cwf .CwF.Con
+  cwf-to-motive .Tyᴱ  _     = cwf .CwF.Ty
+  cwf-to-motive .Tmᴱ Γ A _  = cwf .CwF._⊢_ Γ A
+  cwf-to-motive .Tmsᴱ Δ Γ _ = cwf .CwF._⊨_ Δ Γ
   
   cwf-to-branches : Branches cwf-to-motive
-  cwf-to-branches .Branches.idᴱ   = cwf .CwF.id
-  cwf-to-branches .Branches._∘ᴱ_  = cwf .CwF._∘_
-  cwf-to-branches .Branches.id∘ᴱ  = cwf .CwF.id∘
+  cwf-to-branches .idᴱ   = cwf .CwF.id
+  cwf-to-branches ._∘ᴱ_  = cwf .CwF._∘_
+  cwf-to-branches .id∘ᴱ  = cwf .CwF.id∘
   -- etc...
 \end{code}
 
 %if False
 \begin{code}
-  cwf-to-branches .Branches.∘idᴱ  = cwf .CwF.∘id
-  cwf-to-branches .Branches.∘∘ᴱ   = cwf .CwF.∘∘
-  cwf-to-branches .Branches._[_]ᴱ = cwf .CwF._[_]
-  cwf-to-branches .Branches.[id]ᴱ = cwf .CwF.[id]
-  cwf-to-branches .Branches.[∘]ᴱ  = cwf .CwF.[∘]
-  cwf-to-branches .Branches.•ᴱ    = cwf .CwF.•
-  cwf-to-branches .Branches.εᴱ    = cwf .CwF.ε
-  cwf-to-branches .Branches.•-ηᴱ  = cwf .CwF.•-η
-  cwf-to-branches .Branches._▷ᴱ_  = cwf .CwF._▷_
-  cwf-to-branches .Branches._,ᴱ_  = cwf .CwF._,_
-  cwf-to-branches .Branches.π₀ᴱ   = cwf .CwF.π₀
-  cwf-to-branches .Branches.π₁ᴱ   = cwf .CwF.π₁
-  cwf-to-branches .Branches.▷-β₀ᴱ = cwf .CwF.▷-β₀
-  cwf-to-branches .Branches.▷-β₁ᴱ = cwf .CwF.▷-β₁
-  cwf-to-branches .Branches.▷-ηᴱ  = cwf .CwF.▷-η
-  cwf-to-branches .Branches.π₀∘ᴱ  = cwf .CwF.π₀∘
-  cwf-to-branches .Branches.π₁∘ᴱ  = cwf .CwF.π₁∘
-  cwf-to-branches .Branches.oᴱ    = cwf .CwF.o
-  cwf-to-branches .Branches._⇒ᴱ_  = cwf .CwF._⇒_
-  cwf-to-branches .Branches._·ᴱ_  = cwf .CwF._·_
-  cwf-to-branches .Branches.ƛᴱ_   = cwf .CwF.ƛ_
-  cwf-to-branches .Branches.·[]ᴱ  = cwf .CwF.·[]
-  cwf-to-branches .Branches.ƛ[]ᴱ  = cwf .CwF.ƛ[]
+  cwf-to-branches .∘idᴱ  = cwf .CwF.∘id
+  cwf-to-branches .∘∘ᴱ   = cwf .CwF.∘∘
+  cwf-to-branches ._[_]ᴱ = cwf .CwF._[_]
+  cwf-to-branches .[id]ᴱ = cwf .CwF.[id]
+  cwf-to-branches .[∘]ᴱ  = cwf .CwF.[∘]
+  cwf-to-branches .•ᴱ    = cwf .CwF.•
+  cwf-to-branches .εᴱ    = cwf .CwF.ε
+  cwf-to-branches .•-ηᴱ  = cwf .CwF.•-η
+  cwf-to-branches ._▷ᴱ_  = cwf .CwF._▷_
+  cwf-to-branches ._,ᴱ_  = cwf .CwF._,_
+  cwf-to-branches .π₀ᴱ   = cwf .CwF.π₀
+  cwf-to-branches .π₁ᴱ   = cwf .CwF.π₁
+  cwf-to-branches .▷-β₀ᴱ = cwf .CwF.▷-β₀
+  cwf-to-branches .▷-β₁ᴱ = cwf .CwF.▷-β₁
+  cwf-to-branches .▷-ηᴱ  = cwf .CwF.▷-η
+  cwf-to-branches .π₀∘ᴱ  = cwf .CwF.π₀∘
+  cwf-to-branches .π₁∘ᴱ  = cwf .CwF.π₁∘
+  cwf-to-branches .oᴱ    = cwf .CwF.o
+  cwf-to-branches ._⇒ᴱ_  = cwf .CwF._⇒_
+  cwf-to-branches ._·ᴱ_  = cwf .CwF._·_
+  cwf-to-branches .ƛᴱ_   = cwf .CwF.ƛ_
+  cwf-to-branches .·[]ᴱ  = cwf .CwF.·[]
+  cwf-to-branches .ƛ[]ᴱ  = cwf .CwF.ƛ[]
 \end{code}
 %endif
 
@@ -720,8 +737,20 @@ Con≡ {Γ = Γ ▷ A} = cong₂ _▷_ Con≡ Ty≡
 Ty≡ {A = o} = refl
 Ty≡ {A = A ⇒ B} = cong₂ _⇒_ Ty≡ Ty≡
 
-{-# REWRITE Con≡ Ty≡ #-}
+\end{code}
 
+\begin{spec}
+%TODO: REWRITE RULE
+
+\end{spec}
+
+%if False
+\begin{code}
+{-# REWRITE Con≡ Ty≡ #-}
+\end{code}
+%endif
+
+\begin{code}
 norm : Γ ⊢ᴵ A → Γ ⊢ A
 norm = rec-tm is-cwf 
 
@@ -782,12 +811,6 @@ stab {x = ƛ t} = cong ƛ_ (stab {x = t})
 To prove completeness, we must instead induct on the initial CwF itself, which
 means there are many more cases. We start with the motive:
 
-%if False
-\begin{code}
-open Motive public
-\end{code}
-%endif
-
 \begin{code}
 compl-𝕄 : Motive
 compl-𝕄 .Conᴱ _ = ⊤
@@ -832,8 +855,18 @@ to keep Agda's termination checker happy.
 
 ⌜id⌝′ : Sort → ⌜ id {Γ = Γ} ⌝* ≡ idᴵ
 ⌜id⌝ = ⌜id⌝′ V
+
+\end{code}
+\begin{spec}
+%TODO: INLINE pragma!
+\end{spec}
+
+
+%if False
+\begin{code}
 {-# INLINE ⌜id⌝ #-}
 \end{code}
+%endif
 
 To complete these proofs, we also need beta-laws about our initial CwF
 substitutions, so we derive these now.
@@ -975,8 +1008,6 @@ preservation lemmas and the IHs.
 duip : ∀ {A B : Set ℓ} {x y : A} {z w : B} {p q} {r : (x ≡ y) ≡ (z ≡ w)}
       → p ≡[ r ]≡ q
 duip {p = refl} {q = refl} {r = refl} = refl
-
-open Branches public
 \end{code}
 %endif
 
@@ -1036,11 +1067,11 @@ CwF into any non-set).
 As we are working in vanilla Agda, we'll take a simpler approach, and rely on 
 UIP.
 
-\spec{code}
+\begin{spec}
 duip : ∀ {A B : Set ℓ} {x y : A} {z w : B} {p q} {r : (x ≡ y) ≡ (z ≡ w)}
       → p ≡[ r ]≡ q
 duip {p = refl} {q = refl} {r = refl} = refl
-\spec{code}
+\end{spec}
 
 It is probably worth noting that this implementation of (dependent) UIP relies 
 on type constructor injectivity (specifically, injectivity of |_≡_|). 
@@ -1070,3 +1101,4 @@ And completeness is just call to the eliminator away.
 compl : ⌜ norm tᴵ ⌝ ≡ tᴵ
 compl {tᴵ = tᴵ} = elim-cwf compl-𝔹 tᴵ
 \end{code}
+ 
