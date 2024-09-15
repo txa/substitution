@@ -526,10 +526,10 @@ sucᴵ x A = x [ π₀ᴵ idᴵ ]ᴵ
 \end{code}
 %endif
 
-% TODO: Is this the right paper to cite - i.e. was this the first paper to use
+% TODO: Is this the correct paper to cite? i.e. was this the first paper to use
 % use this convention or was it taken from somewhere else?
-We state the eliminator for the initial CwF in terms of a |Motive| and |Methods| 
-record as in \cite{altenkirch2016tt_in_tt}.
+We state the eliminator for the initial CwF in terms of |Motive| and |Methods| 
+records as in \cite{altenkirch2016tt_in_tt}.
 
 \begin{code}
 record Motive : Set₁ where
@@ -684,7 +684,7 @@ open Eliminator public
 
 Normalisation from the initial CwF into substitution normal forms now only
 needs a way to connect our notion of ``being a CwF'' with our initial CwF's 
-eliminator: specifically, that any set of type families obeying the CwF laws
+eliminator: specifically, that any set of type families satisfying the CwF laws
 gives rise to a |Motive| and associated set of |Methods|.
 
 The one extra ingredient we need to make this work out neatly is to introduce
@@ -709,7 +709,7 @@ cong-const {p = refl} = refl
 \end{code}
 %endif
 
-This is enables the no-longer-dependent |_≡[_]≡_|s to collapse to |_≡_|s 
+This enables the no-longer-dependent |_≡[_]≡_|s to collapse to |_≡_|s 
 automatically.
 
 \begin{code}
