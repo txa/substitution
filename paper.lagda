@@ -199,8 +199,8 @@ calls when doing termination checking. The solutions to these problems were
 all quite mechanical, which perhaps implies there is room for Agda's termination
 checker to be extended.
 Finally, it would be nice if the termination checker
-provided evidence that its non-trivial reasoning is sound and
-can be checked independently. 
+provided independently-checkable evidence that its non-trivial reasoning is 
+sound. 
 
 This paper can also be seen as a preparation for the harder problem to
 implement recursive substitution for dependent types. This is harder
