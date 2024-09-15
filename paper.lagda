@@ -194,7 +194,7 @@ We could simplify our development slightly further if we could instrument the
 termination checker, for example, with an ordering on constructors. 
 We also ran into issues with Agda only examining direct arguments to function
 calls when doing termination checking. The solutions to these problems were
-all quite mechnical, which perhaps implies there is room for Agda's termination
+all quite mechanical, which perhaps implies there is room for Agda's termination
 checker to be extended.
 Finally, it would be nice if the termination checker
 provided evidence that its non-trivial reasoning is sound and
