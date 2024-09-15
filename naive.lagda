@@ -149,19 +149,19 @@ idv {Γ = Γ ▷ A} =  idv ^v A
 suc-tm t A = t [ idv ⁺v A ]v
 \end{code}
 
-This may not sound too bad to obtain structural termination we have to
-duplicate a definition but it gets even worse when proving the
-laws. To prove associativity we need to prove functoriality of
+This may not sound too bad: To obtain structural termination we just have to
+duplicate a few definitions, but it gets even worse when proving the
+laws. For example, to prove associativity we need to prove functoriality of
 substitution first:
 \begin{spec}
 [∘] : t [ us ∘ vs ] ≡ t [ us ] [ vs ]
 \end{spec}
 Since |t , us , vs| can be variables/renamings or terms/substitutions
-there are in principle 8 combinations of which we need 4. And each
-time we need to prove a number of lemmas again in a different
-setting.
+there are in principle eight combinations (though it turns out we can get away 
+with just four). Each time, we must to prove a number of lemmas again in a 
+different setting.
 
-In the rest of the paper we describe a technique how the definition
-and thr proof can be
-factored only relying on the Agda termination checker to validate that
+In the rest of the paper we describe a technique how these definitions
+and the proofs can be
+factored, only relying on the Agda termination checker to validate that
 the recursion is structurally terminating.

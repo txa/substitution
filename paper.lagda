@@ -147,7 +147,7 @@ checker by investigating all possible recursive paths. We will define
 mutually recursive proofs which heavily rely on each other.
 
 The only recent
-feature we use, though sparingly, is the possibility to turn propositional
+feature we use, albeit sparingly, is the possibility to turn propositional
 equations into rewriting rules (i.e. definitional equalities). This
 makes the statement of some theorems more readable because we can avoid
 using |subst|, but this is not essential.
