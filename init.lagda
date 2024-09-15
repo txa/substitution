@@ -722,7 +722,7 @@ module Recursor (cwf : CwF-simple) where
   cwf-to-methods .idᴹ   = cwf .CwF.id
   cwf-to-methods ._∘ᴹ_  = cwf .CwF._∘_
   cwf-to-methods .id∘ᴹ  = cwf .CwF.id∘
-  -- etc...
+  -- ...
 \end{code}
 
 %if False
@@ -979,17 +979,23 @@ suc[]ᴵ {tᴵ = tᴵ} {B = B} {δᴵ = δᴵ} {uᴵ = uᴵ} =
 \end{code}
 %endif
 
-We also need a couple lemmas about how |⌜_⌝| ignores sort coercions.
+We also need a couple lemmas about how |⌜_⌝| treats terms of different sorts
+identically. 
 
 \begin{code}
 ⌜⊑⌝ : ∀ {x : Γ ⊢[ q ] A} → ⌜ tm⊑ ⊑t x ⌝ ≡ ⌜ x ⌝
+⌜⊑⌝* : ⌜ tm*⊑ ⊑t xs ⌝* ≡ ⌜ xs ⌝*
+\end{code}
+
+%if False
+\begin{code}
 ⌜⊑⌝ {q = V} = refl
 ⌜⊑⌝ {q = T} = refl
 
-⌜⊑⌝* : ⌜ tm*⊑ ⊑t xs ⌝* ≡ ⌜ xs ⌝*
 ⌜⊑⌝* {xs = ε} = refl
 ⌜⊑⌝* {xs = xs , x} = cong₂ _,ᴵ_ ⌜⊑⌝* (⌜⊑⌝ {x = x})
 \end{code}
+%endif
 
 We can now (finally) proceed with the proofs. There is quite a large number of
 cases to cover, so for brevity we elide the proofs of |⌜[]⌝| and |⌜suc⌝|.
