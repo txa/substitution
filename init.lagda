@@ -566,7 +566,8 @@ module _ (𝕄 : Motive) where
 \begin{code}
     field
       idᴹ  : Tmsᴹ Γᴹ Γᴹ idᴵ 
-      _∘ᴹ_ : Tmsᴹ Δᴹ Γᴹ σᴵ → Tmsᴹ θᴹ Δᴹ δᴵ → Tmsᴹ θᴹ Γᴹ (σᴵ ∘ᴵ δᴵ)
+      _∘ᴹ_ : Tmsᴹ Δᴹ Γᴹ σᴵ → Tmsᴹ θᴹ Δᴹ δᴵ 
+           → Tmsᴹ θᴹ Γᴹ (σᴵ ∘ᴵ δᴵ)
       
       id∘ᴹ : idᴹ ∘ᴹ δᴹ ≡[ cong (Tmsᴹ Δᴹ Γᴹ) id∘ᴵ ]≡ δᴹ
       -- ...
@@ -642,16 +643,22 @@ module Eliminator {𝕄} (𝕞 : Methods 𝕄) where
     elim-cwf* : ∀ δᴵ → Tmsᴹ (elim-con Δ) (elim-con Γ) δᴵ
 
     elim-cwf*-idβ : elim-cwf* (idᴵ {Γ}) ≡ idᴹ
-    elim-cwf*-∘β  : elim-cwf* (σᴵ ∘ᴵ δᴵ) ≡ elim-cwf* σᴵ ∘ᴹ elim-cwf* δᴵ
+    elim-cwf*-∘β  : elim-cwf* (σᴵ ∘ᴵ δᴵ) 
+                  ≡ elim-cwf* σᴵ ∘ᴹ elim-cwf* δᴵ
 
-    elim-cwf*-[]β : elim-cwf (tᴵ [ δᴵ ]ᴵ) ≡ elim-cwf tᴵ [ elim-cwf* δᴵ ]ᴹ
+    elim-cwf*-[]β : elim-cwf (tᴵ [ δᴵ ]ᴵ) 
+                  ≡ elim-cwf tᴵ [ elim-cwf* δᴵ ]ᴹ
 
     elim-cwf*-εβ  : elim-cwf* (εᴵ {Δ = Δ}) ≡ εᴹ
-    elim-cwf*-,β  : elim-cwf* (δᴵ ,ᴵ tᴵ) ≡ (elim-cwf* δᴵ ,ᴹ elim-cwf tᴵ)
-    elim-cwf*-π₀β : elim-cwf* (π₀ᴵ δᴵ) ≡ π₀ᴹ (elim-cwf* δᴵ)
-    elim-cwf*-π₁β : elim-cwf (π₁ᴵ δᴵ) ≡ π₁ᴹ (elim-cwf* δᴵ)
+    elim-cwf*-,β  : elim-cwf* (δᴵ ,ᴵ tᴵ) 
+                  ≡ (elim-cwf* δᴵ ,ᴹ elim-cwf tᴵ)
+    elim-cwf*-π₀β : elim-cwf* (π₀ᴵ δᴵ) 
+                  ≡ π₀ᴹ (elim-cwf* δᴵ)
+    elim-cwf*-π₁β : elim-cwf (π₁ᴵ δᴵ) 
+                  ≡ π₁ᴹ (elim-cwf* δᴵ)
 
-    elim-cwf-·β : elim-cwf (tᴵ ·ᴵ uᴵ) ≡ elim-cwf tᴵ ·ᴹ elim-cwf uᴵ
+    elim-cwf-·β : elim-cwf (tᴵ ·ᴵ uᴵ) 
+                ≡ elim-cwf tᴵ ·ᴹ elim-cwf uᴵ
     elim-cwf-ƛβ : elim-cwf (ƛᴵ tᴵ) ≡ ƛᴹ elim-cwf tᴵ
 \end{code}
 
@@ -680,7 +687,8 @@ a new reduction for |cong|:
 \footnote{This identity also holds definitionally in Cubical.}
 
 \begin{code}
-cong-const : ∀ {A : Set ℓ₁} {B : Set ℓ₂} {x : A} {y z : B} {p : y ≡ z} 
+cong-const : ∀ {A : Set ℓ₁} {B : Set ℓ₂} {x : A} 
+               {y z : B} {p : y ≡ z} 
            → cong (λ _ → x) p ≡ refl
 cong-const {p = refl} = refl
 
@@ -849,7 +857,8 @@ stab {x = suc i B} =
   ≡⟨ cong `_ suc[id⁺] ⟩
   ` suc i B ∎
 stab {x = ` i} = stab {x = i}
-stab {x = t · u} = cong₂ _·_ (stab {x = t}) (stab {x = u})
+stab {x = t · u} = 
+  cong₂ _·_ (stab {x = t}) (stab {x = u})
 stab {x = ƛ t} = cong ƛ_ (stab {x = t})
 \end{code}
 
@@ -969,7 +978,8 @@ We also need a couple lemmas about how |⌜_⌝| ignores sort coercions.
 We can now (finally) proceed with the proofs:
 
 \begin{code}
-⌜[]⌝ {x = zero} {ys = ys , y} = sym (zero[]ᴵ {δᴵ = ⌜ ys ⌝*})
+⌜[]⌝ {x = zero} {ys = ys , y} = 
+  sym (zero[]ᴵ {δᴵ = ⌜ ys ⌝*})
 ⌜[]⌝ {x = suc i B} {ys = ys , y} =
   ⌜ i [ ys ] ⌝
   ≡⟨ ⌜[]⌝ {x = i} ⟩
@@ -1051,7 +1061,7 @@ preservation lemmas and the IHs.
 %if False
 \begin{code}
 duip : ∀ {A B : Set ℓ} {x y : A} {z w : B} {p q} {r : (x ≡ y) ≡ (z ≡ w)}
-      → p ≡[ r ]≡ q
+     → p ≡[ r ]≡ q
 duip {p = refl} {q = refl} {r = refl} = refl
 \end{code}
 %endif
@@ -1113,7 +1123,8 @@ As we are working in vanilla Agda, we'll take a simpler approach, and rely on
 UIP.
 
 \begin{spec}
-duip : ∀ {A B : Set ℓ} {x y : A} {z w : B} {p q} {r : (x ≡ y) ≡ (z ≡ w)}
+duip : ∀ {A B : Set ℓ} {x y : A} {z w : B} {p q} 
+         {r : (x ≡ y) ≡ (z ≡ w)}
       → p ≡[ r ]≡ q
 duip {p = refl} {q = refl} {r = refl} = refl
 \end{spec}
