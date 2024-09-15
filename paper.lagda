@@ -164,8 +164,8 @@ Implicit variables, which are indicated by using |{..}| instead of
 allowing mixfix syntax declarations using |_| to indicate where the
 parameters go.
 
-In the proofs we also use the Agda standard library's syntax for equational 
-derivations, which exploits Agda's flexible syntax.
+In the proofs we also use the Agda standard library's definitions for equational 
+derivations, which exploit Agda's flexible syntax.
 
 The source of this document contains the actual Agda code, i.e. it is
 a literate Agda file. Different chapters are in different modules to
