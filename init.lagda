@@ -83,13 +83,6 @@ record CwF-simple : Set₁ where
   infixr  6  _⇒_
   infixl  6  _·_
   infix   8  _[_]
-\end{code}
-%endif
-
-
-We start with the category of contexts, using the same names as
-introduced previously:
-\begin{code}
   field
     Con : Set
     _⊨_ : Con → Con → Set
@@ -104,9 +97,7 @@ introduced previously:
     ∘∘ : ∀ {Γ Δ Θ Ξ}
           {ξ : Θ ⊨ Ξ}{θ : Δ ⊨ Θ}{δ : Γ ⊨ Δ}
           → (ξ ∘ θ) ∘ δ ≡ ξ ∘ (θ ∘ δ)  
-\end{code}
-We introduce the set of types and associate a presheaf with each type:
-\begin{code}
+
     Ty : Set           
     _⊢_ : Con → Ty → Set         
     _[_] : ∀ {Γ Δ A}
@@ -116,17 +107,12 @@ We introduce the set of types and associate a presheaf with each type:
     [∘] : ∀ {Γ Δ Θ A}
           {t : Θ ⊢ A}{θ : Δ ⊨ Θ}{δ : Γ ⊨ Δ} →
           t [ θ ] [ δ ] ≡ t [ θ ∘ δ ] 
-\end{code}
-The category of contexts has a terminal object (the empty context):
-\begin{code}
+
     • : Con
     ε : ∀ {Γ} → Γ ⊨ • 
     •-η : ∀ {Γ}{δ : Γ ⊨ •}
         → δ ≡ ε  
-\end{code}
-Context extension resembles categorical products but mixing contexts
-and types:
-\begin{code}
+
     _▷_ : Con → Ty → Con
     _,_ : ∀ {Γ Δ A}
         → Γ ⊨ Δ → Γ ⊢ A → Γ ⊨ (Δ ▷ A)
@@ -144,17 +130,10 @@ and types:
            → π₀ (θ ∘ δ) ≡ π₀ θ ∘ δ
     π₁∘ : ∀ {Γ Δ Θ A}{θ : Δ ⊨ (Θ ▷ A)}{δ : Γ ⊨ Δ}
            → π₁ (θ ∘ δ) ≡ (π₁ θ) [ δ ]  
-\end{code}
-We can define the morphism part of the context extension functor as
-before:
-\begin{code}
+
   _^_ : ∀ {Γ Δ} → Γ ⊨ Δ → ∀ A → Γ ▷ A ⊨ Δ ▷ A
   δ ^ A = (δ ∘ (π₀ id)) , π₁ id
-\end{code}
-We need to add the specific components for simply typed
-$\lambda$-calculus: we add the type constructors, the term
-constructors and the corresponding naturality laws:
-\begin{code}
+
   field
     o : Ty
     _⇒_ : Ty → Ty → Ty
@@ -166,6 +145,66 @@ constructors and the corresponding naturality laws:
     ƛ[] :  ∀ {Γ Δ A B}{t : Γ ▷ A ⊢ B}{δ : Δ ⊨ Γ}
            → (ƛ t) [ δ ] ≡ ƛ (t [ δ ^ _ ])  
 \end{code}
+%endif
+
+We start with the category of contexts, using the same names as
+introduced previously:
+\begin{spec}
+  field
+    Con : Set
+    _⊨_ : Con → Con → Set
+
+    id  : Γ ⊨ Γ
+    _∘_ : Δ ⊨ Θ → Γ ⊨ Δ → Γ ⊨ Θ
+    id∘ : id ∘ δ ≡ δ
+    ∘id : δ ∘ id ≡ δ
+    ∘∘  : (ξ ∘ θ) ∘ δ ≡ ξ ∘ (θ ∘ δ)  
+\end{spec}
+We introduce the set of types and associate a presheaf with each type:
+\begin{spec}
+    Ty   : Set           
+    _⊢_  : Con → Ty → Set         
+    _[_] : Γ ⊢ A → Δ ⊨ Γ → Δ ⊢ A
+    [id] : (t [ id ]) ≡ t
+    [∘]  : t [ θ ] [ δ ] ≡ t [ θ ∘ δ ] 
+\end{spec}
+The category of contexts has a terminal object (the empty context):
+\begin{spec}
+    •   : Con
+    ε   : Γ ⊨ • 
+    •-η : δ ≡ ε  
+\end{spec}
+Context extension resembles categorical products but mixing contexts
+and types:
+\begin{spec}
+    _▷_  : Con → Ty → Con
+    _,_  : Γ ⊨ Δ → Γ ⊢ A → Γ ⊨ (Δ ▷ A)
+    π₀   : Γ ⊨ (Δ ▷ A) → Γ ⊨ Δ
+    π₁   : Γ ⊨ (Δ ▷ A) → Γ ⊢ A
+    ▷-β₀ : π₀ (δ , t) ≡ δ
+    ▷-β₁ : π₁ (δ , t) ≡ t
+    ▷-η  : (π₀ δ , π₁ δ) ≡ δ
+    π₀∘  : π₀ (θ ∘ δ) ≡ π₀ θ ∘ δ
+    π₁∘  : π₁ (θ ∘ δ) ≡ (π₁ θ) [ δ ]  
+\end{spec}
+We can define the morphism part of the context extension functor as
+before:
+\begin{spec}
+  _^_ : Γ ⊨ Δ → ∀ A → Γ ▷ A ⊨ Δ ▷ A
+  δ ^ A = (δ ∘ (π₀ id)) , π₁ id
+\end{spec}
+We need to add the specific components for simply typed
+$\lambda$-calculus: we add the type constructors, the term
+constructors and the corresponding naturality laws:
+\begin{spec}
+  field
+    o    : Ty
+    _⇒_  : Ty → Ty → Ty
+    _·_  : Γ ⊢ A ⇒ B → Γ ⊢ A → Γ ⊢ B
+    ƛ_   : Γ ▷ A ⊢ B → Γ ⊢ A ⇒ B  
+    ·[]  : (t · u) [ δ ] ≡ (t [ δ ]) · (u [ δ ])
+    ƛ[]  : (ƛ t) [ δ ] ≡ ƛ (t [ δ ^ _ ])  
+\end{spec}
 
 \subsection{The CwF of recursive substitutions}
 \label{sec:cwf-recurs-subst}
@@ -434,7 +473,7 @@ We also reuse our existing datatypes for contexts and types for convenience
 (note terms do not occur inside types in STLC).
 
 To state the dependent equations between outputs of the eliminator, we need
-dependent identity types, which we can define by matching on the identity
+dependent identity types. We can define this simply by matching on the identity
 between the LHS and RHS types.
 
 %if False
