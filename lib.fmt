@@ -203,8 +203,8 @@
 %format ⊑⁺ = "\sqsubseteq^{+}"
 %format ⊑^ = "\sqsubseteq\uparrow"
 
-%format ⁺-nat[]v = "^{+}\!\texttt{-}\mathrm{nat}[]\mathrm{v}"
-%format ⁺-nat[] = "^{+}\!\texttt{-}\mathrm{nat}[]"
+%format ⁺-nat[]v = "^{+}" -nat[]v
+%format ⁺-nat[] = "^{+}" -nat[]
 
 %format cong₂ = "\mathrm{cong}_{2}"
 
@@ -212,11 +212,12 @@
 
 %format 𝕄 = "\mathbb{M}"
 %format 𝕞 = "\textbf{m}"
-%format compl-𝕄 = "\mathrm{compl}\texttt{-}" 𝕄
-%format compl-𝕞 = "\mathrm{compl}\texttt{-}" 𝕞
+%format compl-𝕄 = compl- 𝕄
+%format compl-𝕞 = compl- 𝕞
 
-%format elim-cwf- = "\mathrm{elim}\texttt{-}\mathrm{cwf}\texttt{-}"
-%format elim-cwf*- = "\mathrm{elim}\texttt{-}\mathrm{cwf*}\texttt{-}"
+%format norm*     = norm "\mathrm{*}"
+%format elim-cwf*  = elim-cwf "\mathrm{*}"
+%format elim-cwf*- = elim-cwf "\mathrm{*}" -
 
 %format elim-cwf*-idβ = elim-cwf*- id β
 %format elim-cwf*-∘β  = elim-cwf*- ∘ β
@@ -224,7 +225,7 @@
 %format elim-cwf*-εβ  = elim-cwf*- ε β
 %format elim-cwf*-,β  = elim-cwf*- , β
 %format elim-cwf*-π₀β = elim-cwf*- π₀ β
-%format elim-cwf*-π₁β = elim-cwf*- π₁ β
+%format elim-cwf-π₁β = elim-cwf- π₁ β
 %format elim-cwf-·β  = elim-cwf- · β
 %format elim-cwf-ƛβ  = elim-cwf- ƛ β
 

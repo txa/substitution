@@ -549,21 +549,6 @@ module _ (𝕄 : Motive) where
     δᴹ σᴹ ξᴹ : Tmsᴹ Δᴹ Γᴹ δᴵ
   
   record Methods : Set₁ where
-\end{code}
-
-%if False
-\begin{code}
-    infixl  4  _▷ᴹ_
-    infixl  4  _,ᴹ_
-    infix   5  _∘ᴹ_
-    infix   5  ƛᴹ_
-    infixr  6  _⇒ᴹ_
-    infixl  6  _·ᴹ_
-    infix   8  _[_]ᴹ
-\end{code}
-%endif
-
-\begin{code}
     field
       idᴹ  : Tmsᴹ Γᴹ Γᴹ idᴵ 
       _∘ᴹ_ : Tmsᴹ Δᴹ Γᴹ σᴵ → Tmsᴹ θᴹ Δᴹ δᴵ 
@@ -575,6 +560,15 @@ module _ (𝕄 : Motive) where
 
 %if False
 \begin{code}
+    infixl  4  _▷ᴹ_
+    infixl  4  _,ᴹ_
+    infix   5  _∘ᴹ_
+    infix   5  ƛᴹ_
+    infixr  6  _⇒ᴹ_
+    infixl  6  _·ᴹ_
+    infix   8  _[_]ᴹ
+
+    field
       ∘idᴹ : δᴹ ∘ᴹ idᴹ ≡[ cong (Tmsᴹ Δᴹ Γᴹ) ∘idᴵ ]≡ δᴹ
       ∘∘ᴹ  : (ξᴹ ∘ᴹ σᴹ) ∘ᴹ δᴹ ≡[ cong (Tmsᴹ Ξᴹ Γᴹ) ∘∘ᴵ ]≡ ξᴹ ∘ᴹ (σᴹ ∘ᴹ δᴹ) 
 
@@ -645,7 +639,11 @@ module Eliminator {𝕄} (𝕞 : Methods 𝕄) where
     elim-cwf*-idβ : elim-cwf* (idᴵ {Γ}) ≡ idᴹ
     elim-cwf*-∘β  : elim-cwf* (σᴵ ∘ᴵ δᴵ) 
                   ≡ elim-cwf* σᴵ ∘ᴹ elim-cwf* δᴵ
+    -- ...
+\end{code}
 
+%if False
+\begin{code}
     elim-cwf*-[]β : elim-cwf (tᴵ [ δᴵ ]ᴵ) 
                   ≡ elim-cwf tᴵ [ elim-cwf* δᴵ ]ᴹ
 
@@ -654,18 +652,15 @@ module Eliminator {𝕄} (𝕞 : Methods 𝕄) where
                   ≡ (elim-cwf* δᴵ ,ᴹ elim-cwf tᴵ)
     elim-cwf*-π₀β : elim-cwf* (π₀ᴵ δᴵ) 
                   ≡ π₀ᴹ (elim-cwf* δᴵ)
-    elim-cwf*-π₁β : elim-cwf (π₁ᴵ δᴵ) 
+    elim-cwf-π₁β : elim-cwf (π₁ᴵ δᴵ) 
                   ≡ π₁ᴹ (elim-cwf* δᴵ)
 
     elim-cwf-·β : elim-cwf (tᴵ ·ᴵ uᴵ) 
                 ≡ elim-cwf tᴵ ·ᴹ elim-cwf uᴵ
     elim-cwf-ƛβ : elim-cwf (ƛᴵ tᴵ) ≡ ƛᴹ elim-cwf tᴵ
-\end{code}
 
-%if False
-\begin{code}
   {-# REWRITE elim-cwf*-idβ elim-cwf*-∘β elim-cwf*-[]β elim-cwf*-εβ elim-cwf*-,β 
-              elim-cwf*-π₀β elim-cwf*-π₁β elim-cwf-·β elim-cwf-ƛβ #-}
+              elim-cwf*-π₀β elim-cwf-π₁β elim-cwf-·β elim-cwf-ƛβ #-}
 
 open Motive public
 open Methods public
@@ -674,17 +669,19 @@ open Eliminator public
 %endif
 
 \begin{spec}
-TODO: Insert REWRITE rule transformed into LaTeX characters here!
+{-# REWRITE elim-cwf$\mathrm{*}$-id$\beta$ #-}
+{-# REWRITE elim-cwf$\mathrm{*}$-$\circ\beta$ #-}
+-- ...
 \end{spec}
 
 Normalisation from the initial CwF into substitution normal forms now only
-needs a way to connect our notion of "being a CwF" with our initial CwF's 
+needs a way to connect our notion of ``being a CwF'' with our initial CwF's 
 eliminator: specifically, that any set of type families obeying the CwF laws
 gives rise to a |Motive| and associated set of |Methods|.
 
 The one extra ingredient we need to make this work out neatly is to introduce
 a new reduction for |cong|:
-\footnote{This identity also holds definitionally in Cubical.}
+\footnote{This definitional identity also holds natively in Cubical.}
 
 \begin{code}
 cong-const : ∀ {A : Set ℓ₁} {B : Set ℓ₂} {x : A} 
@@ -692,17 +689,8 @@ cong-const : ∀ {A : Set ℓ₁} {B : Set ℓ₂} {x : A}
            → cong (λ _ → x) p ≡ refl
 cong-const {p = refl} = refl
 
-\end{code}
-
-\begin{spec}
-% TODO: REWRITE rule
-\end{spec}
-
-%if False
-\begin{code}
 {-# REWRITE cong-const #-}
 \end{code}
-%endif
 
 This is enables the no-longer-dependent |_≡[_]≡_|s to collapse to |_≡_|s 
 automatically.
@@ -760,18 +748,18 @@ module Recursor (cwf : CwF-simple) where
   rec-ty  = elim-ty  cwf-to-methods
   rec-tm  = elim-cwf  cwf-to-methods
   rec-tms = elim-cwf* cwf-to-methods
-
-open Recursor public
 \end{code}
 
 %if False
 \begin{code}
+open Recursor public
 {-# INLINE rec-con #-}
 {-# INLINE rec-ty #-}
 \end{code}
 %endif
 
 Normalisation into to our substitution-normal forms can now be achieved by with:
+
 \begin{spec}
 norm : Γ ⊢ᴵ A → rec-con is-cwf Γ ⊢ rec-ty is-cwf A
 norm = rec-tm is-cwf 
@@ -779,8 +767,8 @@ norm = rec-tm is-cwf
 
 Of course, normalisation doesn't affect contexts or types so we might hope for a
 simpler signature |Γ ⊢ᴵ A → Γ ⊢ A| and, luckily, rewrite rules can get us there!
-\begin{code}
 
+\begin{code}
 Con≡ : rec-con is-cwf Γ ≡ Γ
 Ty≡  : rec-ty is-cwf A ≡ A
 
@@ -793,7 +781,7 @@ Ty≡ {A = A ⇒ B} = cong₂ _⇒_ Ty≡ Ty≡
 \end{code}
 
 \begin{spec}
-%TODO: REWRITE RULE
+{-# REWRITE $\mathrm{Con}\!\equiv \; \mathrm{Ty}\!\equiv$ #-} 
 
 \end{spec}
 
@@ -842,7 +830,7 @@ details worth mentioning:
   slightly more general way, taking expressions of any sort and coercing them up 
   to sort |T| on the RHS.
   \item The case for variables relies on a bit of coercion manipulation and our 
-  earlier lemma relating |suc i B| and |i [ id ⁺ B ]|.
+  earlier lemma equating |i [ id ⁺ B ]| and |suc i B|.
 \end{itemize}
 
 \begin{code}
@@ -889,6 +877,9 @@ beta-laws of the initial CwF.
 ⌜π₁⌝ {δ = δ , x} = sym ▷-β₁ᴵ
 \end{code}
 
+And preservation of |zero[_]| reduces to reflexivity after splitting on the
+sort.
+
 \begin{code}
 ⌜zero⌝ : ⌜ zero[_] {Γ = Γ} {A = A} q ⌝ ≡ zeroᴵ
 ⌜zero⌝ {q = V} = refl
@@ -897,8 +888,8 @@ beta-laws of the initial CwF.
 
 Preservation proofs for |_[_]|, |_^_|, |_⁺_|, |id| and |suc[_]| are all mutually 
 inductive, mirroring their original recursive definitions. We must stay
-polymorphic over sorts and again use our dummy |Sort| argument trick in |⌜id⌝| 
-to keep Agda's termination checker happy.
+polymorphic over sorts and again use our dummy |Sort| argument trick when
+implementing |⌜id⌝| to keep Agda's termination checker happy.
 
 \begin{code}
 ⌜[]⌝  : ⌜ x [ ys ] ⌝ ≡ ⌜ x ⌝ [ ⌜ ys ⌝* ]ᴵ
@@ -912,7 +903,7 @@ to keep Agda's termination checker happy.
 
 \end{code}
 \begin{spec}
-%TODO: INLINE pragma!
+{-# INLINE $\ulcorner\mathrm{id}\urcorner\;$ #-}
 \end{spec}
 
 
@@ -975,8 +966,10 @@ We also need a couple lemmas about how |⌜_⌝| ignores sort coercions.
 ⌜⊑⌝* {xs = xs , x} = cong₂ _,ᴵ_ ⌜⊑⌝* (⌜⊑⌝ {x = x})
 \end{code}
 
-We can now (finally) proceed with the proofs:
+We can now (finally) proceed with the proofs. There is quite a large number of
+cases to cover, so for brevity we elide the proof of |⌜[]⌝| and |⌜suc⌝|.
 
+%if False
 \begin{code}
 ⌜[]⌝ {x = zero} {ys = ys , y} = 
   sym (zero[]ᴵ {δᴵ = ⌜ ys ⌝*})
@@ -1006,7 +999,10 @@ We can now (finally) proceed with the proofs:
   ƛᴵ ⌜ t ⌝ [ ⌜ ys ⌝* ^ᴵ _ ]ᴵ
   ≡⟨ sym ƛ[]ᴵ ⟩
   (ƛᴵ ⌜ t ⌝) [ ⌜ ys ⌝* ]ᴵ ∎
+\end{code}
+%endif
 
+\begin{code}
 ⌜^⌝ {q = q} = cong₂ _,ᴵ_ ⌜⁺⌝ (⌜zero⌝ {q = q})
 
 ⌜⁺⌝ {xs = ε} = sym •-ηᴵ
@@ -1028,7 +1024,10 @@ We can now (finally) proceed with the proofs:
   wkᴵ ,ᴵ zeroᴵ
   ≡⟨ ▷-ηᴵ ⟩
   idᴵ ∎
+\end{code}
 
+%if False
+\begin{code}
 ⌜suc⌝ {q = V} = refl
 ⌜suc⌝ {q = T} {x = t} {B = B} =
   ⌜ t [ id ⁺ B ] ⌝
@@ -1041,6 +1040,7 @@ We can now (finally) proceed with the proofs:
   ≡⟨ cong (⌜ t ⌝ [_]ᴵ) id∘ᴵ ⟩
   ⌜ t ⌝ [ wkᴵ ]ᴵ ∎
 \end{code}
+%endif
 
 We also prove preservation of substitution composition.
 
@@ -1056,7 +1056,7 @@ We also prove preservation of substitution composition.
 \end{code}
 
 The main cases of |Methods compl-𝕄| can now be proved by just applying the 
-preservation lemmas and the IHs.
+preservation lemmas and inductive hypotheses.
 
 %if False
 \begin{code}
@@ -1140,6 +1140,11 @@ proof by unification.
 compl-𝕞 .id∘ᴹ  = duip
 compl-𝕞 .∘idᴹ  = duip
 compl-𝕞 .∘∘ᴹ   = duip
+-- ...
+\end{code}
+
+%if False
+\begin{code}
 compl-𝕞 .[id]ᴹ = duip
 compl-𝕞 .[∘]ᴹ  = duip
 compl-𝕞 .•-ηᴹ  = duip
@@ -1151,6 +1156,7 @@ compl-𝕞 .π₁∘ᴹ  = duip
 compl-𝕞 .·[]ᴹ  = duip
 compl-𝕞 .ƛ[]ᴹ  = duip
 \end{code}
+%endif
 
 And completeness is just one call to the eliminator away.
 
@@ -1158,4 +1164,4 @@ And completeness is just one call to the eliminator away.
 compl : ⌜ norm tᴵ ⌝ ≡ tᴵ
 compl {tᴵ = tᴵ} = elim-cwf compl-𝕞 tᴵ
 \end{code}
- 
+   
