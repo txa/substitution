@@ -78,6 +78,10 @@
 %format ℓ₁ = "\ell_1"
 %format ℓ₂ = "\ell_2"
 
+%format Γ, = Γ ,
+%format Δ, = Δ ,
+%format Θ, = Θ ,
+
 %format ℕ = "\mathbb{N}"
 %format ℝ = "\mathbb{R}"
 

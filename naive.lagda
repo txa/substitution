@@ -16,8 +16,7 @@ infix   8  _[_]v
 \label{sec:naive-approach}
 
 Let us first review the naive approach which leads to the
-copy-and-paste proof. We define types (|A,B,C|) and contexts (|Γ , Δ ,
-Θ|):
+copy-and-paste proof. We define types (|A, B, C|) and contexts (|Γ, Δ, Θ|):
 \begin{code}
 data Ty : Set where
   o : Ty
@@ -35,8 +34,8 @@ variable
 \end{code}
 %endif
 
-Next we introduce intrinsically typed de Bruijn variables (|i,j,k|) and
-$\lambda$-terms (|t,u,v|) :
+Next we introduce intrinsically typed de Bruijn variables (|i, j, k|) and
+$\lambda$-terms (|t, u, v|) :
 \begin{code}
 data _∋_ : Con → Ty → Set where 
   zero : Γ ▷ A ∋ A
@@ -48,16 +47,17 @@ data _⊢_ : Con → Ty → Set where
   ƛ_   : Γ ▷ A ⊢ B → Γ ⊢ A ⇒ B  
 \end{code}
 Here the constructor |`_| corresponds to \emph{variables are
-  $\lambda$-terms}; we write applications as |t  · u|, since we use de
-Bruijn variables lambda abstraction |ƛ_| doesn't use a name but
-refers to the variable |zero|. We also define substitutions as
-sequences of terms:
+  $\lambda$-terms}. We write applications as |t · u|. Since we use de
+Bruijn variables, lambda abstraction |ƛ_| doesn't bind a name explicitly
+(instead, variables count the number of binders between them and their 
+actual binding site). 
+We also define substitutions as sequences of terms:
 \begin{code}
 data _⊨_ : Con → Con → Set where
   ε   : Γ ⊨ •
   _,_ : Γ ⊨ Δ → Γ ⊢ A → Γ ⊨ Δ ▷ A  
 \end{code}
-Now to define the categorical structure (|_∘_|,|id|) we first need to define
+Now to define the categorical structure (|_∘_|, |id|) we first need to define
 substitution for terms and variables:
 %if False
 \begin{code}
@@ -80,8 +80,8 @@ _[_] : Γ ⊢ A → Δ ⊨ Γ → Δ ⊢ A
 \begin{spec}
 (ƛ t)   [ ts ]       =  ƛ ?
 \end{spec}
-As usual we have a problem with the binder |ƛ_| we are given a
-substitution |ts : Δ ⊨ Γ| but our term lives in the extended context
+As usual, we encounter a problem with the case for binders |ƛ_|. We are given a
+substitution |ts : Δ ⊨ Γ| but the body |t| lives in the extended context
 |t : Γ , A ⊢ B|. We need to exploit the fact that context extension
 |_▷_| is functorial:
 \begin{spec}
@@ -92,7 +92,7 @@ Using |_^_| we can complete |_[_]|
 (ƛ t)   [ ts ]       =  ƛ (t [ ts ^ _ ])
 \end{code}
 
-However, now we have to define |_^_|. This is easy, isn't it but we
+However, now we have to define |_^_|. This is easy (isn't it?) but we
 need weakening on substitutions:
 \begin{code}
 _⁺_ : Γ ⊨ Δ → (A : Ty) → Γ ▷ A ⊨ Δ
@@ -101,7 +101,7 @@ And now we can define |_^_|:
 \begin{code}
 ts ^ A = ts ⁺ A , ` zero 
 \end{code}
-but we need to define |_⁺_ | which is nothing but a fold of weakening
+but we need to define |_⁺_| which is nothing but a fold of weakening
 of terms
 \begin{code}
 suc-tm : Γ ⊢ B → (A : Ty) → Γ ▷ A ⊢ B
@@ -109,8 +109,8 @@ suc-tm : Γ ⊢ B → (A : Ty) → Γ ▷ A ⊢ B
 ε         ⁺ A  = ε
 (ts , t)  ⁺ A  = ts ⁺ A , suc-tm t A  
 \end{code}
-But how to define |suc-tm| we only have weakening for variables? If we
-already had identity |id : Γ  ⊨ Γ| and substitution we could say:
+But how can we define |suc-tm| when we only have weakening for variables? If we
+already had identity |id : Γ ⊨ Γ| and substitution we could say:
 \begin{spec}
 suc-tm t A = t [ id ⁺ A ] 
 \end{spec}

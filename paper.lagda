@@ -150,7 +150,7 @@ The only recent
 feature we use, though sparingly, is the possibility to turn propositional
 equations into rewriting rules (i.e. definitional equalities). This
 makes the statement of some theorems more readable because we can avoid
-using |subst| but this is not essential.
+using |subst|, but this is not essential.
 
 We extensively use variable declarations to introduce implicit
 quantification (we summarize the variables conventions in passing in
@@ -160,12 +160,11 @@ write |∀ {Γ} → ..|.
 
 Implicit variables, which are indicated by using |{..}| instead of
 |(..)| in dependent function types,  can be instantiated using the syntax
-|a {x = b}| which we use in the proofs. Agda syntax is very flexible
-allowing mixfix syntax declarations using |_| to indicate where the
-parameters go.
-
-In the proofs we also use the Agda standard library's definitions for equational 
-derivations, which exploit Agda's flexible syntax.
+|a {x = b}|. 
+Agda syntax is very flexible allowing mixfix syntax declarations using |_| to 
+indicate where the parameters go.
+In the proofs we use the Agda standard library's definitions for equational 
+derivations, which exploit this flexibility.
 
 The source of this document contains the actual Agda code, i.e. it is
 a literate Agda file. Different chapters are in different modules to
