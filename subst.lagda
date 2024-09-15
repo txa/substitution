@@ -35,19 +35,21 @@ module Subst where
 \end{code}
 %endif
 
-Our main idea is that we have to turn the distinction between
+Our main idea is to turn the distinction between
 variables and terms into a parameter. The first approximation is to
-define a type |Sort| (|q , r , s|) :
+define a type |Sort| (|q, r, s|) :
 \begin{spec}
 data Sort : Set where
    V T : Sort  
  \end{spec}
 but this is not exactly what we want because we want Agda to know that
-the sort of variables |V| is \emph{easier} than the sort of terms
-|T|. Agda's termination checker only knows about the structural
-ordering of an inductive type, and with the following definition we
-can make |V| structurally smaller than |T| maintaining that |V| and
-|T| are the only elements of |Sort|.
+the sort of variables |V| is \emph{smaller} than the sort of terms
+|T| (following intuition that because weakening variables is trivial but to 
+weaken a term we must construct a renaming). 
+Agda's termination checker only knows about the structural
+orderings. With following definition, we
+can make |V| structurally smaller than |T|, while maintaining that |Sort| has
+only two elements.
 \begin{code}
 data Sort : Set 
 data IsV : Sort → Set
@@ -64,19 +66,19 @@ variable
 \end{code}
 %endif
 
-Here the predicate |isV| only holds for |V|. We can avoid this mutual
+Here the predicate |isV| only holds for |V|. We could avoid this mutual
 definition by using equality |_≡_|.
 
-We can now define |T : Sort| but even better we can tell Agda that
+We can now define |T = T>V V isV : Sort| but, even better, we can tell Agda that
 this is a derived pattern
 \begin{code}
 pattern T = T>V V isV
 \end{code}
-this means we can pattern match over |Sort| just with |V| and |T|,
-which are indeed the only elements of |Sort| but now |V| is
-structurally smaller than |T|.
+This means we can pattern match over |Sort| just with |V| and |T|,
+but now |V| is visibly (to Agda's termination checker) structurally smaller than
+|T|.
 
-We can now define terms and variables in one go (|x , y , z|) ~:
+We can now define terms and variables in one go (|x, y, z|):
 \begin{code}
 data _⊢[_]_ : Con → Sort → Ty → Set where
   zero : Γ ▷ A ⊢[ V ] A
@@ -90,7 +92,7 @@ While almost identical to the previous definition (|Γ ⊢[ V ] A| corresponds t
 |Γ ∋ A| and |Γ  ⊢[ T ]  A| to |Γ ⊢ A|)
 we can now
 parametrize all definitions and theorems explicitly. As a first step
-we can generalize renamings and substitutions (|xs , ys , zs|):
+we can generalize renamings and substitutions (|xs, ys, zs|):
 \begin{code}
 data _⊨[_]_ : Con → Sort → Con → Set where
   ε   : Γ ⊨[ q ] •
@@ -114,7 +116,7 @@ _⊔_ : Sort → Sort → Sort
 V ⊔ r  =  r
 T ⊔ r  =  T
 \end{code}
-We also need the order to insert a coercion when necessary:
+We also need the order as a relation for inserting coercions when necessary:
 \begin{code}
 data _⊑_ : Sort → Sort → Set where
   rfl : s ⊑ s
@@ -153,7 +155,7 @@ v⊑ {T} = v⊑t
 \end{code}
 %endif
 
-To improve readability we turn the equations  (|⊔⊔| , |⊔v|) into
+To improve readability we turn the equations (|⊔⊔|, |⊔v|) into
 rewrite rules: by declaring
 
 \begin{spec}
@@ -166,10 +168,10 @@ rewrite rules: by declaring
 \end{code}
 %endif
 
-we introduce additional definitional equalities, i.e.
+This introduces new definitional equalities, i.e.
 |q ⊔ (r ⊔ s) = (q ⊔ r) ⊔ s| and |q ⊔ V = q| are now used by the type
 checker.
-\footnote{Basically, this feature allows a selective use of extensional
+\footnote{Effectively, this feature allows a selective use of extensional
   Type Theory.}
 The order gives rise to a functor which is witnessed by
 \begin{code}
@@ -267,7 +269,7 @@ why Agda still doesn't accept our program. The limitation is ultimately a
 technical one: Agda only looks at the direct arguments to function calls when 
 building the call graph from which it identifies termination order 
 \cite{alti:jfp02}. Because |id| is not passed a sort, the sort cannot be 
-considered as  decreasing in the case of term weakening.
+considered as decreasing in the case of term weakening (|suc[ T ] t A|).
 
 Luckily, working around this is not difficult. We can implement |id| 
 sort-polymorphically and then define an abbreviation which specialises this to 
