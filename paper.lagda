@@ -206,10 +206,10 @@ implement recursive substitution for dependent types. This is harder
 because here the typing of the constructors actually depends on the
 substitution laws. While such a M\"unchhausian \cite{altenkirch2023munchhausen} 
 construction
-\footnote{The reference is to Baron Münchhausen who allegedly pulled himself on 
-his own hair out of a swamp.
-We call definitions in type theory whose typing depends on equations about them 
-\emph{M\"unchhausian}.
+\footnote{The reference is to Baron Münchhausen who allegedly pulled himself 
+out of a swamp by his own hair.
+We call definitions in type theory whose typing depends on equations about 
+themselves \emph{M\"unchhausian}.
 }
 should actually be possible in Agda, the theoretical underpinning of
 inductive-inductive-recursive definitions is mostly unexplored (with
