@@ -157,7 +157,7 @@ To improve readability we turn the equations  (|⊔⊔| , |⊔v|) into
 rewrite rules: by declaring
 
 \begin{spec}
-{-# REWRITE $\sqcup\!\sqcup \; \sqcup\mathrm{v} \;$ #-}
+{-# \Keyword{REWRITE} $\sqcup\!\sqcup \; \sqcup\mathrm{v} \;$ #-}
 \end{spec}
 
 %if False
@@ -280,7 +280,7 @@ id-poly {Γ = Γ ▷ A} = id-poly ^ A
 
 id : Γ ⊨[ V ] Γ 
 id = id-poly
-{-# INLINE id #-}
+{-# \Keyword{INLINE} id #-}
 \end{spec}
 
 Finally, we define composition by folding substitution:

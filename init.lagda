@@ -677,8 +677,8 @@ open Eliminator public
 %endif
 
 \begin{spec}
-{-# REWRITE elim-cwf$\mathrm{*}$-id$\beta$ #-}
-{-# REWRITE elim-cwf$\mathrm{*}$-$\circ\beta$ #-}
+{-# \Keyword{REWRITE} elim-cwf$\mathrm{*}$-id$\beta$ #-}
+{-# \Keyword{REWRITE} elim-cwf$\mathrm{*}$-$\circ\beta$ #-}
 -- ...
 \end{spec}
 
@@ -697,8 +697,17 @@ cong-const : ∀ {A : Set ℓ₁} {B : Set ℓ₂} {x : A}
            → cong (λ _ → x) p ≡ refl
 cong-const {p = refl} = refl
 
+\end{code}
+
+\begin{spec}
+{-# \Keyword{REWRITE} cong-const #-}
+\end{spec}
+
+%if False
+\begin{code}
 {-# REWRITE cong-const #-}
 \end{code}
+%endif
 
 This is enables the no-longer-dependent |_≡[_]≡_|s to collapse to |_≡_|s 
 automatically.
@@ -768,7 +777,7 @@ open Recursor public
 \end{code}
 %endif
 
-Normalisation into to our substitution-normal forms can now be achieved by with:
+Normalisation into to our substitution normal forms can now be achieved by with:
 
 \begin{spec}
 norm : Γ ⊢ᴵ A → rec-con is-cwf Γ ⊢ rec-ty is-cwf A
@@ -792,7 +801,7 @@ Ty≡ {A = A ⇒ B} = cong₂ _⇒_ Ty≡ Ty≡
 \end{code}
 
 \begin{spec}
-{-# REWRITE $\mathrm{Con}\!\equiv \; \mathrm{Ty}\!\equiv$ #-} 
+{-# \Keyword{REWRITE} $\mathrm{Con}\!\equiv \; \mathrm{Ty}\!\equiv$ #-} 
 
 \end{spec}
 
@@ -810,8 +819,8 @@ norm* : Δ ⊨ᴵ Γ → Δ ⊨ Γ
 norm* = rec-tms is-cwf
 \end{code}
 
-The inverse operation to inject our syntax back into the initial CwF comes out
-easily be recursing on our substitution-normal forms.
+The inverse operation to inject our syntax back into the initial CwF is easily
+implemented by recursing on our substitution normal forms.
 
 \begin{code}
 ⌜_⌝ : Γ ⊢[ q ] A → Γ ⊢ᴵ A
@@ -914,7 +923,7 @@ implementing |⌜id⌝| to keep Agda's termination checker happy.
 
 \end{code}
 \begin{spec}
-{-# INLINE $\ulcorner\mathrm{id}\urcorner\;$ #-}
+{-# \Keyword{INLINE} $\ulcorner\mathrm{id}\urcorner\;$ #-}
 \end{spec}
 
 

@@ -139,7 +139,7 @@ id∘ = id∘′ V
 \end{code}
 
 \begin{spec}
-{-# INLINE $id \circ \;$ #-}
+{-# \Keyword{INLINE} $id \circ \;$ #-}
 \end{spec}
 
 %if False
