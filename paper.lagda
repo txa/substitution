@@ -134,16 +134,16 @@ structurally smaller than |T| and as a consequence the highly mutually
 recursive proof is accepted by agda.
 
 We also relate the recursive definition of substitution to a
-specification using a quotient inductive type where substitution is a
-term former. Our specification is that the substitution laws
-correspond to the equations of a simply typed category with families
-(CwF) --- this is a variant of a category with families where the
-types do not depend on a context. We show that the recursive
-definition of substitution leads to a simply typed CwF which is
-isomorphic to the specified initial one. This can be viewed as a
+specification using a quotient-inductive-inductive type (QIIT), that
+is a a mutual inductive type with equations,  where
+substitution is a term former. Our specification is that the
+substitution laws correspond to the equations of a simply typed
+category with families (CwF) --- this is a variant of a category with
+families where the types do not depend on a context. We show that the
+recursive definition of substitution leads to a simply typed CwF which
+is isomorphic to the specified initial one. This can be viewed as a
 normalisation result where the usual $\lambda$-terms without explicit
-substitution are the \emph{substitution normal forms}.
-
+substitutions are the \emph{substitution normal forms}.
 
 \subsection{Related work}
 \label{sec:related-work}
@@ -157,12 +157,16 @@ recursion. However, this is only applied to the definition and the
 categorical laws (which follow from the monad laws) were not formally
 verified. Also the present approach seems to be simpler and scales
 better avoiding well-founded recursion.  The monadic approach has been
-further investigated in \cite{mcbride2006type}. The structure of the
-proofs is explained in \cite{allais2017type} from a monadic
-perspective. Indeed this example is one of the motivations for
-relative monads \cite{altenkirch2015monads}.
+further investigated in \cite{mcbride2006type, allais2017type}. While
+this gives a semantic framework to analyse the relation between
+renaming and substitution it is not clear how this can be exploited to
+solve the problem we are considering here: to give uniform definitions
+and proofs capturing both.
 
-We avoid the monadic perspective here for two reasons: first we want
+The monadic perspective ledas to the notion of relative monads
+\cite{altenkirch2015monads}, indeed substitution for typed and untyped
+$\lambda$-terms is one of the motivating examples. We avoid the
+monadic perspective here for two reasons: first we want 
 to give a simple self-contained proof avoiding too much advanced
 categorical constructions as mentioned in the introduction as a
 motivation; second we are interested in the application to dependent
@@ -220,19 +224,6 @@ The source of this document contains the actual Agda code, i.e. it is
 a literate Agda file. Different chapters are in different modules to
 avoid name clashes, e.g. preliminary definitions from section \ref{sec:naive-approach}
 are redefined later.
-
-\subsection{Structure of the paper}
-\label{sec:structure-paper}
-
-First we motivate the problem by explaining tha naive approach (section
-\ref{sec:naive-approach}) and then we factor the operations using sorts
-(section \ref{sec:fact-with-sorts}. We use this to prove the
-categorical laws
-without repetitions (section \ref{sec:proving-laws}). In section
-\ref{sec:initiality} we introduce simply typed CwFs and use our
-previous proofs to show  that the
-recursive definition is initial (i.e. it is isomorphic to the quotient
-inductive type).
 
 %include naive.lagda
 %include subst.lagda
