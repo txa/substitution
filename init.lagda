@@ -170,10 +170,16 @@ constructors and the corresponding naturality laws:
 \subsection{The CwF of recursive substitutions}
 \label{sec:cwf-recurs-subst}
 
-We now aim to show that our recursive substitution syntax obeys the CwF laws.
-As we shall see later, this will also be more-or-less enough to implement the 
-"normalisation" direction of our initial CwF |≃| recursive sub syntax 
+We are building towards a proof of initiality for our recursive substitution
+syntax, but shall start by showing that our recursive substitution syntax obeys 
+the CwF laws, specifically that |CwF-simple| can be instantiated with 
+|_⊢[_]_|/|_⊨[_]_|. This will be more-or-less enough to implement the 
+``normalisation'' direction of our initial CwF |≃| recursive sub syntax 
 isomorphism.
+
+Most of the work to prove these laws was already done in
+\ref{sec:proving-laws} but there are a couple tricky details with fitting
+into the exact structure the |CwF-simple| record requires.
 
 %if False
 \begin{code}
@@ -191,9 +197,9 @@ is-cwf : CwF-simple
 is-cwf .CwF.Con = Con
 \end{spec}
 
-We now need to decide which type family to interpret substitutions into. 
+We need to decide which type family to interpret substitutions into. 
 In our first attempt, we tried to pair renamings/substitutions with their sorts 
-and stay polymorphic:
+to stay polymorphic:
 
 \begin{spec}
 record _⊨_ (Δ : Con) (Γ : Con) : Set where
@@ -219,7 +225,7 @@ Our |_⊨_| record is simply too flexible here. It allows two distinct
 implementations: |record {sort = V; tms = ε}| and |record {sort = T; tms = ε}|. 
 We are stuck!
 
-To avoid this, we instead fix the sort to |T|.
+Therefore, we instead fix the sort to |T|.
 
 \begin{code}
 _⊨_ = _⊨[ T ]_ 
@@ -263,9 +269,10 @@ interleaved mutual
   is-cwf .CwF.∘∘  = sym ∘∘
 \end{code}
 
-The lack of flexibility to choose the sort does, however, make identity a little 
-trickier. |id| doesn't fit directly as it produces
-renamings |Γ ⊨[ V ] Γ|; we need the equivalent substitution |Γ ⊨[ T ] Γ|. 
+The lack of flexibility over sorts when constructing substitutions does, 
+however, make identity a little trickier. 
+|id| doesn't fit |CwF.id| directly as it produces a renaming |Γ ⊨[ V ] Γ|. 
+We need the equivalent substitution |Γ ⊨[ T ] Γ|. 
 Technically, |id-poly| would suit this purpose but for reasons that will become 
 clear soon, we take a slightly more indirect approach.
 \footnote{Also, |id-poly| was ultimately just an implementation detail 
@@ -277,8 +284,10 @@ We first extend |tm⊑| to sequences of variables/terms:
   tm*⊑ q⊑s ε = ε
   tm*⊑ q⊑s (σ , x) = tm*⊑ q⊑s σ , tm⊑ q⊑s x
 \end{spec}
+
 And prove various lemmas about how |tm*⊑| coercions can be lifted outside of
 our substitution operators:
+
 \begin{spec}
   ⊑∘   : tm*⊑ v⊑t xs ∘ ys ≡ xs ∘ ys
   ∘⊑   : xs ∘ tm*⊑ v⊑t ys ≡ xs ∘ ys
@@ -289,7 +298,7 @@ our substitution operators:
 \end{spec}
 
 Most of these are proofs come out easily by induction on terms and 
-substitutions and we skip over them.
+substitutions so we skip over them.
 Perhaps worth noting though is that |⊑⁺| requires one new law relating our two
 ways of weakening variables.
 
@@ -408,7 +417,8 @@ differing implementations of |_^_|.
     ƛ x [ (ys ∘ id) ^ A ]
     ≡⟨ cong (λ ρ → ƛ x [ ρ , ` zero ]) (sym ⁺-nat∘) ⟩ 
     ƛ x [ ys ∘ id ⁺ A , ` zero ]
-    ≡⟨ cong (λ ρ → ƛ x [ ρ , ` zero ]) (sym (∘⊑ {xs = ys}  {ys = id ⁺ _})) ⟩
+    ≡⟨ cong (λ ρ → ƛ x [ ρ , ` zero ]) 
+            (sym (∘⊑ {ys = id ⁺ _})) ⟩
     ƛ x [ ys ∘ tm*⊑ v⊑t (id ⁺ A) , ` zero ] ∎
 \end{code}
 
@@ -418,9 +428,10 @@ the initial CwF.
 
 An important first step is to actually define the initial CwF (and its
 eliminator). We use postulates and rewrite rules instead of a Cubical 
-Agda QIIT because of technical limitations mentioned previously.
-We also reuse our existing datatypes for contexts and types because terms do not 
-occur inside types in STLC.
+Agda higher inductive type (HIT) because of technical limitations mentioned 
+previously.
+We also reuse our existing datatypes for contexts and types for convenience
+(note terms do not occur inside types in STLC).
 
 To state the dependent equations between outputs of the eliminator, we need
 dependent identity types, which we can define by matching on the identity
@@ -438,9 +449,14 @@ private variable
 %endif
 
 \begin{code}
-_≡[_]≡_ : ∀ {A B : Set ℓ} → A → A ≡ B → B → Set ℓ
+_≡[_]≡_ : ∀ {A B : Set ℓ} → A → A ≡ B → B 
+        → Set ℓ
 x ≡[ refl ]≡ y = x ≡ y
+
 \end{code}
+
+To avoid name clashes between our existing syntax and the initial CwF 
+constructors, we annotate every |ICwF| constructor with |ᴵ|.
 
 %if False
 \begin{code}
@@ -466,6 +482,11 @@ postulate
   idᴵ  : Γ ⊨ᴵ Γ
   _∘ᴵ_ : Δ ⊨ᴵ Γ → Θ ⊨ᴵ Δ → Θ ⊨ᴵ Γ
   id∘ᴵ : idᴵ ∘ᴵ δᴵ ≡ δᴵ
+  -- ...
+\end{code}
+
+%if False
+\begin{code}
   ∘idᴵ : δᴵ ∘ᴵ idᴵ ≡ δᴵ
   ∘∘ᴵ  : (ξᴵ ∘ᴵ σᴵ) ∘ᴵ δᴵ ≡ ξᴵ ∘ᴵ (σᴵ ∘ᴵ δᴵ)
 
@@ -502,112 +523,136 @@ postulate
 
 sucᴵ : Γ ⊢ᴵ B → ∀ A → Γ ▷ A ⊢ᴵ B
 sucᴵ x A = x [ π₀ᴵ idᴵ ]ᴵ
+\end{code}
+%endif
 
+% TODO: Is this the right paper to cite - i.e. was this the first paper to use
+% use this convention or was it taken from somewhere else?
+We state the eliminator for the initial CwF in terms of a |Motive| and |Methods| 
+record as in \cite{altenkirch2016tt_in_tt}.
+
+\begin{code}
 record Motive : Set₁ where
   field
-    Conᴱ : Con → Set
-    Tyᴱ  : Ty → Set
-    Tmᴱ  : Conᴱ Γ → Tyᴱ A → Γ ⊢ᴵ A → Set
-    Tmsᴱ : Conᴱ Δ → Conᴱ Γ → Δ ⊨ᴵ Γ → Set
+    Conᴹ : Con → Set
+    Tyᴹ  : Ty → Set
+    Tmᴹ  : Conᴹ Γ → Tyᴹ A → Γ ⊢ᴵ A → Set
+    Tmsᴹ : Conᴹ Δ → Conᴹ Γ → Δ ⊨ᴵ Γ → Set
 
 module _ (𝕄 : Motive) where
   open Motive 𝕄
 
   variable
-    Γᴱ Δᴱ θᴱ Ξᴱ : Conᴱ Γ
-    Aᴱ Bᴱ Cᴱ Dᴱ : Tyᴱ A
-    tᴱ uᴱ vᴱ : Tmᴱ Γᴱ Aᴱ tᴵ
-    δᴱ σᴱ ξᴱ : Tmsᴱ Δᴱ Γᴱ δᴵ
+    Γᴹ Δᴹ θᴹ Ξᴹ : Conᴹ Γ
+    Aᴹ Bᴹ Cᴹ Dᴹ : Tyᴹ A
+    tᴹ uᴹ vᴹ : Tmᴹ Γᴹ Aᴹ tᴵ
+    δᴹ σᴹ ξᴹ : Tmsᴹ Δᴹ Γᴹ δᴵ
+  
+  record Methods : Set₁ where
+\end{code}
 
-  record Branches : Set₁ where
-    infixl  4  _▷ᴱ_
-    infixl  4  _,ᴱ_
-    infix   5  _∘ᴱ_
-    infix   5  ƛᴱ_
-    infixr  6  _⇒ᴱ_
-    infixl  6  _·ᴱ_
-    infix   8  _[_]ᴱ
+%if False
+\begin{code}
+    infixl  4  _▷ᴹ_
+    infixl  4  _,ᴹ_
+    infix   5  _∘ᴹ_
+    infix   5  ƛᴹ_
+    infixr  6  _⇒ᴹ_
+    infixl  6  _·ᴹ_
+    infix   8  _[_]ᴹ
+\end{code}
+%endif
+
+\begin{code}
     field
-      idᴱ  : Tmsᴱ Γᴱ Γᴱ idᴵ 
-      _∘ᴱ_ : Tmsᴱ Δᴱ Γᴱ σᴵ → Tmsᴱ θᴱ Δᴱ δᴵ → Tmsᴱ θᴱ Γᴱ (σᴵ ∘ᴵ δᴵ)
+      idᴹ  : Tmsᴹ Γᴹ Γᴹ idᴵ 
+      _∘ᴹ_ : Tmsᴹ Δᴹ Γᴹ σᴵ → Tmsᴹ θᴹ Δᴹ δᴵ → Tmsᴹ θᴹ Γᴹ (σᴵ ∘ᴵ δᴵ)
       
-      id∘ᴱ : idᴱ ∘ᴱ δᴱ ≡[ cong (Tmsᴱ Δᴱ Γᴱ) id∘ᴵ ]≡ δᴱ
-      ∘idᴱ : δᴱ ∘ᴱ idᴱ ≡[ cong (Tmsᴱ Δᴱ Γᴱ) ∘idᴵ ]≡ δᴱ
-      ∘∘ᴱ  : (ξᴱ ∘ᴱ σᴱ) ∘ᴱ δᴱ ≡[ cong (Tmsᴱ Ξᴱ Γᴱ) ∘∘ᴵ ]≡ ξᴱ ∘ᴱ (σᴱ ∘ᴱ δᴱ) 
+      id∘ᴹ : idᴹ ∘ᴹ δᴹ ≡[ cong (Tmsᴹ Δᴹ Γᴹ) id∘ᴵ ]≡ δᴹ
+      -- ...
+\end{code}
 
-      _[_]ᴱ : Tmᴱ Γᴱ Aᴱ tᴵ → Tmsᴱ Δᴱ Γᴱ δᴵ → Tmᴱ Δᴱ Aᴱ (tᴵ [ δᴵ ]ᴵ)
+%if False
+\begin{code}
+      ∘idᴹ : δᴹ ∘ᴹ idᴹ ≡[ cong (Tmsᴹ Δᴹ Γᴹ) ∘idᴵ ]≡ δᴹ
+      ∘∘ᴹ  : (ξᴹ ∘ᴹ σᴹ) ∘ᴹ δᴹ ≡[ cong (Tmsᴹ Ξᴹ Γᴹ) ∘∘ᴵ ]≡ ξᴹ ∘ᴹ (σᴹ ∘ᴹ δᴹ) 
+
+      _[_]ᴹ : Tmᴹ Γᴹ Aᴹ tᴵ → Tmsᴹ Δᴹ Γᴹ δᴵ → Tmᴹ Δᴹ Aᴹ (tᴵ [ δᴵ ]ᴵ)
       
-      [id]ᴱ : tᴱ [ idᴱ ]ᴱ ≡[ cong (Tmᴱ Γᴱ Aᴱ) [id]ᴵ ]≡ tᴱ
-      [∘]ᴱ  : tᴱ [ σᴱ ]ᴱ [ δᴱ ]ᴱ ≡[ cong (Tmᴱ θᴱ Aᴱ) [∘]ᴵ ]≡ tᴱ [ σᴱ ∘ᴱ δᴱ ]ᴱ
+      [id]ᴹ : tᴹ [ idᴹ ]ᴹ ≡[ cong (Tmᴹ Γᴹ Aᴹ) [id]ᴵ ]≡ tᴹ
+      [∘]ᴹ  : tᴹ [ σᴹ ]ᴹ [ δᴹ ]ᴹ ≡[ cong (Tmᴹ θᴹ Aᴹ) [∘]ᴵ ]≡ tᴹ [ σᴹ ∘ᴹ δᴹ ]ᴹ
 
-      •ᴱ : Conᴱ •
-      εᴱ : Tmsᴱ Δᴱ •ᴱ εᴵ
+      •ᴹ : Conᴹ •
+      εᴹ : Tmsᴹ Δᴹ •ᴹ εᴵ
 
-      •-ηᴱ : δᴱ ≡[ cong (Tmsᴱ Δᴱ •ᴱ) •-ηᴵ ]≡ εᴱ
+      •-ηᴹ : δᴹ ≡[ cong (Tmsᴹ Δᴹ •ᴹ) •-ηᴵ ]≡ εᴹ
 
-      _▷ᴱ_ : Conᴱ Γ → Tyᴱ A → Conᴱ (Γ ▷ A)
-      _,ᴱ_ : Tmsᴱ Δᴱ Γᴱ δᴵ → Tmᴱ Δᴱ Aᴱ tᴵ → Tmsᴱ Δᴱ (Γᴱ ▷ᴱ Aᴱ) (δᴵ ,ᴵ tᴵ)
-      π₀ᴱ  : Tmsᴱ Δᴱ (Γᴱ ▷ᴱ Aᴱ) δᴵ → Tmsᴱ Δᴱ Γᴱ (π₀ᴵ δᴵ)
-      π₁ᴱ  : Tmsᴱ Δᴱ (Γᴱ ▷ᴱ Aᴱ) δᴵ → Tmᴱ Δᴱ Aᴱ (π₁ᴵ δᴵ)
+      _▷ᴹ_ : Conᴹ Γ → Tyᴹ A → Conᴹ (Γ ▷ A)
+      _,ᴹ_ : Tmsᴹ Δᴹ Γᴹ δᴵ → Tmᴹ Δᴹ Aᴹ tᴵ → Tmsᴹ Δᴹ (Γᴹ ▷ᴹ Aᴹ) (δᴵ ,ᴵ tᴵ)
+      π₀ᴹ  : Tmsᴹ Δᴹ (Γᴹ ▷ᴹ Aᴹ) δᴵ → Tmsᴹ Δᴹ Γᴹ (π₀ᴵ δᴵ)
+      π₁ᴹ  : Tmsᴹ Δᴹ (Γᴹ ▷ᴹ Aᴹ) δᴵ → Tmᴹ Δᴹ Aᴹ (π₁ᴵ δᴵ)
 
-      ▷-β₀ᴱ : π₀ᴱ (δᴱ ,ᴱ tᴱ) ≡[ cong (Tmsᴱ Δᴱ Γᴱ) ▷-β₀ᴵ ]≡ δᴱ
-      ▷-β₁ᴱ : π₁ᴱ (δᴱ ,ᴱ tᴱ) ≡[ cong (Tmᴱ Δᴱ Aᴱ) ▷-β₁ᴵ ]≡ tᴱ
-      ▷-ηᴱ  : (π₀ᴱ δᴱ ,ᴱ π₁ᴱ δᴱ) ≡[ cong (Tmsᴱ Δᴱ (Γᴱ ▷ᴱ Aᴱ)) ▷-ηᴵ ]≡ δᴱ
-      π₀∘ᴱ  : π₀ᴱ (σᴱ ∘ᴱ δᴱ) ≡[ cong (Tmsᴱ θᴱ Γᴱ) π₀∘ᴵ ]≡ π₀ᴱ σᴱ ∘ᴱ δᴱ
-      π₁∘ᴱ  : π₁ᴱ (σᴱ ∘ᴱ δᴱ) ≡[ cong (Tmᴱ θᴱ Aᴱ) π₁∘ᴵ ]≡ π₁ᴱ σᴱ [ δᴱ ]ᴱ
+      ▷-β₀ᴹ : π₀ᴹ (δᴹ ,ᴹ tᴹ) ≡[ cong (Tmsᴹ Δᴹ Γᴹ) ▷-β₀ᴵ ]≡ δᴹ
+      ▷-β₁ᴹ : π₁ᴹ (δᴹ ,ᴹ tᴹ) ≡[ cong (Tmᴹ Δᴹ Aᴹ) ▷-β₁ᴵ ]≡ tᴹ
+      ▷-ηᴹ  : (π₀ᴹ δᴹ ,ᴹ π₁ᴹ δᴹ) ≡[ cong (Tmsᴹ Δᴹ (Γᴹ ▷ᴹ Aᴹ)) ▷-ηᴵ ]≡ δᴹ
+      π₀∘ᴹ  : π₀ᴹ (σᴹ ∘ᴹ δᴹ) ≡[ cong (Tmsᴹ θᴹ Γᴹ) π₀∘ᴵ ]≡ π₀ᴹ σᴹ ∘ᴹ δᴹ
+      π₁∘ᴹ  : π₁ᴹ (σᴹ ∘ᴹ δᴹ) ≡[ cong (Tmᴹ θᴹ Aᴹ) π₁∘ᴵ ]≡ π₁ᴹ σᴹ [ δᴹ ]ᴹ
     
-    wkᴱ : Tmsᴱ (Γᴱ ▷ᴱ Aᴱ) Γᴱ wkᴵ
-    wkᴱ = π₀ᴱ idᴱ
+    wkᴹ : Tmsᴹ (Γᴹ ▷ᴹ Aᴹ) Γᴹ wkᴵ
+    wkᴹ = π₀ᴹ idᴹ
 
-    zeroᴱ : Tmᴱ (Γᴱ ▷ᴱ Aᴱ) Aᴱ zeroᴵ
-    zeroᴱ = π₁ᴱ idᴱ
+    zeroᴹ : Tmᴹ (Γᴹ ▷ᴹ Aᴹ) Aᴹ zeroᴵ
+    zeroᴹ = π₁ᴹ idᴹ
 
-    _^ᴱ_ : Tmsᴱ Δᴱ Γᴱ δᴵ → ∀ Aᴱ → Tmsᴱ (Δᴱ ▷ᴱ Aᴱ) (Γᴱ ▷ᴱ Aᴱ) (δᴵ ^ᴵ A)
-    δᴱ ^ᴱ Aᴱ = (δᴱ ∘ᴱ wkᴱ) ,ᴱ zeroᴱ
+    _^ᴹ_ : Tmsᴹ Δᴹ Γᴹ δᴵ → ∀ Aᴹ → Tmsᴹ (Δᴹ ▷ᴹ Aᴹ) (Γᴹ ▷ᴹ Aᴹ) (δᴵ ^ᴵ A)
+    δᴹ ^ᴹ Aᴹ = (δᴹ ∘ᴹ wkᴹ) ,ᴹ zeroᴹ
 
     field
-      oᴱ   : Tyᴱ o
-      _⇒ᴱ_ : Tyᴱ A → Tyᴱ B → Tyᴱ (A ⇒ B)
+      oᴹ   : Tyᴹ o
+      _⇒ᴹ_ : Tyᴹ A → Tyᴹ B → Tyᴹ (A ⇒ B)
       
-      _·ᴱ_ : Tmᴱ Γᴱ (Aᴱ ⇒ᴱ Bᴱ) tᴵ → Tmᴱ Γᴱ Aᴱ uᴵ → Tmᴱ Γᴱ Bᴱ (tᴵ ·ᴵ uᴵ)
-      ƛᴱ_  : Tmᴱ (Γᴱ ▷ᴱ Aᴱ) Bᴱ tᴵ → Tmᴱ Γᴱ (Aᴱ ⇒ᴱ Bᴱ) (ƛᴵ tᴵ)
+      _·ᴹ_ : Tmᴹ Γᴹ (Aᴹ ⇒ᴹ Bᴹ) tᴵ → Tmᴹ Γᴹ Aᴹ uᴵ → Tmᴹ Γᴹ Bᴹ (tᴵ ·ᴵ uᴵ)
+      ƛᴹ_  : Tmᴹ (Γᴹ ▷ᴹ Aᴹ) Bᴹ tᴵ → Tmᴹ Γᴹ (Aᴹ ⇒ᴹ Bᴹ) (ƛᴵ tᴵ)
       
-      ·[]ᴱ : (tᴱ ·ᴱ uᴱ) [ δᴱ ]ᴱ 
-          ≡[ cong (Tmᴱ Δᴱ Bᴱ) ·[]ᴵ 
-          ]≡ tᴱ [ δᴱ ]ᴱ ·ᴱ uᴱ [ δᴱ ]ᴱ
-      ƛ[]ᴱ : (ƛᴱ tᴱ) [ δᴱ ]ᴱ 
-          ≡[ cong (Tmᴱ Δᴱ (Aᴱ ⇒ᴱ Bᴱ)) ƛ[]ᴵ 
-          ]≡ ƛᴱ (tᴱ [ δᴱ ^ᴱ Aᴱ ]ᴱ)  
+      ·[]ᴹ : (tᴹ ·ᴹ uᴹ) [ δᴹ ]ᴹ 
+          ≡[ cong (Tmᴹ Δᴹ Bᴹ) ·[]ᴵ 
+          ]≡ tᴹ [ δᴹ ]ᴹ ·ᴹ uᴹ [ δᴹ ]ᴹ
+      ƛ[]ᴹ : (ƛᴹ tᴹ) [ δᴹ ]ᴹ 
+          ≡[ cong (Tmᴹ Δᴹ (Aᴹ ⇒ᴹ Bᴹ)) ƛ[]ᴵ 
+          ]≡ ƛᴹ (tᴹ [ δᴹ ^ᴹ Aᴹ ]ᴹ)  
+\end{code}
+%endif
 
-module Eliminator {𝕄} (𝔹 : Branches 𝕄) where
+\begin{code}
+module Eliminator {𝕄} (𝕞 : Methods 𝕄) where
   open Motive 𝕄
-  open Branches 𝔹
+  open Methods 𝕞
 
-  elim-con : ∀ Γ → Conᴱ Γ
-  elim-ty  : ∀ A → Tyᴱ  A
+  elim-con : ∀ Γ → Conᴹ Γ
+  elim-ty  : ∀ A → Tyᴹ  A
 
-  elim-con • = •ᴱ
-  elim-con (Γ ▷ A) = (elim-con Γ) ▷ᴱ (elim-ty A)
+  elim-con • = •ᴹ
+  elim-con (Γ ▷ A) = (elim-con Γ) ▷ᴹ (elim-ty A)
 
-  elim-ty o = oᴱ
-  elim-ty (A ⇒ B) = (elim-ty A) ⇒ᴱ (elim-ty B) 
+  elim-ty o = oᴹ
+  elim-ty (A ⇒ B) = (elim-ty A) ⇒ᴹ (elim-ty B) 
 
   postulate
-    elim-cwf  : ∀ tᴵ → Tmᴱ (elim-con Γ) (elim-ty A) tᴵ
-    elim-cwf* : ∀ δᴵ → Tmsᴱ (elim-con Δ) (elim-con Γ) δᴵ
+    elim-cwf  : ∀ tᴵ → Tmᴹ (elim-con Γ) (elim-ty A) tᴵ
+    elim-cwf* : ∀ δᴵ → Tmsᴹ (elim-con Δ) (elim-con Γ) δᴵ
 
-    elim-cwf*-idβ : elim-cwf* (idᴵ {Γ}) ≡ idᴱ
-    elim-cwf*-∘β  : elim-cwf* (σᴵ ∘ᴵ δᴵ) ≡ elim-cwf* σᴵ ∘ᴱ elim-cwf* δᴵ
+    elim-cwf*-idβ : elim-cwf* (idᴵ {Γ}) ≡ idᴹ
+    elim-cwf*-∘β  : elim-cwf* (σᴵ ∘ᴵ δᴵ) ≡ elim-cwf* σᴵ ∘ᴹ elim-cwf* δᴵ
 
-    elim-cwf*-[]β : elim-cwf (tᴵ [ δᴵ ]ᴵ) ≡ elim-cwf tᴵ [ elim-cwf* δᴵ ]ᴱ
+    elim-cwf*-[]β : elim-cwf (tᴵ [ δᴵ ]ᴵ) ≡ elim-cwf tᴵ [ elim-cwf* δᴵ ]ᴹ
 
-    elim-cwf*-εβ  : elim-cwf* (εᴵ {Δ = Δ}) ≡ εᴱ
-    elim-cwf*-,β  : elim-cwf* (δᴵ ,ᴵ tᴵ) ≡ (elim-cwf* δᴵ ,ᴱ elim-cwf tᴵ)
-    elim-cwf*-π₀β : elim-cwf* (π₀ᴵ δᴵ) ≡ π₀ᴱ (elim-cwf* δᴵ)
-    elim-cwf*-π₁β : elim-cwf (π₁ᴵ δᴵ) ≡ π₁ᴱ (elim-cwf* δᴵ)
+    elim-cwf*-εβ  : elim-cwf* (εᴵ {Δ = Δ}) ≡ εᴹ
+    elim-cwf*-,β  : elim-cwf* (δᴵ ,ᴵ tᴵ) ≡ (elim-cwf* δᴵ ,ᴹ elim-cwf tᴵ)
+    elim-cwf*-π₀β : elim-cwf* (π₀ᴵ δᴵ) ≡ π₀ᴹ (elim-cwf* δᴵ)
+    elim-cwf*-π₁β : elim-cwf (π₁ᴵ δᴵ) ≡ π₁ᴹ (elim-cwf* δᴵ)
 
-    elim-cwf-·β : elim-cwf (tᴵ ·ᴵ uᴵ) ≡ elim-cwf tᴵ ·ᴱ elim-cwf uᴵ
-    elim-cwf-ƛβ : elim-cwf (ƛᴵ tᴵ) ≡ ƛᴱ elim-cwf tᴵ
+    elim-cwf-·β : elim-cwf (tᴵ ·ᴵ uᴵ) ≡ elim-cwf tᴵ ·ᴹ elim-cwf uᴵ
+    elim-cwf-ƛβ : elim-cwf (ƛᴵ tᴵ) ≡ ƛᴹ elim-cwf tᴵ
 \end{code}
 
 %if False
@@ -616,7 +661,7 @@ module Eliminator {𝕄} (𝔹 : Branches 𝕄) where
               elim-cwf*-π₀β elim-cwf*-π₁β elim-cwf-·β elim-cwf-ƛβ #-}
 
 open Motive public
-open Branches public
+open Methods public
 open Eliminator public
 \end{code}
 %endif
@@ -628,7 +673,7 @@ TODO: Insert REWRITE rule transformed into LaTeX characters here!
 Normalisation from the initial CwF into substitution normal forms now only
 needs a way to connect our notion of "being a CwF" with our initial CwF's 
 eliminator: specifically, that any set of type families obeying the CwF laws
-gives rise to a |Motive| and associated set of |Branches|.
+gives rise to a |Motive| and associated set of |Methods|.
 
 The one extra ingredient we need to make this work out neatly is to introduce
 a new reduction for |cong|:
@@ -662,51 +707,51 @@ module Recursor (cwf : CwF-simple) where
   rec-tm  : Γ ⊢ᴵ A → cwf .CwF._⊢_ (rec-con Γ) (rec-ty A)
 
   cwf-to-motive : Motive
-  cwf-to-motive .Conᴱ _     = cwf .CwF.Con
-  cwf-to-motive .Tyᴱ  _     = cwf .CwF.Ty
-  cwf-to-motive .Tmᴱ Γ A _  = cwf .CwF._⊢_ Γ A
-  cwf-to-motive .Tmsᴱ Δ Γ _ = cwf .CwF._⊨_ Δ Γ
+  cwf-to-motive .Conᴹ _     = cwf .CwF.Con
+  cwf-to-motive .Tyᴹ  _     = cwf .CwF.Ty
+  cwf-to-motive .Tmᴹ Γ A _  = cwf .CwF._⊢_ Γ A
+  cwf-to-motive .Tmsᴹ Δ Γ _ = cwf .CwF._⊨_ Δ Γ
   
-  cwf-to-branches : Branches cwf-to-motive
-  cwf-to-branches .idᴱ   = cwf .CwF.id
-  cwf-to-branches ._∘ᴱ_  = cwf .CwF._∘_
-  cwf-to-branches .id∘ᴱ  = cwf .CwF.id∘
+  cwf-to-methods : Methods cwf-to-motive
+  cwf-to-methods .idᴹ   = cwf .CwF.id
+  cwf-to-methods ._∘ᴹ_  = cwf .CwF._∘_
+  cwf-to-methods .id∘ᴹ  = cwf .CwF.id∘
   -- etc...
 \end{code}
 
 %if False
 \begin{code}
-  cwf-to-branches .∘idᴱ  = cwf .CwF.∘id
-  cwf-to-branches .∘∘ᴱ   = cwf .CwF.∘∘
-  cwf-to-branches ._[_]ᴱ = cwf .CwF._[_]
-  cwf-to-branches .[id]ᴱ = cwf .CwF.[id]
-  cwf-to-branches .[∘]ᴱ  = cwf .CwF.[∘]
-  cwf-to-branches .•ᴱ    = cwf .CwF.•
-  cwf-to-branches .εᴱ    = cwf .CwF.ε
-  cwf-to-branches .•-ηᴱ  = cwf .CwF.•-η
-  cwf-to-branches ._▷ᴱ_  = cwf .CwF._▷_
-  cwf-to-branches ._,ᴱ_  = cwf .CwF._,_
-  cwf-to-branches .π₀ᴱ   = cwf .CwF.π₀
-  cwf-to-branches .π₁ᴱ   = cwf .CwF.π₁
-  cwf-to-branches .▷-β₀ᴱ = cwf .CwF.▷-β₀
-  cwf-to-branches .▷-β₁ᴱ = cwf .CwF.▷-β₁
-  cwf-to-branches .▷-ηᴱ  = cwf .CwF.▷-η
-  cwf-to-branches .π₀∘ᴱ  = cwf .CwF.π₀∘
-  cwf-to-branches .π₁∘ᴱ  = cwf .CwF.π₁∘
-  cwf-to-branches .oᴱ    = cwf .CwF.o
-  cwf-to-branches ._⇒ᴱ_  = cwf .CwF._⇒_
-  cwf-to-branches ._·ᴱ_  = cwf .CwF._·_
-  cwf-to-branches .ƛᴱ_   = cwf .CwF.ƛ_
-  cwf-to-branches .·[]ᴱ  = cwf .CwF.·[]
-  cwf-to-branches .ƛ[]ᴱ  = cwf .CwF.ƛ[]
+  cwf-to-methods .∘idᴹ  = cwf .CwF.∘id
+  cwf-to-methods .∘∘ᴹ   = cwf .CwF.∘∘
+  cwf-to-methods ._[_]ᴹ = cwf .CwF._[_]
+  cwf-to-methods .[id]ᴹ = cwf .CwF.[id]
+  cwf-to-methods .[∘]ᴹ  = cwf .CwF.[∘]
+  cwf-to-methods .•ᴹ    = cwf .CwF.•
+  cwf-to-methods .εᴹ    = cwf .CwF.ε
+  cwf-to-methods .•-ηᴹ  = cwf .CwF.•-η
+  cwf-to-methods ._▷ᴹ_  = cwf .CwF._▷_
+  cwf-to-methods ._,ᴹ_  = cwf .CwF._,_
+  cwf-to-methods .π₀ᴹ   = cwf .CwF.π₀
+  cwf-to-methods .π₁ᴹ   = cwf .CwF.π₁
+  cwf-to-methods .▷-β₀ᴹ = cwf .CwF.▷-β₀
+  cwf-to-methods .▷-β₁ᴹ = cwf .CwF.▷-β₁
+  cwf-to-methods .▷-ηᴹ  = cwf .CwF.▷-η
+  cwf-to-methods .π₀∘ᴹ  = cwf .CwF.π₀∘
+  cwf-to-methods .π₁∘ᴹ  = cwf .CwF.π₁∘
+  cwf-to-methods .oᴹ    = cwf .CwF.o
+  cwf-to-methods ._⇒ᴹ_  = cwf .CwF._⇒_
+  cwf-to-methods ._·ᴹ_  = cwf .CwF._·_
+  cwf-to-methods .ƛᴹ_   = cwf .CwF.ƛ_
+  cwf-to-methods .·[]ᴹ  = cwf .CwF.·[]
+  cwf-to-methods .ƛ[]ᴹ  = cwf .CwF.ƛ[]
 \end{code}
 %endif
 
 \begin{code}
-  rec-con = elim-con cwf-to-branches
-  rec-ty  = elim-ty  cwf-to-branches
-  rec-tm  = elim-cwf  cwf-to-branches
-  rec-tms = elim-cwf* cwf-to-branches
+  rec-con = elim-con cwf-to-methods
+  rec-ty  = elim-ty  cwf-to-methods
+  rec-tm  = elim-cwf  cwf-to-methods
+  rec-tms = elim-cwf* cwf-to-methods
 
 open Recursor public
 \end{code}
@@ -813,10 +858,10 @@ means there are many more cases. We start with the motive:
 
 \begin{code}
 compl-𝕄 : Motive
-compl-𝕄 .Conᴱ _ = ⊤
-compl-𝕄 .Tyᴱ  _ = ⊤
-compl-𝕄 .Tmᴱ _ _ tᴵ = ⌜ norm tᴵ ⌝ ≡ tᴵ
-compl-𝕄 .Tmsᴱ _ _ δᴵ = ⌜ norm* δᴵ ⌝* ≡ δᴵ
+compl-𝕄 .Conᴹ _ = ⊤
+compl-𝕄 .Tyᴹ  _ = ⊤
+compl-𝕄 .Tmᴹ _ _ tᴵ = ⌜ norm tᴵ ⌝ ≡ tᴵ
+compl-𝕄 .Tmsᴹ _ _ δᴵ = ⌜ norm* δᴵ ⌝* ≡ δᴵ
 \end{code}
 
 To show these identities, we need to prove that our various recursively-defined
@@ -1000,7 +1045,7 @@ We also prove preservation of substitution composition.
   (⌜ xs ⌝* ,ᴵ ⌜ x ⌝) ∘ᴵ ⌜ ys ⌝* ∎
 \end{code}
 
-The main cases of |Branches compl-𝕄| can now be proved by just applying the 
+The main cases of |Methods compl-𝕄| can now be proved by just applying the 
 preservation lemmas and the IHs.
 
 %if False
@@ -1012,45 +1057,45 @@ duip {p = refl} {q = refl} {r = refl} = refl
 %endif
 
 \begin{code}
-compl-𝔹 : Branches compl-𝕄
-compl-𝔹 .idᴱ = 
+compl-𝕞 : Methods compl-𝕄
+compl-𝕞 .idᴹ = 
   ⌜ tm*⊑ v⊑t id ⌝*
   ≡⟨ ⌜⊑⌝* ⟩
   ⌜ id ⌝*
   ≡⟨ ⌜id⌝ ⟩
   idᴵ ∎
-compl-𝔹 ._∘ᴱ_ {σᴵ = σᴵ} {δᴵ = δᴵ} σᴱ δᴱ = 
+compl-𝕞 ._∘ᴹ_ {σᴵ = σᴵ} {δᴵ = δᴵ} σᴹ δᴹ = 
   ⌜ norm* σᴵ ∘ norm* δᴵ ⌝*
   ≡⟨ ⌜∘⌝ ⟩
   ⌜ norm* σᴵ ⌝* ∘ᴵ ⌜ norm* δᴵ ⌝*
-  ≡⟨ cong₂ _∘ᴵ_ σᴱ δᴱ ⟩
+  ≡⟨ cong₂ _∘ᴵ_ σᴹ δᴹ ⟩
   σᴵ ∘ᴵ δᴵ ∎
-compl-𝔹 ._[_]ᴱ {tᴵ = tᴵ} {δᴵ = δᴵ} tᴱ δᴱ = 
+compl-𝕞 ._[_]ᴹ {tᴵ = tᴵ} {δᴵ = δᴵ} tᴹ δᴹ = 
   ⌜ norm tᴵ [ norm* δᴵ ] ⌝
   ≡⟨ ⌜[]⌝ {x = norm tᴵ} ⟩
   ⌜ norm tᴵ ⌝ [ ⌜ norm* δᴵ ⌝* ]ᴵ
-  ≡⟨ cong₂ _[_]ᴵ tᴱ δᴱ ⟩
+  ≡⟨ cong₂ _[_]ᴵ tᴹ δᴹ ⟩
   tᴵ [ δᴵ ]ᴵ ∎
-compl-𝔹 .•ᴱ = tt
-compl-𝔹 .εᴱ = refl
-compl-𝔹 ._▷ᴱ_ _ _ = tt
-compl-𝔹 ._,ᴱ_ δᴱ tᴱ = cong₂ _,ᴵ_ δᴱ tᴱ
-compl-𝔹 .π₀ᴱ {δᴵ = δᴵ} δᴱ = 
+compl-𝕞 .•ᴹ = tt
+compl-𝕞 .εᴹ = refl
+compl-𝕞 ._▷ᴹ_ _ _ = tt
+compl-𝕞 ._,ᴹ_ δᴹ tᴹ = cong₂ _,ᴵ_ δᴹ tᴹ
+compl-𝕞 .π₀ᴹ {δᴵ = δᴵ} δᴹ = 
   ⌜ π₀ (norm* δᴵ) ⌝*
   ≡⟨ ⌜π₀⌝ ⟩
   π₀ᴵ ⌜ norm* δᴵ ⌝*
-  ≡⟨ cong π₀ᴵ δᴱ ⟩
+  ≡⟨ cong π₀ᴵ δᴹ ⟩
   π₀ᴵ δᴵ ∎
-compl-𝔹 .π₁ᴱ {δᴵ = δᴵ} δᴱ = 
+compl-𝕞 .π₁ᴹ {δᴵ = δᴵ} δᴹ = 
   ⌜ π₁ (norm* δᴵ) ⌝
   ≡⟨ ⌜π₁⌝ ⟩
   π₁ᴵ ⌜ norm* δᴵ ⌝*
-  ≡⟨ cong π₁ᴵ δᴱ ⟩
+  ≡⟨ cong π₁ᴵ δᴹ ⟩
   π₁ᴵ δᴵ ∎
-compl-𝔹 .oᴱ = tt
-compl-𝔹 ._⇒ᴱ_ _ _ = tt
-compl-𝔹 ._·ᴱ_ tᴱ uᴱ = cong₂ _·ᴵ_ tᴱ uᴱ
-compl-𝔹 .ƛᴱ_ tᴱ = cong (ƛᴵ_) tᴱ
+compl-𝕞 .oᴹ = tt
+compl-𝕞 ._⇒ᴹ_ _ _ = tt
+compl-𝕞 ._·ᴹ_ tᴹ uᴹ = cong₂ _·ᴵ_ tᴹ uᴹ
+compl-𝕞 .ƛᴹ_ tᴹ = cong (ƛᴵ_) tᴹ
 \end{code}
 
 The remaining cases correspond to the CwF equations, which are required to hold 
@@ -1080,25 +1125,25 @@ instead, but this would be clunkier to use; Agda has no hope of inferring such a
 proof by unification.
 
 \begin{code}
-compl-𝔹 .id∘ᴱ  = duip
-compl-𝔹 .∘idᴱ  = duip
-compl-𝔹 .∘∘ᴱ   = duip
-compl-𝔹 .[id]ᴱ = duip
-compl-𝔹 .[∘]ᴱ  = duip
-compl-𝔹 .•-ηᴱ  = duip
-compl-𝔹 .▷-β₀ᴱ = duip
-compl-𝔹 .▷-β₁ᴱ = duip
-compl-𝔹 .▷-ηᴱ  = duip
-compl-𝔹 .π₀∘ᴱ  = duip
-compl-𝔹 .π₁∘ᴱ  = duip
-compl-𝔹 .·[]ᴱ  = duip
-compl-𝔹 .ƛ[]ᴱ  = duip
+compl-𝕞 .id∘ᴹ  = duip
+compl-𝕞 .∘idᴹ  = duip
+compl-𝕞 .∘∘ᴹ   = duip
+compl-𝕞 .[id]ᴹ = duip
+compl-𝕞 .[∘]ᴹ  = duip
+compl-𝕞 .•-ηᴹ  = duip
+compl-𝕞 .▷-β₀ᴹ = duip
+compl-𝕞 .▷-β₁ᴹ = duip
+compl-𝕞 .▷-ηᴹ  = duip
+compl-𝕞 .π₀∘ᴹ  = duip
+compl-𝕞 .π₁∘ᴹ  = duip
+compl-𝕞 .·[]ᴹ  = duip
+compl-𝕞 .ƛ[]ᴹ  = duip
 \end{code}
 
 And completeness is just one call to the eliminator away.
 
 \begin{code}
 compl : ⌜ norm tᴵ ⌝ ≡ tᴵ
-compl {tᴵ = tᴵ} = elim-cwf compl-𝔹 tᴵ
+compl {tᴵ = tᴵ} = elim-cwf compl-𝕞 tᴵ
 \end{code}
  
