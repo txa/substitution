@@ -28,9 +28,9 @@
 
 \begin{abstract}
 When defining substitution recursively for a language with binders
-like the simply typed $\lambda$-calculus we need to define
+like the simply typed $\lambda$-calculus, we need to define
 substitution and renaming separately. When we want to verify the
-categorical properties of this calculus we end up repeating the same
+categorical properties of this calculus, we end up repeating the same
 argument many times. In this paper we present a lightweight method
 that avoids this repetition and is implemented in Agda.
 
@@ -81,17 +81,17 @@ erroneous. \citet{curry1958combinatory}
 The first author was writing lecture notes for an introduction to
 category theory for functional programmers. A nice example of a
 category is the category of simply typed $\lambda$-terms and
-substitutions hence it seemed a good idea to give the definition and
+substitutions; hence it seemed a good idea to give the definition and
 ask the students to prove the category laws. When writing the answer
 they realised that it is not as easy as they thought. To make sure that
-there are no mistakes they started to formalize the problem in Agda.
+there were no mistakes they started to formalize the problem in Agda.
 The main setback was that the same proofs got repeated many times. 
 If there is one guideline of good software engineering then it is 
 \textbf{Do not write code by copy and paste} and this applies even more so to 
 formal proofs.
 
 This paper is the result of the effort to refactor the proof. We think
-that the method used is interesting also for other problems, in
+that the method used is interesting also for other problems. In
 particular the current construction can be seen as a warmup for the
 recursive definition of substitution for dependent type theory which
 may have interesting applications for the coherence problem,
@@ -108,7 +108,7 @@ problem of showing termination of a simple definition of substitution
 recursion. However, this is only applied to the definition and the
 categorical laws (which follow from the monad laws) were not formally
 verified. Also the present approach seems to be simpler and scales
-better avoiding well-founded recursion.  The monadic approach has been
+better, avoiding well-founded recursion.  The monadic approach has been
 further investigated in \cite{mcbride2006type}. The structure of the
 proofs is explained in \cite{allais2017type} from a monadic
 perspective. Indeed this example is one of the motivations for
@@ -147,7 +147,7 @@ checker by investigating all possible recursive paths. We will define
 mutually recursive proofs which heavily rely on each other.
 
 The only recent
-feature we use even though sparingly is the possibility to turn propositional
+feature we use, though sparingly, is the possibility to turn propositional
 equations into rewriting rules (i.e. definitional equalities). This
 makes the statement of some theorems more readable because we can avoid
 using |subst| but this is not essential.
