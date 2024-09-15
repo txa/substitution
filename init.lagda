@@ -13,13 +13,13 @@ open  ≡-Reasoning public
 \section{Initiality}
 \label{sec:initiality}
 
-We can do more than just prove that we have got a category, indeed we
+We can do more than just prove that we have a category, indeed we
 can verify the laws of a simply typed category with families
 (CwF). CwFs are mostly known as models of dependent type theory but
 they can be specialised to simple types \cite{castellan2021categories}.
 
 For the categorically minded we can summarize:
-\footnote{It is not necessary to know the categorical definition to
+\footnote{It is not necessary to know the categorical definitions to
   understand the rest of the paper.}
 a CwF is given by
 \begin{itemize}
@@ -34,7 +34,7 @@ a CwF is given by
 \end{itemize}
 To this we can add further constructors, e.g. $\Pi$-types. If we are
 only interested in a substitution calculus like in our current work, we
-only add the type and term formers and the condition that they are
+only add the type and term formers, plus the condition that they are
 natural, i.e. commute with substitution.
 
 In the simply typed case the type
@@ -87,7 +87,7 @@ record CwF-simple : Set₁ where
 %endif
 
 
-We start with the category of contexts using the same names as
+We start with the category of contexts, using the same names as
 introduced previously:
 \begin{code}
   field
@@ -152,7 +152,7 @@ before:
   δ ^ A = (δ ∘ (π₀ id)) , π₁ id
 \end{code}
 We need to add the specific components for simply typed
-$\lambda$-calculus: we add the type constructors and the term
+$\lambda$-calculus: we add the type constructors, the term
 constructors and the corresponding naturality laws:
 \begin{code}
   field
