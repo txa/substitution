@@ -196,8 +196,8 @@
 %format tm*⊑ = "\mathrm{tm*}\!\sqsubseteq"
 %format q⊑s = "\mathrm{q}\!\sqsubseteq\!\mathrm{s}"
 
-%format ⊑∘ = "\sqsubseteq\circ"
-%format ∘⊑ = "\circ\sqsubseteq"
+%format ⊑∘ = "\sqsubseteq\!\circ"
+%format ∘⊑ = "\circ\!\sqsubseteq"
 %format v[⊑] = "\mathrm{v}[\sqsubseteq]"
 %format t[⊑] = "\mathrm{t}[\sqsubseteq]"
 %format ⊑⁺ = "\sqsubseteq^{+}"
@@ -412,5 +412,5 @@
 %format .ƛ[]ᴹ  = "\mathrm{.}" ƛ[]ᴹ
 %format .[id]ᴹ = "\mathrm{.}" [id]ᴹ
 
-%format Con≡   = Con ≡
-%format Ty≡    = Ty ≡
+%format Con≡   = Con "\!" ≡
+%format Ty≡    = Ty "\!" ≡

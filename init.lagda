@@ -538,7 +538,21 @@ record Motive : Set₁ where
     Tyᴹ  : Ty → Set
     Tmᴹ  : Conᴹ Γ → Tyᴹ A → Γ ⊢ᴵ A → Set
     Tmsᴹ : Conᴹ Δ → Conᴹ Γ → Δ ⊨ᴵ Γ → Set
+\end{code}
 
+\begin{spec}
+record Methods (𝕄 : Motive) : Set₁ where
+  field
+    idᴹ  : Tmsᴹ Γᴹ Γᴹ idᴵ 
+    _∘ᴹ_ : Tmsᴹ Δᴹ Γᴹ σᴵ → Tmsᴹ θᴹ Δᴹ δᴵ 
+          → Tmsᴹ θᴹ Γᴹ (σᴵ ∘ᴵ δᴵ)
+    
+    id∘ᴹ : idᴹ ∘ᴹ δᴹ ≡[ cong (Tmsᴹ Δᴹ Γᴹ) id∘ᴵ ]≡ δᴹ
+    -- ...
+\end{spec}
+
+%if False
+\begin{code}
 module _ (𝕄 : Motive) where
   open Motive 𝕄
 
@@ -547,19 +561,8 @@ module _ (𝕄 : Motive) where
     Aᴹ Bᴹ Cᴹ Dᴹ : Tyᴹ A
     tᴹ uᴹ vᴹ : Tmᴹ Γᴹ Aᴹ tᴵ
     δᴹ σᴹ ξᴹ : Tmsᴹ Δᴹ Γᴹ δᴵ
-  
-  record Methods : Set₁ where
-    field
-      idᴹ  : Tmsᴹ Γᴹ Γᴹ idᴵ 
-      _∘ᴹ_ : Tmsᴹ Δᴹ Γᴹ σᴵ → Tmsᴹ θᴹ Δᴹ δᴵ 
-           → Tmsᴹ θᴹ Γᴹ (σᴵ ∘ᴵ δᴵ)
-      
-      id∘ᴹ : idᴹ ∘ᴹ δᴹ ≡[ cong (Tmsᴹ Δᴹ Γᴹ) id∘ᴵ ]≡ δᴹ
-      -- ...
-\end{code}
 
-%if False
-\begin{code}
+  record Methods : Set₁ where
     infixl  4  _▷ᴹ_
     infixl  4  _,ᴹ_
     infix   5  _∘ᴹ_
@@ -567,8 +570,13 @@ module _ (𝕄 : Motive) where
     infixr  6  _⇒ᴹ_
     infixl  6  _·ᴹ_
     infix   8  _[_]ᴹ
-
-    field
+    
+    field  
+      idᴹ  : Tmsᴹ Γᴹ Γᴹ idᴵ 
+      _∘ᴹ_ : Tmsᴹ Δᴹ Γᴹ σᴵ → Tmsᴹ θᴹ Δᴹ δᴵ 
+           → Tmsᴹ θᴹ Γᴹ (σᴵ ∘ᴵ δᴵ)
+      
+      id∘ᴹ : idᴹ ∘ᴹ δᴹ ≡[ cong (Tmsᴹ Δᴹ Γᴹ) id∘ᴵ ]≡ δᴹ
       ∘idᴹ : δᴹ ∘ᴹ idᴹ ≡[ cong (Tmsᴹ Δᴹ Γᴹ) ∘idᴵ ]≡ δᴹ
       ∘∘ᴹ  : (ξᴹ ∘ᴹ σᴹ) ∘ᴹ δᴹ ≡[ cong (Tmsᴹ Ξᴹ Γᴹ) ∘∘ᴵ ]≡ ξᴹ ∘ᴹ (σᴹ ∘ᴹ δᴹ) 
 
@@ -699,8 +707,10 @@ automatically.
 module Recursor (cwf : CwF-simple) where
   rec-con : Con → cwf .CwF.Con
   rec-ty  : Ty  → cwf .CwF.Ty
-  rec-tms : Δ ⊨ᴵ Γ → cwf .CwF._⊨_ (rec-con Δ) (rec-con Γ)
-  rec-tm  : Γ ⊢ᴵ A → cwf .CwF._⊢_ (rec-con Γ) (rec-ty A)
+  rec-tms : Δ ⊨ᴵ Γ 
+          → cwf .CwF._⊨_ (rec-con Δ) (rec-con Γ)
+  rec-tm  : Γ ⊢ᴵ A 
+          → cwf .CwF._⊢_ (rec-con Γ) (rec-ty A)
 
   cwf-to-motive : Motive
   cwf-to-motive .Conᴹ _     = cwf .CwF.Con
@@ -765,8 +775,9 @@ norm : Γ ⊢ᴵ A → rec-con is-cwf Γ ⊢ rec-ty is-cwf A
 norm = rec-tm is-cwf 
 \end{spec}
 
-Of course, normalisation doesn't affect contexts or types so we might hope for a
-simpler signature |Γ ⊢ᴵ A → Γ ⊢ A| and, luckily, rewrite rules can get us there!
+Of course, normalisation shouldn't change the type of a term or the context it
+is in, so we might hope for a simpler signature |Γ ⊢ᴵ A → Γ ⊢ A| and, 
+conveniently, rewrite rules can get us there!
 
 \begin{code}
 Con≡ : rec-con is-cwf Γ ≡ Γ
@@ -926,7 +937,20 @@ zero[]ᴵ {δᴵ = δᴵ} {tᴵ = tᴵ} =
   π₁ᴵ (δᴵ ,ᴵ tᴵ)
   ≡⟨ ▷-β₁ᴵ ⟩
   tᴵ ∎
+\end{code}
 
+\begin{spec}
+suc[]ᴵ : sucᴵ tᴵ B [ δᴵ ,ᴵ uᴵ ]ᴵ ≡ tᴵ [ δᴵ ]ᴵ
+suc[]ᴵ {tᴵ = tᴵ} {B = B} {δᴵ = δᴵ} {uᴵ = uᴵ} = 
+  -- ...
+
+,[]ᴵ : (δᴵ ,ᴵ tᴵ) ∘ᴵ σᴵ ≡ (δᴵ ∘ᴵ σᴵ) ,ᴵ (tᴵ [ σᴵ ]ᴵ)
+,[]ᴵ {δᴵ = δᴵ} {tᴵ = tᴵ} {σᴵ = σᴵ} = 
+  -- ...
+\end{spec}
+
+%if False
+\begin{code}
 suc[]ᴵ : sucᴵ tᴵ B [ δᴵ ,ᴵ uᴵ ]ᴵ ≡ tᴵ [ δᴵ ]ᴵ
 suc[]ᴵ {tᴵ = tᴵ} {B = B} {δᴵ = δᴵ} {uᴵ = uᴵ} =
   sucᴵ tᴵ B [ δᴵ ,ᴵ uᴵ ]ᴵ
@@ -953,6 +977,7 @@ suc[]ᴵ {tᴵ = tᴵ} {B = B} {δᴵ = δᴵ} {uᴵ = uᴵ} =
   ≡⟨ cong (λ ρ → (δᴵ ∘ᴵ σᴵ) ,ᴵ (ρ [ σᴵ ]ᴵ)) ▷-β₁ᴵ ⟩
   (δᴵ ∘ᴵ σᴵ) ,ᴵ (tᴵ [ σᴵ ]ᴵ) ∎
 \end{code}
+%endif
 
 We also need a couple lemmas about how |⌜_⌝| ignores sort coercions.
 
@@ -967,7 +992,7 @@ We also need a couple lemmas about how |⌜_⌝| ignores sort coercions.
 \end{code}
 
 We can now (finally) proceed with the proofs. There is quite a large number of
-cases to cover, so for brevity we elide the proof of |⌜[]⌝| and |⌜suc⌝|.
+cases to cover, so for brevity we elide the proofs of |⌜[]⌝| and |⌜suc⌝|.
 
 %if False
 \begin{code}
@@ -1042,8 +1067,10 @@ cases to cover, so for brevity we elide the proof of |⌜[]⌝| and |⌜suc⌝|.
 \end{code}
 %endif
 
-We also prove preservation of substitution composition.
+We also prove preservation of substitution composition 
+|⌜∘⌝ : ⌜ xs ∘ ys ⌝* ≡ ⌜ xs ⌝* ∘ᴵ ⌜ ys ⌝*| in similar fashion.
 
+%if False
 \begin{code}
 ⌜∘⌝ : ⌜ xs ∘ ys ⌝* ≡ ⌜ xs ⌝* ∘ᴵ ⌜ ys ⌝*
 ⌜∘⌝ {xs = ε} = sym •-ηᴵ
@@ -1054,6 +1081,7 @@ We also prove preservation of substitution composition.
   ≡⟨ sym ,[]ᴵ ⟩
   (⌜ xs ⌝* ,ᴵ ⌜ x ⌝) ∘ᴵ ⌜ ys ⌝* ∎
 \end{code}
+%endif
 
 The main cases of |Methods compl-𝕄| can now be proved by just applying the 
 preservation lemmas and inductive hypotheses.
@@ -1080,6 +1108,11 @@ compl-𝕞 ._∘ᴹ_ {σᴵ = σᴵ} {δᴵ = δᴵ} σᴹ δᴹ =
   ⌜ norm* σᴵ ⌝* ∘ᴵ ⌜ norm* δᴵ ⌝*
   ≡⟨ cong₂ _∘ᴵ_ σᴹ δᴹ ⟩
   σᴵ ∘ᴵ δᴵ ∎
+-- ...
+\end{code}
+
+%if False
+\begin{code}
 compl-𝕞 ._[_]ᴹ {tᴵ = tᴵ} {δᴵ = δᴵ} tᴹ δᴹ = 
   ⌜ norm tᴵ [ norm* δᴵ ] ⌝
   ≡⟨ ⌜[]⌝ {x = norm tᴵ} ⟩
@@ -1107,6 +1140,7 @@ compl-𝕞 ._⇒ᴹ_ _ _ = tt
 compl-𝕞 ._·ᴹ_ tᴹ uᴹ = cong₂ _·ᴵ_ tᴹ uᴹ
 compl-𝕞 .ƛᴹ_ tᴹ = cong (ƛᴵ_) tᴹ
 \end{code}
+%endif
 
 The remaining cases correspond to the CwF laws, which most hold 
 for whatever type family we eliminate into in order to retain congruence of 
