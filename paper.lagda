@@ -190,8 +190,10 @@ convince the termination checker that |V| is structurally smaller than
 |T| and so leave the actual work determining and verifying the termination 
 ordering to Agda.
 This greatly simplifies the formal development. 
-We could simplify our development slightly further if we could instrument the 
-termination checker, for example, with an ordering on constructors. 
+
+We could, however, simplify our development slightly further if we were able to 
+instrument the termination checker, for example with an ordering on 
+constructors. 
 We also ran into issues with Agda only examining direct arguments to function
 calls when doing termination checking. The solutions to these problems were
 all quite mechanical, which perhaps implies there is room for Agda's termination
