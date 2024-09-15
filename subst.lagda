@@ -240,7 +240,8 @@ fold for substitutions (|_⁺_|):
 \begin{code}
 _⁺_ : Γ ⊨[ q ] Δ → (A : Ty) → Γ ▷ A ⊨[ q ] Δ
 
-suc[_] :  ∀ q → Γ ⊢[ q ] B → (A : Ty) → Γ ▷ A ⊢[ q ] B
+suc[_] : ∀ q → Γ ⊢[ q ] B → (A : Ty) 
+       → Γ ▷ A ⊢[ q ] B
 suc[ V ] i  A   =  suc i A
 suc[ T ] t  A   =  t [ id ⁺  A ]
 
