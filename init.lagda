@@ -1108,15 +1108,16 @@ compl-𝕞 ._·ᴹ_ tᴹ uᴹ = cong₂ _·ᴵ_ tᴹ uᴹ
 compl-𝕞 .ƛᴹ_ tᴹ = cong (ƛᴵ_) tᴹ
 \end{code}
 
-The remaining cases correspond to the CwF equations, which are required to hold 
-for whatever type family we eliminate the initial CwF into so congruence of 
-|_≡_| is retained. For our completeness proof, all of these cases become
-higher-dimensional identities, equating different proof trees for completeness
-instantiated with the LHS/RHS terms/substitutions. 
+The remaining cases correspond to the CwF laws, which most hold 
+for whatever type family we eliminate into in order to retain congruence of 
+|_≡_|. 
+For our completeness proof, we are eliminating into equations, and so all of 
+these cases become higher-dimensional identities, demanding we equate different 
+proof trees for completeness instantiated with the LHS/RHS terms/substitutions. 
 
 In a univalent type theory we might try and carefully introduce additional 
 coherences to our initial CwF to try and make these identities provable without 
-the sledgehammer of set truncation (which would prevent eliminating the initial 
+the sledgehammer of set truncation (which prevents eliminating the initial 
 CwF into any non-set).
 
 As we are working in vanilla Agda, we'll take a simpler approach, and rely on 
@@ -1125,14 +1126,14 @@ UIP.
 \begin{spec}
 duip : ∀ {A B : Set ℓ} {x y : A} {z w : B} {p q} 
          {r : (x ≡ y) ≡ (z ≡ w)}
-      → p ≡[ r ]≡ q
+     → p ≡[ r ]≡ q
 duip {p = refl} {q = refl} {r = refl} = refl
 \end{spec}
 
 It is probably worth noting that this implementation of (dependent) UIP relies 
 on type constructor injectivity (specifically, injectivity of |_≡_|). 
-We could use a weaker version which takes an additional proof of |x ≡ z| 
-instead, but this would be clunkier to use; Agda has no hope of inferring such a
+We could use a weaker version taking an additional proof of |x ≡ z|, 
+but this would be clunkier to use; Agda has no hope of inferring such a
 proof by unification.
 
 \begin{code}
