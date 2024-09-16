@@ -229,8 +229,8 @@ derivations, which exploit this flexibility.
 
 The source of this document contains the actual Agda code, i.e. it is
 a literate Agda file. Different chapters are in different modules to
-avoid name clashes, e.g. preliminary definitions from section \ref{sec:naive-approach}
-are redefined later.
+avoid name clashes, e.g. preliminary definitions from section 
+\ref{sec:naive-approach} are redefined later.
 
 %include naive.lagda
 %include subst.lagda
@@ -240,24 +240,23 @@ are redefined later.
 \section{Conclusions and further work}
 \label{sec:concl-furth-work}
 
-The subject of the paper is a problem which everybody including
-ourselves would have thought to be trivial. As it turns out, it isn't. 
-We spent some time going down alleys that didn't work. 
-In the end with hindsight the main idea seems rather
+The subject of the paper is a problem which everybody (including
+ourselves) would have thought to be trivial. As it turns out, it isn't, and 
+we spent quite some time going down alleys that didn't work. 
+With hindsight, the main idea seems rather
 obvious: introduce sorts as a datatype with the structure of a boolean
-algebra. To implement the solution in Agda we managed to
+algebra. To implement the solution in Agda, we managed to
 convince the termination checker that |V| is structurally smaller than
-|T| and so leave the actual work determining and verifying the termination 
-ordering to Agda.
-This greatly simplifies the formal development. 
+|T| and so left the actual work determining and verifying the termination 
+ordering to Agda. This greatly simplifies the formal development. 
 
 We could, however, simplify our development slightly further if we were able to 
 instrument the termination checker, for example with an ordering on 
-constructors. 
+constructors (i.e. removing the need for the |T>V| encoding). 
 We also ran into issues with Agda only examining direct arguments to function
-calls when doing termination checking. The solutions to these problems were
+calls for identifying termination order. The solutions to these problems were
 all quite mechanical, which perhaps implies there is room for Agda's termination
-checker to be extended.
+checking to be extended.
 Finally, it would be nice if the termination checker
 provided independently-checkable evidence that its non-trivial reasoning is 
 sound. 

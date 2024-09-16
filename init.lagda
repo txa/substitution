@@ -29,16 +29,16 @@ they can be specialised to simple types \cite{castellan2021categories}.
   |(Γ ⊨ Δ) × (Γ ⊢ A|).
 \end{itemize}
 
+I.e. a simply typed CwF is just a CwF where the presheaf of types is constant.
 We will give the precise definition in the next section, hence it
-isn't necessary to know the categorical terminology. If you don know
-CwFs for dependent types then a simply typed CwF is just a CwF where the presheaf of types
-is constant.
+isn't necessary to be familiar with the categorical terminology to follow the 
+rest of the paper. 
 
-We can add further constructors like function types |_⇒_| which usuay
-come with a natural isomorphism giving rise to $\beta$ and $\eta$ laws
-but since in the moment we are only interested in substitutions we
-don't assume this. Instead we add the term formers for application
-(|_\$_|) and lambda-abstraction |ƛ| as natural transformations.
+We can add further constructors like function types |_⇒_|. These usually
+come with a natural isomorphisms, giving rise to $\beta$ and $\eta$ laws,
+but since we are only interested in substitutions, we don't assume this. 
+Instead we add the term formers for application
+(|_·_|) and lambda-abstraction |ƛ| as natural transformations.
 
 % For the categorically minded we can summarize:
 % \footnote{It is not necessary to know the categorical definition to
@@ -65,7 +65,7 @@ don't assume this. Instead we add the term formers for application
 % presheaf over the category of contexts.
 
 
-We start with a precise definition of a simply typed CwF with
+We start with a precise definition of a simply typed CwF with the
 additional structure to model simply typed $\lambda$-calculus (section
 \ref{sec:simply-typed-cwfs}) and then we show that the recursive
 definition of substitution gives rise to a simply typed CwF (section
@@ -78,7 +78,7 @@ we just postulate the existence of this QIIT in Agda (with
 the associated rewriting rules). By initiality there is an evaluation
 functor from the initial CwF to the recursively defined CwF (defined
 in section \ref{sec:cwf-recurs-subst}). On the
-other hand we can embed the recursive CwF into the initial CwF ---
+other hand, we can embed the recursive CwF into the initial CwF;
 this corresponds to the embedding of normal forms into
 $\lambda$-terms, only that here we talk about \emph{substitution normal
 forms}. We then show that these two structure maps are inverse to each
@@ -854,17 +854,14 @@ Con≡ {Γ = Γ ▷ A} = cong₂ _▷_ Con≡ Ty≡
 Ty≡ {A = o} = refl
 Ty≡ {A = A ⇒ B} = cong₂ _⇒_ Ty≡ Ty≡
 \end{code}
-
 \begin{spec}
 {-# \Keyword{REWRITE} $\mathrm{Con}\!\equiv \; \mathrm{Ty}\!\equiv$ #-} 
 \end{spec}
-
 %if False
 \begin{code}
 {-# REWRITE Con≡ Ty≡ #-}
 \end{code}
 %endif
-
 \begin{code}
 norm : Γ ⊢ᴵ A → Γ ⊢[ T ] A
 norm = rec-cwf is-cwf 
@@ -948,7 +945,7 @@ sort.
 \end{code}
 
 Preservation of each of the projections out of sequences of terms 
-(e.g. |⌜ π₀ δ ⌝* ≡ π₀ᴵ ⌜ δ ⌝*|) reduces to the 
+(e.g. |⌜ π₀ δ ⌝* ≡ π₀ᴵ ⌜ δ ⌝*|) reduce to the 
 associated beta-laws of the initial CwF (e.g. |▷-β₀ᴵ|).
 
 %if False
@@ -1016,7 +1013,9 @@ zero[]ᴵ {δᴵ = δᴵ} {tᴵ = tᴵ} =
 
 \begin{spec}
 suc[]ᴵ : sucᴵ tᴵ B [ δᴵ ,ᴵ uᴵ ]ᴵ ≡ tᴵ [ δᴵ ]ᴵ
+suc[]ᴵ = -- ...
 ,[]ᴵ : (δᴵ ,ᴵ tᴵ) ∘ᴵ σᴵ ≡ (δᴵ ∘ᴵ σᴵ) ,ᴵ (tᴵ [ σᴵ ]ᴵ)
+suc[]ᴵ = -- ...
 \end{spec}
 
 
