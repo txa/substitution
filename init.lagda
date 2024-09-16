@@ -289,14 +289,8 @@ We are stuck!
 
 Therefore, we instead fix the sort to |T|.
 
-\begin{code}
-_⊨_ = _⊨[ T ]_ 
-
-\end{code}
 %if False
 \begin{code}
-_⊢_ = _⊢[ T ]_
-
 π₀ : Δ ⊨[ q ] (Γ ▷ A) → Δ ⊨[ q ] Γ
 π₀ (δ , M) = δ
 
@@ -321,7 +315,7 @@ interleaved mutual
 \begin{code}
   is-cwf : CwF-simple
   is-cwf .CwF.Con = Con
-  is-cwf .CwF._⊨_ = _⊨_
+  is-cwf .CwF._⊨_ = _⊨[ T ]_
 
   is-cwf .CwF.•           = •
   is-cwf .CwF.ε           = ε
@@ -431,12 +425,9 @@ Similarly to substitutions, we must fix the sort of our terms to |T|
 (in this case, so we can prove the identity law - note that applying the 
 identity substitution to a variable |i| produces the distinct term |` i|).
 
-\begin{spec}
-  _⊢_ = _⊢[ T ]_
-\end{spec}
 \begin{code}
   is-cwf .CwF.Ty           = Ty
-  is-cwf .CwF._⊢_          = _⊢_
+  is-cwf .CwF._⊢_          = _⊢[ T ]_
   is-cwf .CwF._[_]         = _[_]
   is-cwf .CwF.[∘] {t = t}  = sym ([∘] {x = t})
   is-cwf .CwF.[id] {t = t} =
@@ -834,12 +825,12 @@ open Recursor public
 Normalisation into to our substitution normal forms can now be achieved by with:
 
 \begin{spec}
-norm : Γ ⊢ᴵ A → rec-con is-cwf Γ ⊢ rec-ty is-cwf A
+norm : Γ ⊢ᴵ A → rec-con is-cwf Γ ⊢[ T ] rec-ty is-cwf A
 norm = rec-cwf is-cwf 
 \end{spec}
 
 Of course, normalisation shouldn't change the type of a term or the context it
-is in, so we might hope for a simpler signature |Γ ⊢ᴵ A → Γ ⊢ A| and, 
+is in, so we might hope for a simpler signature |Γ ⊢ᴵ A → Γ ⊢[ T ] A| and, 
 conveniently, rewrite rules can get us there!
 
 \begin{code}
@@ -866,10 +857,10 @@ Ty≡ {A = A ⇒ B} = cong₂ _⇒_ Ty≡ Ty≡
 %endif
 
 \begin{code}
-norm : Γ ⊢ᴵ A → Γ ⊢ A
+norm : Γ ⊢ᴵ A → Γ ⊢[ T ] A
 norm = rec-cwf is-cwf 
 
-norm* : Δ ⊨ᴵ Γ → Δ ⊨ Γ
+norm* : Δ ⊨ᴵ Γ → Δ ⊨[ T ] Γ
 norm* = rec-cwf* is-cwf
 \end{code}
 
@@ -953,11 +944,11 @@ associated beta-laws of the initial CwF (e.g. |▷-β₀ᴵ|).
 
 %if False
 \begin{code}
-⌜π₀⌝ : ∀ {δ : Δ ⊨ (Γ ▷ A)}
+⌜π₀⌝ : ∀ {δ : Δ ⊨[ T ] (Γ ▷ A)}
      → ⌜ π₀ δ ⌝* ≡ π₀ᴵ ⌜ δ ⌝*
 ⌜π₀⌝ {δ = δ , x} = sym ▷-β₀ᴵ
 
-⌜π₁⌝ : ∀ {δ : Δ ⊨ (Γ ▷ A)}
+⌜π₁⌝ : ∀ {δ : Δ ⊨[ T ] (Γ ▷ A)}
      → ⌜ π₁ δ ⌝ ≡ π₁ᴵ ⌜ δ ⌝*
 ⌜π₁⌝ {δ = δ , x} = sym ▷-β₁ᴵ
 \end{code}
