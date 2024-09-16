@@ -28,9 +28,9 @@
 
 \begin{abstract}
 When defining substitution recursively for a language with binders
-like the simply typed $\lambda$-calculus we need to define
+like the simply typed $\lambda$-calculus, we need to define
 substitution and renaming separately. When we want to verify the
-categorical properties of this calculus we end up repeating the same
+categorical properties of this calculus, we end up repeating the same
 argument many times. In this paper we present a lightweight method
 that avoids this repetition and is implemented in Agda.
 
@@ -81,17 +81,17 @@ erroneous. \citet{curry1958combinatory}
 The first author was writing lecture notes for an introduction to
 category theory for functional programmers. A nice example of a
 category is the category of simply typed $\lambda$-terms and
-substitutions hence it seemed a good idea to give the definition and
+substitutions; hence it seemed a good idea to give the definition and
 ask the students to prove the category laws. When writing the answer
-they realised that it  is not as easy as they thought. To make sure that
-there are no mistakes they started to formalize the problem in Agda.
-Now this wasn't as easy as they thought but the main setback was that the
-same proofs got repeated many times. If there is one guideline of good
-software engineering then it is \textbf{Do not write code by copy and
-  paste} and this applies even more so to formal proofs.
+they realised that it is not as easy as they thought. To make sure that
+there were no mistakes they started to formalize the problem in Agda.
+The main setback was that the same proofs got repeated many times. 
+If there is one guideline of good software engineering then it is 
+\textbf{Do not write code by copy and paste} and this applies even more so to 
+formal proofs.
 
 This paper is the result of the effort to refactor the proof. We think
-that the method used is interesting also for other problems, in
+that the method used is interesting also for other problems. In
 particular the current construction can be seen as a warmup for the
 recursive definition of substitution for dependent type theory which
 may have interesting applications for the coherence problem,
@@ -156,40 +156,38 @@ problem of showing termination of a simple definition of substitution
 recursion. However, this is only applied to the definition and the
 categorical laws (which follow from the monad laws) were not formally
 verified. Also the present approach seems to be simpler and scales
-better avoiding well-founded recursion.  The monadic approach has been
-further investigated in \cite{mcbride2006type, allais2017type}. While
-this gives a semantic framework to analyse the relation between
-renaming and substitution it is not clear how this can be exploited to
-solve the problem we are considering here: to give uniform definitions
-and proofs capturing both.
+better, avoiding well-founded recursion.  The monadic approach has been
+further investigated in \cite{mcbride2006type}. The structure of the
+proofs is explained in \cite{allais2017type} from a monadic
+perspective. Indeed this example is one of the motivations for
+relative monads \cite{altenkirch2015monads}.
 
-The monadic perspective ledas to the notion of relative monads
-\cite{altenkirch2015monads}, indeed substitution for typed and untyped
-$\lambda$-terms is one of the motivating examples. We avoid the
-monadic perspective here for two reasons: first we want 
-to give a simple self-contained proof avoiding too much advanced
+We avoid the monadic perspective here for two reasons: first we want
+to give a simple self-contained proof avoiding too many advanced
 categorical constructions as mentioned in the introduction as a
 motivation; second we are interested in the application to dependent
 types where it is not clear how the monadic approach can be applied
 without using very dependent types.
 
-There are a number of publications on formalising substitution laws,
-just to mention a few recent ones: 
-\cite{stark2019autosubst} develops a Coq library but they simply
-repeat the proofs. Their equational theory is similar to the simply
+There are a number of publications on formalising substitution laws.
+Just to mention a few recent ones: 
+\cite{stark2019autosubst} develops a Coq library which automatically derives
+substitution lemmas, but the proofs are simply repeated for renamings and
+substitutions. Their equational theory is similar to the simply
 typed CwFs we are using in section \ref{sec:initiality}.
 \cite{saffrich2024abstractions} is also using Agda but extrinsically
 (i.e. separating preterms and typed syntax). Here the approach from 
 \cite{allais2017type}  is used to factor the construction using
 \emph{kits}.  In \cite{saffrich2024intrinsically} this is further
-developed also using Agda but this time with intrinsic syntax, and
-with substitutions and renamings are defined separately.
+developed, this time using intrinsic syntax, but with renamings and 
+substitutions defined separately and relevant lemmas repeated for all required 
+combinations.
 
 \subsection{Using Agda}
 \label{sec:using-agda}
 
 For the technical details of Agda we refer to the online documentation
-\cite{agda}. We only use plain Agda and inductive definitions and
+\cite{agda}. We only use plain Agda, inductive definitions and
 structurally recursive programs and proofs.  Termination is checked by
 Agda's termination checker \cite{alti:jfp02} which uses a lexical
 combination of structural descent that is inferred by the termination
@@ -197,28 +195,24 @@ checker by investigating all possible recursive paths. We will define
 mutually recursive proofs which heavily rely on each other.
 
 The only recent
-feature we use even though sparingly is the possibility to turn
+feature we use, albeit sparingly, is the possibility to turn propositional
 equations into rewriting rules (i.e. definitional equalities). This
 makes the statement of some theorems more readable because we can avoid
-using |subst| but this is not essential.
+using |subst|, but this is not essential.
 
 We extensively use variable declarations to introduce implicit
 quantification (we summarize the variables conventions in passing in
-the text). However, implicit variables are not available in records,
-which makes the definitions in section \ref{sec:initiality} more
-verbose. However, we do use the $\forall{}$-prefix which means that we don't
-have to write the type if it can be inferred, i.e. instead of |{Γ : Con} → ..| we just write
-|∀{Γ} → ..|.
+the text). We also use $\forall{}$-prefix so we can elide types of function
+parameters where they can be inferred, i.e. instead of |{Γ : Con} → ..| we just 
+write |∀ {Γ} → ..|.
 
 Implicit variables, which are indicated by using |{..}| instead of
 |(..)| in dependent function types,  can be instantiated using the syntax
-|a{x = b}| which we use in the proofs. Agda syntax is very flexible
-allowing general syntax declarations using |_| to indicate where the
-parameters go.
-
-In the proofs we also use Agda's syntax for equational derivations,
-which exploiting Agda's general syntax is just an ordinary Agda
-definition in the standard library.
+|a {x = b}|. 
+Agda syntax is very flexible allowing mixfix syntax declarations using |_| to 
+indicate where the parameters go.
+In the proofs we use the Agda standard library's definitions for equational 
+derivations, which exploit this flexibility.
 
 The source of this document contains the actual Agda code, i.e. it is
 a literate Agda file. Different chapters are in different modules to
@@ -234,28 +228,36 @@ are redefined later.
 \label{sec:concl-furth-work}
 
 The subject of the paper is a problem which everybody including
-ourselves would have thought to be trivial. As it turns out it isn't
-and we are not the only one who noticed this, in
-particular if you don't want to prove it using copy-and-paste. 
-We spend some time going down alleys that didn't work find clever
-parametrisation. In the end with hindsight the main idea seems rather
+ourselves would have thought to be trivial. As it turns out, it isn't. 
+We spent some time going down alleys that didn't work. 
+In the end with hindsight the main idea seems rather
 obvious: introduce sorts as a datatype with the structure of a boolean
-algebra. To be able to implement the solution in Agda we managed to
+algebra. To implement the solution in Agda we managed to
 convince the termination checker that |V| is structurally smaller than
-|T| which means that the actual work determining and verifying the
-termination ordering is left to Agda. This greatly simplifies the
-formal development. In a way one would like to be able to instrument
-the termination checker for example with an ordering on
-constructors. Also it would be nice if the termination checker
-provides evidence that its actual non-trivial reasoning is sound and
-can be checked independently. 
+|T| and so leave the actual work determining and verifying the termination 
+ordering to Agda.
+This greatly simplifies the formal development. 
+
+We could, however, simplify our development slightly further if we were able to 
+instrument the termination checker, for example with an ordering on 
+constructors. 
+We also ran into issues with Agda only examining direct arguments to function
+calls when doing termination checking. The solutions to these problems were
+all quite mechanical, which perhaps implies there is room for Agda's termination
+checker to be extended.
+Finally, it would be nice if the termination checker
+provided independently-checkable evidence that its non-trivial reasoning is 
+sound. 
 
 This paper can also be seen as a preparation for the harder problem to
 implement recursive substitution for dependent types. This is harder
 because here the typing of the constructors actually depends on the
-substitution laws. While such a M\"unchhausian \cite{altenkirch2023munchhausen} construction
-\footnote{The reference is to Baron Münchhausen who allegedly pulled himself on his own hair out of a swamp.
-We call definitions in type theory whose typing depends on equations about them \emph{M\"unchhausian}.
+substitution laws. While such a M\"unchhausian \cite{altenkirch2023munchhausen} 
+construction
+\footnote{The reference is to Baron Münchhausen who allegedly pulled himself 
+out of a swamp by his own hair.
+We call definitions in type theory whose typing depends on equations about 
+themselves \emph{M\"unchhausian}.
 }
 should actually be possible in Agda, the theoretical underpinning of
 inductive-inductive-recursive definitions is mostly unexplored (with
@@ -267,7 +269,7 @@ in the sense of HoTT.
 Hence this paper has two aspects: it turns out that an apparently trivial
 problem isn't so hard after all, and it is a stepping stone to more
 exciting open questions. But before you can run you need to walk and
-we also believe that the construction here can be useful to others.
+we believe that the construction here can be useful to others.
 
 % PLW: We should be sure to cite the following as related work.
 
