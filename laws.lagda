@@ -86,10 +86,10 @@ The category law now is a fold of the functor law:
    cong₂ _,_ (∘id {xs = xs}) ([id] {x = x})
 \end{code}
 
-\subsection{Right identity}
+\subsection{The left identity law}
 \label{sec:right-ident}
 
-We need to prove the right identity law mutually with the second
+We need to prove the left identity law mutually with the second
 functor law for substitution. This is the main lemma for
 associativity. 
 
