@@ -132,18 +132,18 @@ where |q , r : Sort| and |q ⊔ r| is the least upper bound in the
 lattice of sorts (|V ⊑ T|). We also only need to prove one variant of the
 functor law, here we rely on the fact that |_ ⊔_| is associative.
 We manage to convince agda's termination checker that |V| is
-structurally smaller than |T| by:
-\begin{spec}
-data Sort : Set 
-data IsV : Sort → Set
-data Sort where
-  V : Sort
-  T>V : (s : Sort) → IsV s → Sort
-data IsV where
-  isV : IsV V
-pattern T = T>V V isV
-\end{spec}
-and as a consequence the highly mutually
+structurally smaller than |T| (see section \ref{sec:fact-with-sorts})
+% \begin{spec}
+% data Sort : Set 
+% data IsV : Sort → Set
+% data Sort where
+%   V : Sort
+%   T>V : (s : Sort) → IsV s → Sort
+% data IsV where
+%   isV : IsV V
+% pattern T = T>V V isV
+% \end{spec}
+and as a indeed the highly mutually
 recursive proof is accepted by agda.
 
 We also relate the recursive definition of substitution to a
