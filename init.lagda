@@ -19,6 +19,7 @@ can verify the laws of a simply typed category with families
 they can be specialised to simple types \cite{castellan2021categories}.
 
 \begin{itemize}
+
 \item a category of contexts (|Con|) and substitutions (|_⊨_|),
 \item A set of types |Ty|,
 \item For every type |A| a presheaf of terms |_ ⊢  A| over the category of contexts (i.e. a
@@ -72,7 +73,7 @@ definition of substitution gives rise to a simply typed CwF (section
 Quotient Inductive Type. To simplify our development, rather than using a
 Cubical Agda HIT,
 \footnote{Cubical Agda still lacks some essential automation,
-  e.g. integrating no-confusion properties with pattern matching.}
+  e.g. integrating no-confusion properties into pattern matching.}
 we just postulate the existence of this QIIT in Agda (with
 the associated rewriting rules). By initiality there is an evaluation
 functor from the initial CwF to the recursively defined CwF (defined
@@ -1274,4 +1275,4 @@ And completeness is just one call to the eliminator away.
 compl : ⌜ norm tᴵ ⌝ ≡ tᴵ
 compl {tᴵ = tᴵ} = elim-cwf compl-𝕞 tᴵ
 \end{code}
-   
+
