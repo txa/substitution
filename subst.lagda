@@ -1,4 +1,4 @@
-%if False
+%if full
 \begin{code}
 {-# OPTIONS --rewriting #-}
 module subst where

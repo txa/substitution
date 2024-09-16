@@ -8,6 +8,8 @@
 %include agda.fmt
 %include lib.fmt
 
+%include is-full.lagda
+
 \title{Substitution without copy and paste}
 
 \author{Thorsten Altenkirch}

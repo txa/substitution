@@ -2,11 +2,16 @@
 
 default: paper.pdf
 
+paper-full.tex : paper.lagda naive.lagda subst.lagda laws.lagda init.lagda lib.fmt
+	echo "%let full = True" > is-full.lagda
+	lhs2TeX  --agda $< > $@
+
 paper.tex : paper.lagda naive.lagda subst.lagda laws.lagda init.lagda lib.fmt
+	echo "%let full = False" > is-full.lagda
 	lhs2TeX --agda $< > $@
 
 %.pdf : %.tex local.bib
-	latexmk -pdf paper.tex
+	latexmk -pdf $<
 #	latexmk -pdf -pdflatex="xelatex" paper.tex
 
 clean:
