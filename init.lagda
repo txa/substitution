@@ -853,12 +853,10 @@ Con≡ {Γ = Γ ▷ A} = cong₂ _▷_ Con≡ Ty≡
 
 Ty≡ {A = o} = refl
 Ty≡ {A = A ⇒ B} = cong₂ _⇒_ Ty≡ Ty≡
-
 \end{code}
 
 \begin{spec}
 {-# \Keyword{REWRITE} $\mathrm{Con}\!\equiv \; \mathrm{Ty}\!\equiv$ #-} 
-
 \end{spec}
 
 %if False
@@ -979,7 +977,6 @@ implementing |⌜id⌝| to keep Agda's termination checker happy.
 
 ⌜id⌝′ : Sort → ⌜ id {Γ = Γ} ⌝* ≡ idᴵ
 ⌜id⌝ = ⌜id⌝′ V
-
 \end{code}
 \begin{spec}
 {-# \Keyword{INLINE} $\ulcorner\mathrm{id}\urcorner\;$ #-}
@@ -1007,15 +1004,21 @@ zero[]ᴵ {δᴵ = δᴵ} {tᴵ = tᴵ} =
   tᴵ ∎
 \end{code}
 
+% \begin{spec}
+% suc[]ᴵ : sucᴵ tᴵ B [ δᴵ ,ᴵ uᴵ ]ᴵ ≡ tᴵ [ δᴵ ]ᴵ
+% suc[]ᴵ {tᴵ = tᴵ} {B = B} {δᴵ = δᴵ} {uᴵ = uᴵ} = 
+%   -- ...
+
+% ,[]ᴵ : (δᴵ ,ᴵ tᴵ) ∘ᴵ σᴵ ≡ (δᴵ ∘ᴵ σᴵ) ,ᴵ (tᴵ [ σᴵ ]ᴵ)
+% ,[]ᴵ {δᴵ = δᴵ} {tᴵ = tᴵ} {σᴵ = σᴵ} = 
+%   -- ...
+% \end{spec}
+
 \begin{spec}
 suc[]ᴵ : sucᴵ tᴵ B [ δᴵ ,ᴵ uᴵ ]ᴵ ≡ tᴵ [ δᴵ ]ᴵ
-suc[]ᴵ {tᴵ = tᴵ} {B = B} {δᴵ = δᴵ} {uᴵ = uᴵ} = 
-  -- ...
-
 ,[]ᴵ : (δᴵ ,ᴵ tᴵ) ∘ᴵ σᴵ ≡ (δᴵ ∘ᴵ σᴵ) ,ᴵ (tᴵ [ σᴵ ]ᴵ)
-,[]ᴵ {δᴵ = δᴵ} {tᴵ = tᴵ} {σᴵ = σᴵ} = 
-  -- ...
 \end{spec}
+
 
 %if False
 \begin{code}
