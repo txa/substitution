@@ -256,9 +256,9 @@ module _ (𝕄 : Motive) where
           ≡[ cong (Tmᴱ Δᴱ (Aᴱ ⇒ᴱ Bᴱ)) ƛ[] 
           ]≡ ƛᴱ (Mᴱ [ δᴱ ^ᴱ Aᴱ ]ᴱ)  
 
-module Eliminator {𝕄} (C : Cases 𝕄) where
+module Eliminator {𝕄} (ℂ : Cases 𝕄) where
   open Motive 𝕄
-  open Cases C
+  open Cases ℂ
 
   elim-con : ∀ Γ → Conᴱ Γ
   elim-ty  : ∀ A → Tyᴱ  A
