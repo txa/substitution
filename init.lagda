@@ -38,7 +38,7 @@ We can add further constructors like function types |_⇒_| which usuay
 come with a natural isomorphism giving rise to $\beta$ and $\eta$ laws
 but since in the moment we are only interested in substitutions we
 don't assume this. Instead we add the term formers for application
-(|_$_|) and lambda-abstraction |ƛ| as natural transformations.
+(|_\$_|) and lambda-abstraction |ƛ| as natural transformations.
 
 % For the categorically minded we can summarize:
 % \footnote{It is not necessary to know the categorical definition to
@@ -946,9 +946,20 @@ compl-𝕄 .Tmsᴹ _ _ δᴵ = ⌜ norm* δᴵ ⌝* ≡ δᴵ
 To show these identities, we need to prove that our various recursively-defined
 syntax operations are preserved by |⌜_⌝|.
 
-Preservation of projections out of sequences of terms reduce to the associated 
-beta-laws of the initial CwF.
+Preservation of |zero[_]| reduces to reflexivity after splitting on the
+sort.
 
+\begin{code}
+⌜zero⌝ : ⌜ zero[_] {Γ = Γ} {A = A} q ⌝ ≡ zeroᴵ
+⌜zero⌝ {q = V} = refl
+⌜zero⌝ {q = T} = refl
+\end{code}
+
+Preservation of each of the projections out of sequences of terms 
+(e.g. |⌜ π₀ δ ⌝* ≡ π₀ᴵ ⌜ δ ⌝*|) reduces to the 
+associated beta-laws of the initial CwF (e.g. |▷-β₀ᴵ|).
+
+%if False
 \begin{code}
 ⌜π₀⌝ : ∀ {δ : Δ ⊨ (Γ ▷ A)}
      → ⌜ π₀ δ ⌝* ≡ π₀ᴵ ⌜ δ ⌝*
@@ -958,15 +969,7 @@ beta-laws of the initial CwF.
      → ⌜ π₁ δ ⌝ ≡ π₁ᴵ ⌜ δ ⌝*
 ⌜π₁⌝ {δ = δ , x} = sym ▷-β₁ᴵ
 \end{code}
-
-And preservation of |zero[_]| reduces to reflexivity after splitting on the
-sort.
-
-\begin{code}
-⌜zero⌝ : ⌜ zero[_] {Γ = Γ} {A = A} q ⌝ ≡ zeroᴵ
-⌜zero⌝ {q = V} = refl
-⌜zero⌝ {q = T} = refl
-\end{code}
+%endif
 
 Preservation proofs for |_[_]|, |_^_|, |_⁺_|, |id| and |suc[_]| are all mutually 
 inductive, mirroring their original recursive definitions. We must stay
@@ -1233,6 +1236,11 @@ CwF into any non-set).
 
 As we are working in vanilla Agda, we'll take a simpler approach, and rely on 
 UIP.
+\footnote{Note that this implementation of (dependent) UIP relies 
+on type constructor injectivity (specifically, injectivity of |_≡_|). 
+We could use a weaker version taking an additional proof of |x ≡ z|, 
+but this would be clunkier to use; Agda has no hope of inferring such a
+proof by unification.}
 
 \begin{spec}
 duip : ∀ {A B : Set ℓ} {x y : A} {z w : B} {p q} 
@@ -1240,12 +1248,6 @@ duip : ∀ {A B : Set ℓ} {x y : A} {z w : B} {p q}
      → p ≡[ r ]≡ q
 duip {p = refl} {q = refl} {r = refl} = refl
 \end{spec}
-
-It is probably worth noting that this implementation of (dependent) UIP relies 
-on type constructor injectivity (specifically, injectivity of |_≡_|). 
-We could use a weaker version taking an additional proof of |x ≡ z|, 
-but this would be clunkier to use; Agda has no hope of inferring such a
-proof by unification.
 
 \begin{code}
 compl-𝕞 .id∘ᴹ  = duip

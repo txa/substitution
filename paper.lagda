@@ -130,7 +130,7 @@ _[_] : Γ ⊢[ q ] A → Δ ⊨[ r ] Γ → Δ ⊢[ q ⊔ r ] A
 \end{spec}
 where |q , r : Sort| and |q ⊔ r| is the least upper bound in the
 lattice of sorts (|V ⊑ T|). We also only need to prove one variant of the
-functor law, here we rely on the fact that |_ ⊔_| is associative.
+functor law, here we rely on the fact that |_⊔_| is associative.
 We manage to convince agda's termination checker that |V| is
 structurally smaller than |T| (see section \ref{sec:fact-with-sorts})
 % \begin{spec}
