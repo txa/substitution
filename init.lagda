@@ -18,29 +18,51 @@ can verify the laws of a simply typed category with families
 (CwF). CwFs are mostly known as models of dependent type theory but
 they can be specialised to simple types \cite{castellan2021categories}.
 
-For the categorically minded we can summarize:
-\footnote{It is not necessary to know the categorical definitions to
-  understand the rest of the paper.}
-a CwF is given by
 \begin{itemize}
-\item A category of contexts,
-\item A presheaf to model types (i.e. a contravariant functor from the
-  category of contexts to |Set|),
-\item A dependent presheaf for terms over the type presheaf (i.e. a presheaf
-  over the category of elements of the type presheaf),
-\item A terminal object (empty context) and context extension.
-  Context extension corresponds to demanding that the term presheaf is
-  locally representable.  
+\item a category of contexts (|Con|) and substitutions (|_⊨_|),
+\item A set of types |Ty|,
+\item For every type |A| a presheaf of terms |_ ⊢  A| over the category of contexts (i.e. a
+  contravariant functor into the category of sets),
+\item A terminal object (the empty context) and a context extension
+  operation |_▷_| such that |Γ ⊨ Δ ▷ A| is naturally isomorphic to
+  |(Γ ⊨ Δ) × (Γ ⊢ A|).
 \end{itemize}
-To this we can add further constructors, e.g. $\Pi$-types. If we are
-only interested in a substitution calculus like in our current work, we
-only add the type and term formers, plus the condition that they are
-natural, i.e. commute with substitution.
 
-In the simply typed case the type
-presheaf is constant since the set of types doesn't vary over the
-context and the dependent presheaf of terms becomes an ordinary
-presheaf over the category of contexts.
+We will give the precise definition in the next section, hence it
+isn't necessary to know the categorical terminology. If you don know
+CwFs for dependent types then a simply typed CwF is just a CwF where the presheaf of types
+is constant.
+
+We can add further constructors like function types |_⇒_| which usuay
+come with a natural isomorphism giving rise to $\beta$ and $\eta$ laws
+but since in the moment we are only interested in substitutions we
+don't assume this. Instead we add the term formers for application
+(|_$_|) and lambda-abstraction |ƛ| as natural transformations.
+
+% For the categorically minded we can summarize:
+% \footnote{It is not necessary to know the categorical definition to
+%   understand the rest of the paper.}
+% a CwF is given by
+% \begin{itemize}
+% \item A category of contexts,
+% \item A presheaf to model types (i.e. a contravariant functor from the
+%   category of contexts to |Set|),
+% \item A dependent presheaf for terms over the type presheaf (i.e. a presheaf
+%   over the category of elements of the type presheaf),
+% \item A terminal object (empty context) and context extension.
+%   Context extension corresponds to demanding that the term presheaf is
+%   locally representable.  
+% \end{itemize}
+% To this we can add further constructors, e.g. $\Pi$-types. If we are
+% only interested in a substitution calculus like in our current work, we
+% only add the type and term formers and the condition that they are
+% natural, i.e. commute with substitution.
+
+% In the simply typed case the type
+% presheaf is constant since the set of types doesn't vary over the
+% context and the dependent presheaf of terms becomes an ordinary
+% presheaf over the category of contexts.
+
 
 We start with a precise definition of a simply typed CwF with
 additional structure to model simply typed $\lambda$-calculus (section
