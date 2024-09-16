@@ -9,7 +9,7 @@ Philip Wadler, 8 Sep 2024
 
 ```
 {-# OPTIONS --rewriting --no-forcing #-}
-module tradional-data-full where
+module traditional-data-full where
 ```
 The --no-forcing flag is needed because of a bug
 
