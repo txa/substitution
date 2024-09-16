@@ -221,6 +221,7 @@
 
 %format norm*     = norm "\mathrm{*}"
 %format elim-cwf*  = elim-cwf "\mathrm{*}"
+%format rec-cwf*   = rec-cwf "\mathrm{*}"
 %format elim-cwf*- = elim-cwf "\mathrm{*}" -
 
 %format elim-cwf*-idβ = elim-cwf*- id β

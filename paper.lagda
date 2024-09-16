@@ -266,7 +266,7 @@ implement recursive substitution for dependent types. This is harder
 because here the typing of the constructors actually depends on the
 substitution laws. While such a M\"unchhausian \cite{altenkirch2023munchhausen} 
 construction
-\footnote{The reference is to Baron Münchhausen who allegedly pulled himself 
+\footnote{The reference is to Baron Münchhausen, who allegedly pulled himself 
 out of a swamp by his own hair.
 We call definitions in type theory whose typing depends on equations about 
 themselves \emph{M\"unchhausian}.
