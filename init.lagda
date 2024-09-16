@@ -755,7 +755,8 @@ a new reduction for |cong|:
 % for "cong-const"
 % cong-const : cong (λ _ → x) p ≡ refl
 \begin{spec}
-cong-const : cong (λ _ → x) p ≡ refl
+cong-const : ∀ {x : A} {y z : B} {p : y ≡ z}
+           → cong (λ _ → x) p ≡ refl
 cong-const {p = refl} = refl
 
 {-# \Keyword{REWRITE} cong-const #-}

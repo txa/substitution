@@ -96,9 +96,7 @@ associativity.
 Let's state the functor law but postpone the proof until the next section
 
 \begin{code}
-[∘] :
-  {x : Θ ⊢[ q ] A}{xs : Γ ⊨[ r ] Θ}{ys : Δ ⊨[ s ] Γ}
-  → x [ xs ∘ ys ] ≡ x [ xs ] [ ys ]
+[∘] : x [ xs ∘ ys ] ≡ x [ xs ] [ ys ]
 \end{code}
 This actually uses the definitional equality
 \footnote{We rely on Agda's rewrite here.
@@ -233,8 +231,8 @@ tm[] {q = T} = refl
 %endif
 We are now ready to prove |[∘]| by structural induction:
 \begin{code}
-[∘] {x = zero} {ys , y} = refl
-[∘] {x = suc i _} {ys , y} = [∘] {x = i}
+[∘] {x = zero} {xs = xs , x} = refl
+[∘] {x = suc i _} {xs = xs , x} = [∘] {x = i}
 [∘] {x = ` x}{xs = xs}{ys = ys} = 
    tm⊑ ⊑t (x [ xs ∘ ys ])
     ≡⟨ cong (tm⊑ ⊑t) ([∘] {x = x}) ⟩
