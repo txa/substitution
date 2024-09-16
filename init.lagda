@@ -753,20 +753,20 @@ The one extra ingredient we need to make this work out neatly is to introduce
 a new reduction for |cong|:
 \footnote{This definitional identity also holds natively in Cubical.}
 
+\begin{spec}
+cong-const : cong (λ _ → x) p ≡ refl
+cong-const {p = refl} = refl
+
+{-# \Keyword{REWRITE} cong-const #-}
+\end{spec}
+
+%if False
 \begin{code}
 cong-const : ∀ {A : Set ℓ₁} {B : Set ℓ₂} {x : A} 
                {y z : B} {p : y ≡ z} 
            → cong (λ _ → x) p ≡ refl
 cong-const {p = refl} = refl
 
-\end{code}
-
-\begin{spec}
-{-# \Keyword{REWRITE} cong-const #-}
-\end{spec}
-
-%if False
-\begin{code}
 {-# REWRITE cong-const #-}
 \end{code}
 %endif
@@ -1235,29 +1235,22 @@ the sledgehammer of set truncation (which prevents eliminating the initial
 CwF into any non-set).
 
 As we are working in vanilla Agda, we'll take a simpler approach, and rely on 
-UIP.
-\footnote{Note that this implementation of (dependent) UIP relies 
+UIP (|duip : p ≡[ r ]≡ q|).
+\footnote{Note that proving this form of (dependent) UIP relies 
 on type constructor injectivity (specifically, injectivity of |_≡_|). 
 We could use a weaker version taking an additional proof of |x ≡ z|, 
 but this would be clunkier to use; Agda has no hope of inferring such a
 proof by unification.}
 
-\begin{spec}
-duip : ∀ {A B : Set ℓ} {x y : A} {z w : B} {p q} 
-         {r : (x ≡ y) ≡ (z ≡ w)}
-     → p ≡[ r ]≡ q
-duip {p = refl} {q = refl} {r = refl} = refl
-\end{spec}
-
 \begin{code}
 compl-𝕞 .id∘ᴹ  = duip
 compl-𝕞 .∘idᴹ  = duip
-compl-𝕞 .∘∘ᴹ   = duip
 -- ...
 \end{code}
 
 %if False
 \begin{code}
+compl-𝕞 .∘∘ᴹ   = duip
 compl-𝕞 .[id]ᴹ = duip
 compl-𝕞 .[∘]ᴹ  = duip
 compl-𝕞 .•-ηᴹ  = duip
@@ -1278,3 +1271,4 @@ compl : ⌜ norm tᴵ ⌝ ≡ tᴵ
 compl {tᴵ = tᴵ} = elim-cwf compl-𝕞 tᴵ
 \end{code}
 
+  
