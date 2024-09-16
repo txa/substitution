@@ -522,6 +522,18 @@ infix   8  _[_]ᴵ
 \end{code}
 %endif
 
+\begin{spec}
+postulate
+  _⊢ᴵ_ : Con → Ty → Set
+  _⊨ᴵ_ : Con → Con → Set
+  
+  idᴵ  : Γ ⊨ᴵ Γ
+  _∘ᴵ_ : Δ ⊨ᴵ Γ → Θ ⊨ᴵ Δ → Θ ⊨ᴵ Γ
+  id∘ᴵ : idᴵ ∘ᴵ δᴵ ≡ δᴵ
+  -- ...
+\end{spec}
+
+%if False
 \begin{code}
 postulate
   _⊢ᴵ_ : Con → Ty → Set
@@ -535,11 +547,6 @@ postulate
   idᴵ  : Γ ⊨ᴵ Γ
   _∘ᴵ_ : Δ ⊨ᴵ Γ → Θ ⊨ᴵ Δ → Θ ⊨ᴵ Γ
   id∘ᴵ : idᴵ ∘ᴵ δᴵ ≡ δᴵ
-  -- ...
-\end{code}
-
-%if False
-\begin{code}
   ∘idᴵ : δᴵ ∘ᴵ idᴵ ≡ δᴵ
   ∘∘ᴵ  : (ξᴵ ∘ᴵ σᴵ) ∘ᴵ δᴵ ≡ ξᴵ ∘ᴵ (σᴵ ∘ᴵ δᴵ)
 
@@ -744,8 +751,12 @@ The one extra ingredient we need to make this work out neatly is to introduce
 a new reduction for |cong|:
 \footnote{This definitional identity also holds natively in Cubical.}
 
+% To save space, we can always use this shorter (not valid Agda) signature
+% for "cong-const"
+% cong-const : cong (λ _ → x) p ≡ refl
 \begin{spec}
-cong-const : cong (λ _ → x) p ≡ refl
+cong-const : ∀ {A B} {x : A} {y z : B} {p : y ≡ z} 
+           → cong (λ _ → x) p ≡ refl
 cong-const {p = refl} = refl
 
 {-# \Keyword{REWRITE} cong-const #-}
@@ -1113,7 +1124,6 @@ cases to cover, so for brevity we elide the proofs of |⌜[]⌝| and |⌜suc⌝|
   ≡⟨ ▷-ηᴵ ⟩
   idᴵ ∎
 \end{code}
-
 %if False
 \begin{code}
 ⌜suc⌝ {q = V} = refl
