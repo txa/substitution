@@ -776,20 +776,19 @@ automatically.
 
 \begin{code}
 module Recursor (cwf : CwF-simple) where
-  rec-con : Con → cwf .CwF.Con
-  rec-ty  : Ty  → cwf .CwF.Ty
-  rec-tms : Δ ⊨ᴵ Γ 
-          → cwf .CwF._⊨_ (rec-con Δ) (rec-con Γ)
-  rec-tm  : Γ ⊢ᴵ A 
-          → cwf .CwF._⊢_ (rec-con Γ) (rec-ty A)
-
   cwf-to-motive : Motive
+  cwf-to-methods : Methods cwf-to-motive
+
+  rec-con  = elim-con  cwf-to-methods
+  rec-ty   = elim-ty   cwf-to-methods
+  rec-cwf  = elim-cwf  cwf-to-methods
+  rec-cwf* = elim-cwf* cwf-to-methods
+
   cwf-to-motive .Conᴹ _     = cwf .CwF.Con
   cwf-to-motive .Tyᴹ  _     = cwf .CwF.Ty
   cwf-to-motive .Tmᴹ Γ A _  = cwf .CwF._⊢_ Γ A
   cwf-to-motive .Tmsᴹ Δ Γ _ = cwf .CwF._⊨_ Δ Γ
   
-  cwf-to-methods : Methods cwf-to-motive
   cwf-to-methods .idᴹ   = cwf .CwF.id
   cwf-to-methods ._∘ᴹ_  = cwf .CwF._∘_
   cwf-to-methods .id∘ᴹ  = cwf .CwF.id∘
@@ -824,13 +823,6 @@ module Recursor (cwf : CwF-simple) where
 \end{code}
 %endif
 
-\begin{code}
-  rec-con = elim-con cwf-to-methods
-  rec-ty  = elim-ty  cwf-to-methods
-  rec-tm  = elim-cwf  cwf-to-methods
-  rec-tms = elim-cwf* cwf-to-methods
-\end{code}
-
 %if False
 \begin{code}
 open Recursor public
@@ -843,7 +835,7 @@ Normalisation into to our substitution normal forms can now be achieved by with:
 
 \begin{spec}
 norm : Γ ⊢ᴵ A → rec-con is-cwf Γ ⊢ rec-ty is-cwf A
-norm = rec-tm is-cwf 
+norm = rec-cwf is-cwf 
 \end{spec}
 
 Of course, normalisation shouldn't change the type of a term or the context it
@@ -875,10 +867,10 @@ Ty≡ {A = A ⇒ B} = cong₂ _⇒_ Ty≡ Ty≡
 
 \begin{code}
 norm : Γ ⊢ᴵ A → Γ ⊢ A
-norm = rec-tm is-cwf 
+norm = rec-cwf is-cwf 
 
 norm* : Δ ⊨ᴵ Γ → Δ ⊨ Γ
-norm* = rec-tms is-cwf
+norm* = rec-cwf* is-cwf
 \end{code}
 
 The inverse operation to inject our syntax back into the initial CwF is easily
@@ -1071,7 +1063,7 @@ identically.
 \end{code}
 %endif
 
-We can now (finally) proceed with the proofs. There is quite a large number of
+We can now (finally) proceed with the proofs. There are quite a few
 cases to cover, so for brevity we elide the proofs of |⌜[]⌝| and |⌜suc⌝|.
 
 %if False
@@ -1222,14 +1214,15 @@ compl-𝕞 .ƛᴹ_ tᴹ = cong (ƛᴵ_) tᴹ
 \end{code}
 %endif
 
-The remaining cases correspond to the CwF laws, which most hold 
+The remaining cases correspond to the CwF laws, which must hold 
 for whatever type family we eliminate into in order to retain congruence of 
 |_≡_|. 
-For our completeness proof, we are eliminating into equations, and so all of 
-these cases become higher-dimensional identities, demanding we equate different 
-proof trees for completeness instantiated with the LHS/RHS terms/substitutions. 
+In our completeness proof, we are eliminating into equations, and so all of 
+these cases become higher-dimensional identities (demanding we equate different 
+proof trees for completeness, instantiated with the LHS/RHS 
+terms/substitutions). 
 
-In a univalent type theory we might try and carefully introduce additional 
+In a univalent type theory, we might try and carefully introduce additional 
 coherences to our initial CwF to try and make these identities provable without 
 the sledgehammer of set truncation (which prevents eliminating the initial 
 CwF into any non-set).
