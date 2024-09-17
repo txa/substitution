@@ -102,11 +102,11 @@ i.e. interpreting dependent types in higher categories.
 \subsection{In a nutshell}
 \label{sec:nutshell}
 
-When working with substitution for a calculus with binders we find
-that you have to differentiate between renamings (|Δ ⊨v Γ|) where you only
-substitute variables by variables (|Γ ∋ A|) and proper substitutions (|Δ ⊨ Γ|) where you
-replace variables by terms (|Γ ⊢ A|). This results into having to define
-several similar operations
+When working with substitution for a calculus with binders, we find
+that you have to differentiate between renamings (|Δ ⊨v Γ|) where 
+variables are substituted only for variables (|Γ ∋ A|) and proper substitutions 
+(|Δ ⊨ Γ|) where variables are replaced with terms (|Γ ⊢ A|). This results in 
+having to define several similar operations
 \begin{spec}
   _v[_]v  : Γ ∋ A   → Δ ⊨v Γ  → Δ ∋ A
   _v[_]   : Γ ∋ A   → Δ ⊨ Γ   → Δ ⊢ A
@@ -114,24 +114,24 @@ several similar operations
   _[_]    :  Γ ⊢ A  → Δ ⊨ Γ   → Δ ⊢ A
 \end{spec}
 And indeed the operations on terms depend on the operations on
-variables. This duplication is getting worse when we prove properties
-of substitution like the functor law:
+variables. This duplication gets worse when we prove properties
+of substitution, such as the functor law:
 \begin{spec}
  x [ xs ∘ ys ] ≡ x [ xs ] [ ys ]
 \end{spec}
-Since all components |x|,|xs|,|ys| can be either variables/renamings
-and terms/substitutions we could consider 8 possibilities of which we
-actually need 4 and this affects also the lemmas we need to prove. Our
-solution is to introduce a type of sorts with |V : Sort| for
-variables/renamings and |T : Sort| for terms substitutions and we only
-need one operation
+Since all components |x|, |xs|, |ys| can be either variables/renamings
+and terms/substitutions we seemingly need to prove eight possibilities (with
+the repetition extending also to the intermediary lemmas). 
+Our solution is to introduce a type of sorts with |V : Sort| for
+variables/renamings and |T : Sort| for terms substitutions, leading
+to a single substitution operation
 \begin{spec}
 _[_] : Γ ⊢[ q ] A → Δ ⊨[ r ] Γ → Δ ⊢[ q ⊔ r ] A  
 \end{spec}
 where |q , r : Sort| and |q ⊔ r| is the least upper bound in the
-lattice of sorts (|V ⊑ T|). We also only need to prove one variant of the
-functor law, here we rely on the fact that |_⊔_| is associative.
-We manage to convince agda's termination checker that |V| is
+lattice of sorts (|V ⊑ T|). With this, we only need to prove one variant of the
+functor law, relying on the fact that |_⊔_| is associative.
+We manage to convince Agda's termination checker that |V| is
 structurally smaller than |T| (see section \ref{sec:fact-with-sorts})
 % \begin{spec}
 % data Sort : Set 
@@ -143,16 +143,17 @@ structurally smaller than |T| (see section \ref{sec:fact-with-sorts})
 %   isV : IsV V
 % pattern T = T>V V isV
 % \end{spec}
-and as a indeed the highly mutually
-recursive proof is accepted by agda.
+and, indeed, the highly mutually
+recursive proof is accepted by Agda.
 
 We also relate the recursive definition of substitution to a
-specification using a quotient-inductive-inductive type (QIIT), that
-is a a mutual inductive type with equations,  where
-substitution is a term former. Our specification is that the
-substitution laws correspond to the equations of a simply typed
-category with families (CwF) --- this is a variant of a category with
-families where the types do not depend on a context. We show that the
+specification using a quotient-inductive-inductive type (QIIT) (a mutual 
+inductive type with equations) where
+substitution is a term former (i.e. explicit substitutions). 
+Specifically, our specification 
+is such that the substitution laws correspond to the equations of a simply typed
+category with families (CwF) (a variant of a category with
+families where the types do not depend on a context). We show that our
 recursive definition of substitution leads to a simply typed CwF which
 is isomorphic to the specified initial one. This can be viewed as a
 normalisation result where the usual $\lambda$-terms without explicit
