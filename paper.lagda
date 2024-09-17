@@ -277,7 +277,7 @@ essential to prove coherence of models of type theory in higher types,
 in the sense of HoTT.
 
 Hence this paper has two aspects: it turns out that an apparently trivial
-problem isn't so hard after all, and it is a stepping stone to more
+problem isn't so easy after all, and it is a stepping stone to more
 exciting open questions. But before you can run you need to walk and
 we believe that the construction here can be useful to others.
 
