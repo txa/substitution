@@ -84,9 +84,9 @@ The first author was writing lecture notes for an introduction to
 category theory for functional programmers. A nice example of a
 category is the category of simply typed $\lambda$-terms and
 substitutions; hence it seemed a good idea to give the definition and
-ask the students to prove the category laws. When writing the answer
-they realised that it is not as easy as they thought. To make sure that
-there were no mistakes they started to formalize the problem in Agda.
+ask the students to prove the category laws. When writing the answer,
+they realised that it is not as easy as they thought, and to make sure that
+there were no mistakes, they started to formalize the problem in Agda.
 The main setback was that the same proofs got repeated many times. 
 If there is one guideline of good software engineering then it is 
 \textbf{Do not write code by copy and paste} and this applies even more so to 
@@ -120,7 +120,7 @@ of substitution, such as the functor law:
  x [ xs ∘ ys ] ≡ x [ xs ] [ ys ]
 \end{spec}
 Since all components |x|, |xs|, |ys| can be either variables/renamings
-and terms/substitutions we seemingly need to prove eight possibilities (with
+or terms/substitutions, we seemingly need to prove eight possibilities (with
 the repetition extending also to the intermediary lemmas). 
 Our solution is to introduce a type of sorts with |V : Sort| for
 variables/renamings and |T : Sort| for terms substitutions, leading
@@ -128,7 +128,7 @@ to a single substitution operation
 \begin{spec}
 _[_] : Γ ⊢[ q ] A → Δ ⊨[ r ] Γ → Δ ⊢[ q ⊔ r ] A  
 \end{spec}
-where |q , r : Sort| and |q ⊔ r| is the least upper bound in the
+where |q, r : Sort| and |q ⊔ r| is the least upper bound in the
 lattice of sorts (|V ⊑ T|). With this, we only need to prove one variant of the
 functor law, relying on the fact that |_⊔_| is associative.
 We manage to convince Agda's termination checker that |V| is
@@ -143,8 +143,8 @@ structurally smaller than |T| (see section \ref{sec:fact-with-sorts})
 %   isV : IsV V
 % pattern T = T>V V isV
 % \end{spec}
-and, indeed, the highly mutually
-recursive proof is accepted by Agda.
+and, indeed, our highly mutually
+recursive proof relying on this is accepted by Agda.
 
 We also relate the recursive definition of substitution to a
 specification using a quotient-inductive-inductive type (QIIT) (a mutual 
@@ -178,24 +178,22 @@ relative monads \cite{altenkirch2015monads}.
 
 We avoid the monadic perspective here for two reasons: first we want
 to give a simple self-contained proof avoiding too many advanced
-categorical constructions as mentioned in the introduction as a
-motivation; second we are interested in the application to dependent
-types where it is not clear how the monadic approach can be applied
+categorical construction; second, we are interested in the application to 
+dependent types where it is not clear how the monadic approach can be applied
 without using very dependent types.
 
 There are a number of publications on formalising substitution laws.
 Just to mention a few recent ones: 
 \cite{stark2019autosubst} develops a Coq library which automatically derives
-substitution lemmas, but the proofs are simply repeated for renamings and
+substitution lemmas, but the proofs are repeated for renamings and
 substitutions. Their equational theory is similar to the simply
 typed CwFs we are using in section \ref{sec:initiality}.
-\cite{saffrich2024abstractions} is also using Agda but extrinsically
+\cite{saffrich2024abstractions} is also using Agda, but extrinsically
 (i.e. separating preterms and typed syntax). Here the approach from 
-\cite{allais2017type}  is used to factor the construction using
-\emph{kits}.  In \cite{saffrich2024intrinsically} this is further
-developed, this time using intrinsic syntax, but with renamings and 
-substitutions defined separately and relevant lemmas repeated for all required 
-combinations.
+\cite{allais2017type} is used to factor the construction using
+\emph{kits}. \cite{saffrich2024intrinsically} instead uses intrinsic syntax,
+but with renamings and substitutions defined separately, and relevant 
+substitution lemmas repeated for all required combinations.
 
 \subsection{Using Agda}
 \label{sec:using-agda}
@@ -212,20 +210,19 @@ The only recent
 feature we use, albeit sparingly, is the possibility to turn propositional
 equations into rewriting rules (i.e. definitional equalities). This
 makes the statement of some theorems more readable because we can avoid
-using |subst|, but this is not essential.
+using |subst|, but it is not essential.
 
 We extensively use variable declarations to introduce implicit
-quantification (we summarize the variables conventions in passing in
+quantification (we summarize the variable conventions in passing in
 the text). We also use $\forall{}$-prefix so we can elide types of function
 parameters where they can be inferred, i.e. instead of |{Γ : Con} → ..| we just 
-write |∀ {Γ} → ..|.
+write |∀ {Γ} → ..|. Implicit variables, which are indicated by using |{..}| 
+instead of |(..)| in dependent function types,  can be instantiated using the 
+syntax |a {x = b}|.
 
-Implicit variables, which are indicated by using |{..}| instead of
-|(..)| in dependent function types,  can be instantiated using the syntax
-|a {x = b}|. 
-Agda syntax is very flexible allowing mixfix syntax declarations using |_| to 
+Agda syntax is very flexible, allowing mixfix syntax declarations using |_| to 
 indicate where the parameters go.
-In the proofs we use the Agda standard library's definitions for equational 
+In the proofs, we use the Agda standard library's definitions for equational 
 derivations, which exploit this flexibility.
 
 The source of this document contains the actual Agda code, i.e. it is
@@ -263,7 +260,7 @@ provided independently-checkable evidence that its non-trivial reasoning is
 sound. 
 
 This paper can also be seen as a preparation for the harder problem to
-implement recursive substitution for dependent types. This is harder
+implement recursive substitution for dependent types. This is harder,
 because here the typing of the constructors actually depends on the
 substitution laws. While such a M\"unchhausian \cite{altenkirch2023munchhausen} 
 construction
@@ -276,7 +273,7 @@ should actually be possible in Agda, the theoretical underpinning of
 inductive-inductive-recursive definitions is mostly unexplored (with
 the exception of the proposal by \cite{kaposi2023towards}). However, there are
 potential interesting applications: strictifying substitution laws is
-essential to prove coherence of models of type theory in higher types
+essential to prove coherence of models of type theory in higher types,
 in the sense of HoTT.
 
 Hence this paper has two aspects: it turns out that an apparently trivial

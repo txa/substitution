@@ -13,14 +13,14 @@ open  ≡-Reasoning public
 \section{Initiality}
 \label{sec:initiality}
 
-We can do more than just prove that we have a category, indeed we
+We can do more than just prove that we have a category. Indeed we
 can verify the laws of a simply typed category with families
-(CwF). CwFs are mostly known as models of dependent type theory but
-they can be specialised to simple types \cite{castellan2021categories}.
+(CwF). CwFs are mostly known as models of dependent type theory, but
+they can be specialised to simple types \cite{castellan2021categories}. We 
+summarize the definition of a simply typed CwF as follows:
 
 \begin{itemize}
-
-\item a category of contexts (|Con|) and substitutions (|_⊨_|),
+\item A category of contexts (|Con|) and substitutions (|_⊨_|),
 \item A set of types |Ty|,
 \item For every type |A| a presheaf of terms |_ ⊢  A| over the category of contexts (i.e. a
   contravariant functor into the category of sets),
@@ -70,12 +70,12 @@ additional structure to model simply typed $\lambda$-calculus (section
 \ref{sec:simply-typed-cwfs}) and then we show that the recursive
 definition of substitution gives rise to a simply typed CwF (section
 \ref{sec:cwf-recurs-subst}). We can define the initial CwF as a
-Quotient Inductive Type. To simplify our development, rather than using a
-Cubical Agda HIT,
+Quotient Inductive-Inductive Type. To simplify our development, rather than 
+using a Cubical Agda HIT,
 \footnote{Cubical Agda still lacks some essential automation,
   e.g. integrating no-confusion properties into pattern matching.}
 we just postulate the existence of this QIIT in Agda (with
-the associated rewriting rules). By initiality there is an evaluation
+the associated rewriting rules). By initiality, there is an evaluation
 functor from the initial CwF to the recursively defined CwF (defined
 in section \ref{sec:cwf-recurs-subst}). On the
 other hand, we can embed the recursive CwF into the initial CwF;
@@ -217,7 +217,7 @@ before:
   δ ^ A = (δ ∘ (π₀ id)) , π₁ id
 \end{spec}
 We need to add the specific components for simply typed
-$\lambda$-calculus: we add the type constructors, the term
+$\lambda$-calculus; we add the type constructors, the term
 constructors and the corresponding naturality laws:
 \begin{spec}
   field
@@ -234,7 +234,7 @@ constructors and the corresponding naturality laws:
 
 We are building towards a proof of initiality for our recursive substitution
 syntax, but shall start by showing that our recursive substitution syntax obeys 
-the CwF laws, specifically that |CwF-simple| can be instantiated with 
+the specified CwF laws, specifically that |CwF-simple| can be instantiated with 
 |_⊢[_]_|/|_⊨[_]_|. This will be more-or-less enough to implement the 
 ``normalisation'' direction of our initial CwF |≃| recursive sub syntax 
 isomorphism.
@@ -455,7 +455,7 @@ next section also.
 \end{code}
 
 Finally, we can deal with the cases specific to simply typed $\lambda$-calculus.
-Only the beta-rule for substitutions applied to lambdas is non-trivial due to 
+Only the $\beta$-rule for substitutions applied to lambdas is non-trivial due to 
 differing implementations of |_^_|.
 
 \begin{code}
@@ -476,7 +476,7 @@ differing implementations of |_^_|.
 \end{code}
 
 We have shown our recursive substitution syntax satisfies the CwF laws, but we
-want to go a step further and show initiality: that our syntax is isomoprhic to
+want to go a step further and show initiality: that our syntax is isomorphic to
 the initial CwF.
 
 An important first step is to actually define the initial CwF (and its
@@ -833,14 +833,14 @@ open Recursor public
 \end{code}
 %endif
 
-Normalisation into to our substitution normal forms can now be achieved by with:
+Normalisation into our substitution normal forms can now be achieved by with:
 
 \begin{spec}
 norm : Γ ⊢ᴵ A → rec-con is-cwf Γ ⊢[ T ] rec-ty is-cwf A
 norm = rec-cwf is-cwf 
 \end{spec}
 
-Of course, normalisation shouldn't change the type of a term or the context it
+Of course, normalisation shouldn't change the type of a term, or the context it
 is in, so we might hope for a simpler signature |Γ ⊢ᴵ A → Γ ⊢[ T ] A| and, 
 conveniently, rewrite rules can get us there!
 
@@ -890,14 +890,14 @@ implemented by recursing on our substitution normal forms.
 \label{sec:proving-initiality}
 
 We have implemented both directions of the isomorphism. Now to show this truly
-is an isomorphism and not just a pair of functions, we must prove that |norm| 
-and |⌜_⌝| are mutual inverses - i.e. stability |norm ⌜ t ⌝ ≡ t| and 
-completeness |⌜ norm t ⌝ ≡ t|.
+is an isomorphism and not just a pair of functions between two types, we must 
+prove that |norm| and |⌜_⌝| are mutual inverses - i.e. stability 
+(|norm ⌜ t ⌝ ≡ t|) and completeness (|⌜ norm t ⌝ ≡ t|).
 
 We start with stability, as it is considerably easier. There are just a couple
 details worth mentioning:
 \begin{itemize}
-  \item To deal with variables in the |`_| case, we phrase the lemma is a 
+  \item To deal with variables in the |`_| case, we phrase the lemma in a 
   slightly more general way, taking expressions of any sort and coercing them up 
   to sort |T| on the RHS.
   \item The case for variables relies on a bit of coercion manipulation and our 
@@ -932,7 +932,7 @@ compl-𝕄 .Tmᴹ _ _ tᴵ = ⌜ norm tᴵ ⌝ ≡ tᴵ
 compl-𝕄 .Tmsᴹ _ _ δᴵ = ⌜ norm* δᴵ ⌝* ≡ δᴵ
 \end{code}
 
-To show these identities, we need to prove that our various recursively-defined
+To show these identities, we need to prove that our various recursively defined
 syntax operations are preserved by |⌜_⌝|.
 
 Preservation of |zero[_]| reduces to reflexivity after splitting on the
@@ -946,7 +946,7 @@ sort.
 
 Preservation of each of the projections out of sequences of terms 
 (e.g. |⌜ π₀ δ ⌝* ≡ π₀ᴵ ⌜ δ ⌝*|) reduce to the 
-associated beta-laws of the initial CwF (e.g. |▷-β₀ᴵ|).
+associated $\beta$-laws of the initial CwF (e.g. |▷-β₀ᴵ|).
 
 %if False
 \begin{code}
@@ -965,6 +965,7 @@ inductive, mirroring their original recursive definitions. We must stay
 polymorphic over sorts and again use our dummy |Sort| argument trick when
 implementing |⌜id⌝| to keep Agda's termination checker happy.
 
+%if False
 \begin{code}
 ⌜[]⌝  : ⌜ x [ ys ] ⌝ ≡ ⌜ x ⌝ [ ⌜ ys ⌝* ]ᴵ
 ⌜^⌝   : ∀ {xs : Δ ⊨[ q ] Γ} → ⌜ xs ^ A ⌝* ≡ ⌜ xs ⌝* ^ᴵ A
@@ -975,7 +976,18 @@ implementing |⌜id⌝| to keep Agda's termination checker happy.
 ⌜id⌝′ : Sort → ⌜ id {Γ = Γ} ⌝* ≡ idᴵ
 ⌜id⌝ = ⌜id⌝′ V
 \end{code}
+%endif
+
 \begin{spec}
+⌜[]⌝  : ⌜ x [ ys ] ⌝ ≡ ⌜ x ⌝ [ ⌜ ys ⌝* ]ᴵ
+⌜^⌝   : ⌜ xs ^ A ⌝* ≡ ⌜ xs ⌝* ^ᴵ A
+⌜⁺⌝   : ⌜ xs ⁺ A ⌝* ≡ ⌜ xs ⌝* ∘ᴵ wkᴵ
+⌜id⌝  : ⌜ id {Γ = Γ} ⌝* ≡ idᴵ
+⌜suc⌝ : ⌜ suc[ q ] x B ⌝ ≡ ⌜ x ⌝ [ wkᴵ ]ᴵ
+
+⌜id⌝′ : Sort → ⌜ id {Γ = Γ} ⌝* ≡ idᴵ
+⌜id⌝ = ⌜id⌝′ V
+
 {-# \Keyword{INLINE} $\ulcorner\mathrm{id}\urcorner\;$ #-}
 \end{spec}
 
@@ -986,7 +998,7 @@ implementing |⌜id⌝| to keep Agda's termination checker happy.
 \end{code}
 %endif
 
-To complete these proofs, we also need beta-laws about our initial CwF
+To complete these proofs, we also need $\beta$-laws about our initial CwF
 substitutions, so we derive these now.
 
 \begin{code}

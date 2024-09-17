@@ -101,7 +101,7 @@ And now we can define |_^_|:
 \begin{code}
 ts ^ A = ts ⁺ A , ` zero 
 \end{code}
-but we need to define |_⁺_| which is nothing but a fold of weakening
+but we need to define |_⁺_|, which is nothing but a fold of weakening
 of terms
 \begin{code}
 suc-tm : Γ ⊢ B → (A : Ty) → Γ ▷ A ⊢ B
@@ -110,17 +110,17 @@ suc-tm : Γ ⊢ B → (A : Ty) → Γ ▷ A ⊢ B
 (ts , t)  ⁺ A  = ts ⁺ A , suc-tm t A  
 \end{code}
 But how can we define |suc-tm| when we only have weakening for variables? If we
-already had identity |id : Γ ⊨ Γ| and substitution we could say:
+already had identity |id : Γ ⊨ Γ| and substitution we could write:
 \begin{spec}
 suc-tm t A = t [ id ⁺ A ] 
 \end{spec}
 but this is certainly not structurally recursive (and hence rejected
 by Agda's termination checker).
 
-Actually we realize that |id| is a renaming, i.e. it is a substitution
-only containing variables and we can easily define |_⁺v_| for
-renamings. This leads to a structurally recursive definition but we
-also have to repeat the definition of substitutions for renamings.
+Actually, we realize that |id| is a renaming, i.e. it is a substitution
+only containing variables, and we can easily define |_⁺v_| for
+renamings. This leads to a structurally recursive definition, but we
+have to repeat the definition of substitutions for renamings.
 \begin{code}
 data _⊨v_ : Con → Con → Set where
   ε   : Γ ⊨v •
@@ -149,19 +149,18 @@ idv {Γ = Γ ▷ A} =  idv ^v A
 suc-tm t A = t [ idv ⁺v A ]v
 \end{code}
 
-This may not sound too bad: To obtain structural termination we just have to
+This may not sound too bad: to obtain structural termination we just have to
 duplicate a few definitions, but it gets even worse when proving the
-laws. For example, to prove associativity we need to prove functoriality of
-substitution first:
+laws. For example, to prove associativity, we first need to prove functoriality 
+of substitution:
 \begin{spec}
 [∘] : t [ us ∘ vs ] ≡ t [ us ] [ vs ]
 \end{spec}
-Since |t , us , vs| can be variables/renamings or terms/substitutions
-there are in principle eight combinations (though it turns out we can get away 
-with just four). Each time, we must to prove a number of lemmas again in a 
-different setting.
+Since |t, us, vs| can be variables/renamings or terms/substitutions,
+there are in principle eight combinations (though it turns out that four is 
+enough). 
+Each time, we must to prove a number of lemmas again in a different setting.
 
-In the rest of the paper we describe a technique how these definitions
-and the proofs can be
-factored, only relying on the Agda termination checker to validate that
+In the rest of the paper we describe a technique for factoring these definitions
+and the proofs, only relying on the Agda termination checker to validate that
 the recursion is structurally terminating.

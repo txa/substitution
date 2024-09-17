@@ -15,9 +15,9 @@ open import subst public
 \section{Proving the laws}
 \label{sec:proving-laws}
 
-We now present a formal proof of the categorical laws proving each
+We now present a formal proof of the categorical laws, proving each
 lemma only once while only using structural induction. Indeed the
-termination isn't completely trivial but inferred by the termination
+termination isn't completely trivial but is still inferred by the termination
 checker.
 
 \subsection{The right identity law}
@@ -31,9 +31,8 @@ The main lemma is the identity law for the substitution functor:
 \begin{code}
 [id] : x [ id ] ≡ x
 \end{code}
-To prove the successor case we need naturality of |suc[ q ]| applied to a 
-variable, which can be shown by a
-simple induction over said variable:
+To prove the successor case, we need naturality of |suc[ q ]| applied to a 
+variable, which can be shown by simple induction over said variable:
 \footnote{We are using the naming conventions introduced in sections
   \ref{sec:naive-approach} and \ref{sec:fact-with-sorts}, e.g.
   |i : Γ ∋ A|.}
@@ -62,11 +61,11 @@ The identity law is now easily provable by structural induction:
 [id] {x = ƛ t} =
    cong ƛ_ ([id] {x = t})
 \end{code}
-Note that the |ƛ_|-case is easy here: we need the law to hold for
-|t :  Γ , A ⊢[ T ] B| but this is still covered by the inductive hypothesis 
+Note that the |ƛ_| case is easy here: we need the law to hold for
+|t :  Γ , A ⊢[ T ] B|, but this is still covered by the inductive hypothesis 
 because |id {Γ = Γ , A}  =  id ^ A|.
 
-This is the first time we use Agda's syntax for equational derivations.
+Note also that is the first time we use Agda's syntax for equational derivations.
 This is just syntactic sugar for constructing an equational
 derivation using transitivity and reflexivity, exploiting Agda's
 flexible syntax. Here |e ≡⟨ p ⟩ e'| means that |p| is a proof of
@@ -74,7 +73,7 @@ flexible syntax. Here |e ≡⟨ p ⟩ e'| means that |p| is a proof of
 means that |e| and |e'| are definitionally equal (this corresponds to
 |e ≡⟨ refl ⟩ e'| and is just used to make the proof more
 readable).  The proof is terminated with |∎| which inserts |refl|.
-We make heavy use of congruence |cong f : a ≡ b → f a ≡ f b|
+We also make heavy use of congruence |cong f : a ≡ b → f a ≡ f b|
 and a version for binary functions
 |cong₂ g : a ≡ b → c ≡ d → g a c ≡ g b d|.
 
@@ -127,7 +126,7 @@ implement our desired left-identity law by instantiating this unused sort with
 |V|.
 \footnote{Alternatively, we could extend sort coercions, |tm⊑|, to 
 renamings/substitutions. The proofs end up a bit clunkier this way 
-(requiring explicit insertion and removal of these coercions).}
+(requiring explicit insertion and removal of these extra coercions).}
 
 \begin{code}
 id∘′ : Sort → {xs : Γ ⊨[ r ] Δ}
@@ -146,7 +145,7 @@ id∘ = id∘′ V
 \end{code}
 %endif
 
-To prove it we need the $\beta$-laws for |zero[_]| and |_⁺_|:
+To prove it, we need the $\beta$-laws for |zero[_]| and |_⁺_|:
 \begin{code}
 zero[] : zero[ q ] [ xs , x ] ≡ tm⊑ (⊑⊔r {q = q}) x 
 ⁺∘ : xs ⁺ A  ∘ (ys , x) ≡ xs ∘ ys
@@ -210,7 +209,7 @@ the sort decreasing.
 \label{sec:associativity}
 We finally get to the proof of the second functor law
 (|[∘] : x [ xs ∘ ys ] ≡ x [ xs ] [ ys ]|), the main lemma for
-associativity. The main obstacle is that for the |ƛ_| case we need the
+associativity. The main obstacle is that for the |ƛ_| case; we need the
 second functor law for context extension:
 \begin{code}
 ^∘ :  {xs : Γ ⊨[ r ] Θ}{ys : Δ ⊨[ s ] Γ}{A : Ty}
@@ -258,7 +257,7 @@ From here we prove associativity by a fold:
 \end{code}
 
 However, we are not done yet. We still need to prove
-the second functor law for |^| (|^∘|). It turns out that this depends on
+the second functor law for |_^_| (|^∘|). It turns out that this depends on
 the naturality of weakening:
 \begin{code}
 ⁺-nat∘ : xs ∘ (ys ⁺ A) ≡ (xs ∘ ys) ⁺ A  

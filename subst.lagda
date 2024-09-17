@@ -44,12 +44,12 @@ data Sort : Set where
  \end{spec}
 but this is not exactly what we want because we want Agda to know that
 the sort of variables |V| is \emph{smaller} than the sort of terms
-|T| (following intuition that because weakening variables is trivial but to 
+|T| (following intuition that variable weakening is trivial, but to 
 weaken a term we must construct a renaming). 
 Agda's termination checker only knows about the structural
-orderings. With following definition, we
-can make |V| structurally smaller than |T|, while maintaining that |Sort| has
-only two elements.
+orderings. With the following definition, we
+can make |V| structurally smaller than |T>V V isV|, while maintaining that 
+|Sort| has only two elements.
 \begin{code}
 data Sort : Set 
 data IsV : Sort → Set
@@ -91,7 +91,7 @@ data _⊢[_]_ : Con → Sort → Ty → Set where
 While almost identical to the previous definition (|Γ ⊢[ V ] A| corresponds to
 |Γ ∋ A| and |Γ  ⊢[ T ]  A| to |Γ ⊢ A|)
 we can now
-parametrize all definitions and theorems explicitly. As a first step
+parametrize all definitions and theorems explicitly. As a first step,
 we can generalize renamings and substitutions (|xs, ys, zs|):
 \begin{code}
 data _⊨[_]_ : Con → Sort → Con → Set where
@@ -109,14 +109,14 @@ variable
 %endif
 
 To account for the non-uniform behaviour of substitution and
-composition (the result is |V| only of both inputs are |V|) we define
+composition (the result is |V| only if both inputs are |V|) we define
 a least upper bound on |Sort|:
 \begin{code}
 _⊔_ : Sort → Sort → Sort
 V ⊔ r  =  r
 T ⊔ r  =  T
 \end{code}
-We also need the order as a relation for inserting coercions when necessary:
+We also need this order as a relation, for inserting coercions when necessary:
 \begin{code}
 data _⊑_ : Sort → Sort → Set where
   rfl : s ⊑ s
@@ -155,8 +155,8 @@ v⊑ {T} = v⊑t
 \end{code}
 %endif
 
-To improve readability we turn the equations (|⊔⊔|, |⊔v|) into
-rewrite rules: by declaring
+To improve readability we turn the equations ($\sqcup\sqcup$, 
+$\sqcup\mathrm{v}$) into rewrite rules: by declaring
 
 \begin{spec}
 {-# \Keyword{REWRITE} $\sqcup\!\sqcup \; \sqcup\mathrm{v} \;$ #-}
@@ -175,7 +175,7 @@ checker.
   Type Theory.}
 The order gives rise to a functor which is witnessed by
 \begin{code}
-tm⊑ : q ⊑ s → Γ ⊢[ q ] A → Γ ⊢[ s ]  A
+tm⊑ : q ⊑ s → Γ ⊢[ q ] A → Γ ⊢[ s ] A
 tm⊑ rfl x = x
 tm⊑ v⊑t i = ` i
 \end{code}
@@ -193,8 +193,8 @@ zero    [ xs , x ]   =  x
 (t · u) [ xs ]       =  (t [ xs ]) · (u [ xs ])
 (ƛ t)   [ xs ]       =  ƛ (t [ xs ^ _ ]) 
 \end{code}
-To take care of the fact that substitution will only return a variable
-if both inputs are variables / renamings we use |_⊔_| here. We also
+We use |_⊔_| here to take care of the fact that substitution will only return a 
+variable if both inputs are variables / renamings. We also
 need to use |tm⊑| to take care of the two cases when substituting for
 a variable. We can also define |id| using |_^_|:
 \begin{spec}
@@ -226,7 +226,7 @@ id = id-poly
 \end{code}
 %endif
 
-To define |_^_| we need parametric versions of |zero|, |suc| and
+To define |_^_|, we need parametric versions of |zero|, |suc| and
 |suc*|. |zero| is very easy:
 
 \begin{code}
@@ -236,7 +236,7 @@ zero[ T ]      =  ` zero
 \end{code}
 
 However, |suc| is more subtle since the case for |T| depends on its
-fold for substitutions (|_⁺_|):
+fold over substitutions (|_⁺_|):
 \begin{code}
 _⁺_ : Γ ⊨[ q ] Δ → (A : Ty) → Γ ▷ A ⊨[ q ] Δ
 
