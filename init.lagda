@@ -1222,7 +1222,7 @@ The remaining cases correspond to the CwF laws, which must hold
 for whatever type family we eliminate into in order to retain congruence of 
 |_≡_|. 
 In our completeness proof, we are eliminating into equations, and so all of 
-these cases become higher-dimensional identities (demanding we equate different 
+these cases are higher identities (demanding we equate different 
 proof trees for completeness, instantiated with the LHS/RHS 
 terms/substitutions). 
 
@@ -1232,7 +1232,7 @@ the sledgehammer of set truncation (which prevents eliminating the initial
 CwF into any non-set).
 
 As we are working in vanilla Agda, we'll take a simpler approach, and rely on 
-UIP (|duip : p ≡[ r ]≡ q|).
+UIP (|duip : ∀ {p : x ≡ y} {q : z ≡ w} {r} → p ≡[ r ]≡ q|).
 \footnote{Note that proving this form of (dependent) UIP relies 
 on type constructor injectivity (specifically, injectivity of |_≡_|). 
 We could use a weaker version taking an additional proof of |x ≡ z|, 
