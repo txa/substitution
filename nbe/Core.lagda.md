@@ -423,7 +423,7 @@ id⨾ x = refl
 ```
 data _~_ : Γ ⊢ A → Γ ⊢ A → Set where
 
-  η     : L ~ ƛ ((L ↑ _) · ` zero)
+  η     : L ~ ƛ ((L ↑ A) · ` zero)
   β     : (ƛ N) · M ~ N [ id ▷ M ]
 
   ƛ_    : N ~ N′ → (ƛ N) ~ (ƛ N′)
@@ -433,4 +433,30 @@ data _~_ : Γ ⊢ A → Γ ⊢ A → Set where
   ~sym  : M ~ N → N ~ M
   ~tran : L ~ M → M ~ N → L ~ N
 ```
+
+Equivalence is preserved by renaming
+```
+lift : Δ ⊇ Γ → Δ ⊨ Γ
+lift ρ x = ` ρ x
+
+lemma : N [ id ▷ M ] [ ρ ]ʳ ≡ N [ ρ ^ʳ _ ]ʳ [ id ▷ M [ ρ ]ʳ ]
+lemma {N = N} {M = M} {ρ = ρ} =
+  begin
+    N [ id ▷ M ] [ ρ ]ʳ
+  ≡⟨ [][]ʳ (λ{ zero → refl ; (suc x) → refl}) N ⟩
+    N [ lift ρ ▷ M [ ρ ]ʳ ]
+  ≡⟨ []ʳ[] (λ{ zero → refl ; (suc x) → refl }) N ⟨
+    N [ ρ ^ʳ _ ]ʳ [ id ▷ M [ ρ ]ʳ ]
+  ∎
+
+~preserve : M ~ N → M [ ρ ]ʳ ~ N [ ρ ]ʳ
+~preserve {ρ = ρ} (η {A = A} {L = L}) rewrite ↑[^ʳ]ʳ {M = L} {A = A} {ρ = ρ} = η
+~preserve {ρ = ρ} (β {N = N} {M = M}) rewrite lemma {N = N} {M = M} {ρ = ρ} = β
+~preserve (ƛ N~N′) = ƛ ~preserve N~N′
+~preserve (L~L′ · M~M′) = ~preserve L~L′ · ~preserve M~M′
+~preserve ~refl = ~refl
+~preserve (~sym M~N) = ~sym (~preserve M~N)
+~preserve (~tran L~M M~N) = ~tran (~preserve L~M) (~preserve M~N)
+```
+
 
