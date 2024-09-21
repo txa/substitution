@@ -17,6 +17,12 @@ open import Core
 open import Nbe
 ```
 
+# Operators
+```
+infix 4  _≈_
+```
+
+
 # Category theory
 
 Category
@@ -51,3 +57,33 @@ record Nat {C D : Category}(F G : Functor C D) : Set₁ where
     ψ   : ∀ {I} → morph D (Obj⇒ F I) (Obj⇒ G I)
     nat : ∀ {I J}{f : morph C I J} → _∘_ D ψ (morph⇒ F f) ≡ _∘_ D (morph⇒ G f) ψ
 ```
+
+# Completeness
+
+```
+variable
+  γ : ⟦ Γ ⟧ᶜ Δ
+  v w : ⟦ A ⟧ᵀ Γ
+  f : ⟦ A ⇒ B ⟧ᵀ Γ
+```
+
+```
+complete : (M : Γ ⊢ A) → M ~ ⌜ nf M ⌝nf
+complete = {!!}
+```
+
+Kripke logical relation for completeness
+```
+_≈_ : Γ ⊢ A → ⟦ A ⟧ᵀ Γ → Set
+_≈_ {Γ = Γ} {A = ι} M v  =  M ~ ⌜ v ⌝nf
+_≈_ {Γ = Γ} {A = A ⇒ B} L f  =  ∀ {Δ} (ρ : Δ ⊇ Γ) {M} {v} → (L [ ρ ]ʳ) · M ≈ f ρ v
+```
+
+Extension of the above to substitutions
+```
+data _≈ᶜ_ {Δ} : ∀ {Γ} → Δ ⊨ Γ → ⟦ Γ ⟧ᶜ Δ → Set where
+  ∅   : ∀ {σ : Δ ⊨ ∅} → σ ≈ᶜ tt
+  _,_ : ∀ {Γ A} {σ : Δ ⊨ Γ} {M : Δ ⊢ A} {γ : ⟦ Γ ⟧ᶜ Δ} {v : ⟦ A ⟧ᵀ Δ}
+          → σ ≈ᶜ γ → M ≈ v → (σ ▷ M) ≈ᶜ (γ , v)
+```
+
