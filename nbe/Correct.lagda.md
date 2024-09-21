@@ -82,7 +82,7 @@ _≈_ {Γ = Γ} {A = A ⇒ B} L f  =  ∀ {Δ} (ρ : Δ ⊇ Γ) {M} {v} → (L [
 Extension of the above to substitutions
 ```
 data _≈ᶜ_ {Δ} : ∀ {Γ} → Δ ⊨ Γ → ⟦ Γ ⟧ᶜ Δ → Set where
-  ∅   : ∀ {σ : Δ ⊨ ∅} → σ ≈ᶜ tt
+  ∅   : nil ≈ᶜ tt
   _,_ : ∀ {Γ A} {σ : Δ ⊨ Γ} {M : Δ ⊢ A} {γ : ⟦ Γ ⟧ᶜ Δ} {v : ⟦ A ⟧ᵀ Δ}
           → σ ≈ᶜ γ → M ≈ v → (σ ▷ M) ≈ᶜ (γ , v)
 ```
@@ -90,10 +90,11 @@ data _≈ᶜ_ {Δ} : ∀ {Γ} → Δ ⊨ Γ → ⟦ Γ ⟧ᶜ Δ → Set where
 The logical relation is preserved under substitution
 ```
 preserve-value : (ρ : Δ ⊇ Γ) {M : Γ ⊢ A} {v : ⟦ A ⟧ᵀ Γ} → M ≈ v → M [ ρ ]ʳ ≈ weaken-value ρ v
-preserve-value {A = ι} ρ M≈v = {!!}
-preserve-value {A = A ⇒ B} ρ L≈f = {!!}
+preserve-value {A = ι} ρ {M} {v} M≈v rewrite sym (comm-nf ρ v) = ~preserve {ρ = ρ} M≈v
+preserve-value {A = A ⇒ B} ρ {L} {f} L≈f ξ rewrite []ʳ[]ʳ {ρ = ρ} {ξ = ξ} (λ x → refl) L = L≈f (ρ ʳ⨾ʳ ξ)
 
 preserve-env : (ρ : Δ ⊇ Γ) {σ : Γ ⊨ Θ} {γ : ⟦ Θ ⟧ᶜ Γ} → σ ≈ᶜ γ → (σ ⨾ʳ ρ) ≈ᶜ weaken-env ρ γ
-preserve-env = {!!}
+preserve-env ρ ∅ = {!!}
+preserve-env ρ (σ≈ᶜγ , M≈v) = {!? , ?!}
 ```
 

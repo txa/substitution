@@ -9,7 +9,7 @@ Philip Wadler, 8 Sep 2024
 ## Preliminaries
 
 ```
-{-# OPTIONS --rewriting #-}
+{-# OPTIONS --rewriting --no-forcing #-}
 module Core where
 
 open import Agda.Builtin.Equality
@@ -280,8 +280,11 @@ _[_] : Γ ⊢ A → Δ ⊨ Γ → Δ ⊢ A
 (L · M) [ σ ] = (L [ σ ]) · (M [ σ ])
 ```
 
-Cons
+Nil and Cons
 ```
+nil : Δ ⊨ ∅
+nil {A = A} ()
+
 _▷_ : Δ ⊨ Γ → Δ ⊢ A → Δ ⊨ Γ , A
 (σ ▷ M) zero  =  M
 (σ ▷ M) (suc x)  =  σ x
@@ -337,6 +340,15 @@ Composition
 ```
 _⨾ʳ_ : Θ ⊨ Γ → Δ ⊇ Θ → Δ ⊨ Γ
 (σ ⨾ʳ ξ) x  =  (σ x) [ ξ ]ʳ
+```
+
+Lemmas with nil and cons
+```
+postulate
+  extensionality : ∀ {σ τ : Δ ⊨ Γ} → σ == τ → _≡_ {A = Δ ⊨ Γ} σ τ
+
+nil⨾ʳ : nil ⨾ʳ ρ ≡ nil
+nil⨾ʳ {ρ = ρ} = extensionality {σ = nil ⨾ʳ ρ} {τ = nil} (λ{()})
 ```
 
 Instantiate twice
