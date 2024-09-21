@@ -8,7 +8,7 @@ module Nbe where
 
 open import Agda.Builtin.FromNat
 import Relation.Binary.PropositionalEquality as Eq
-open Eq using (_≡_; refl; cong; sym)
+open Eq using (_≡_; refl; cong; cong₂; sym)
 open Eq.≡-Reasoning using (begin_; step-≡-∣; step-≡-⟩; _∎)
 open import Data.Unit using (⊤; tt)
 open import Data.Product using (_×_) renaming (_,_ to infixl 4 _,_)
@@ -76,6 +76,18 @@ ren-nf ρ (ƛ N) = ƛ (ren-nf (ρ ^ʳ _) N)
 
 ren-ne ρ (` x) = ` (ρ x)
 ren-ne ρ (L · M) = (ren-ne ρ L) · (ren-nf ρ M)
+```
+
+Renaming commutes with erasure
+```
+comm-nf : ∀ (ρ : Δ ⊇ Γ) (M : Γ ⊢nf A) → ⌜ M ⌝nf [ ρ ]ʳ ≡ ⌜ ren-nf ρ M ⌝nf
+comm-ne : ∀ (ρ : Δ ⊇ Γ) (M : Γ ⊢ne A) → ⌜ M ⌝ne [ ρ ]ʳ ≡ ⌜ ren-ne ρ M ⌝ne
+
+comm-nf ρ (′ M) = comm-ne ρ M
+comm-nf ρ (ƛ N) = cong ƛ_ (comm-nf (ρ ^ʳ _) N)
+
+comm-ne ρ (` x)   = refl
+comm-ne ρ (L · M) = cong₂ _·_ (comm-ne ρ L) (comm-nf ρ M)
 ```
 
 Interpretation of types and contexts

@@ -87,3 +87,13 @@ data _≈ᶜ_ {Δ} : ∀ {Γ} → Δ ⊨ Γ → ⟦ Γ ⟧ᶜ Δ → Set where
           → σ ≈ᶜ γ → M ≈ v → (σ ▷ M) ≈ᶜ (γ , v)
 ```
 
+The logical relation is preserved under substitution
+```
+preserve-value : (ρ : Δ ⊇ Γ) {M : Γ ⊢ A} {v : ⟦ A ⟧ᵀ Γ} → M ≈ v → M [ ρ ]ʳ ≈ weaken-value ρ v
+preserve-value {A = ι} ρ M≈v = {!!}
+preserve-value {A = A ⇒ B} ρ L≈f = {!!}
+
+preserve-env : (ρ : Δ ⊇ Γ) {σ : Γ ⊨ Θ} {γ : ⟦ Θ ⟧ᶜ Γ} → σ ≈ᶜ γ → (σ ⨾ʳ ρ) ≈ᶜ weaken-env ρ γ
+preserve-env = {!!}
+```
+
