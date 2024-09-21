@@ -40,9 +40,9 @@ _ = 42
 Operator precedence
 ```
 infix  3  _∋_ _⊢_ _⊇_ _⊨_
-infix  4  _==ʳ_ _==_
+infix  4  _==ʳ_ _==_ _~_
 infixl 4  _,_
-infixl 5  _^ʳ_ _↑_ _^_
+infixl 5  _^ʳ_ _↑_ _^_ _▷_
 infixr 5  _ʳ⨾ʳ_ _ʳ⨾_ _⨾ʳ_ _⨾_
 infixr 5  _⇒_
 infix  5  ƛ_
@@ -106,7 +106,7 @@ data _⊢_ : Con -> Ty -> Set where
 
 variable
   x y z : Γ ∋ A
-  L M N : Γ ⊢ A
+  L M N L′ M′ N′ : Γ ⊢ A
 ```
 
 natural number literals as DeBruijn indices
@@ -280,6 +280,13 @@ _[_] : Γ ⊢ A → Δ ⊨ Γ → Δ ⊢ A
 (L · M) [ σ ] = (L [ σ ]) · (M [ σ ])
 ```
 
+Cons
+```
+_▷_ : Δ ⊨ Γ → Δ ⊢ A → Δ ⊨ Γ , A
+(σ ▷ M) zero  =  M
+(σ ▷ M) (suc x)  =  σ x
+```
+
 Identity
 ```
 id : Γ ⊨ Γ
@@ -411,5 +418,19 @@ id⨾ : id ⨾ τ == τ
 id⨾ x = refl
 ```
 
+# Beta and eta equivalence
 
+```
+data _~_ : Γ ⊢ A → Γ ⊢ A → Set where
+
+  η     : L ~ ƛ ((L ↑ _) · ` zero)
+  β     : (ƛ N) · M ~ N [ id ▷ M ]
+
+  ƛ_    : N ~ N′ → (ƛ N) ~ (ƛ N′)
+  _·_   : L ~ L′ → M ~ M′ → L · M ~ L′ · M′
+
+  ~refl : M ~ M
+  ~sym  : M ~ N → N ~ M
+  ~tran : L ~ M → M ~ N → L ~ N
+```
 

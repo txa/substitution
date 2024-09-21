@@ -97,25 +97,19 @@ weaken-value {A = A ⇒ B} ρ f = λ ρ′ v → f (ρ ʳ⨾ʳ ρ′) v
 
 weaken-env : Δ ⊇ Γ -> ⟦ Θ ⟧ᶜ Γ -> ⟦ Θ ⟧ᶜ Δ
 weaken-env {Θ = ∅}     ρ tt      = tt
-weaken-env {Θ = Θ , A} ρ (η , v) = weaken-env {Θ = Θ} ρ η , weaken-value {A = A} ρ v
+weaken-env {Θ = Θ , A} ρ (γ , v) = weaken-env {Θ = Θ} ρ γ , weaken-value {A = A} ρ v
 ```
 
 Interpretation of variables and terms
 ```
 ⟦_⟧ⱽ : Γ ∋ A → ⟦ Γ ⟧ᶜ Δ → ⟦ A ⟧ᵀ Δ
 ⟦ zero ⟧ⱽ  (_ , v) = v
-⟦ suc x ⟧ⱽ (η , _) = ⟦ x ⟧ⱽ η
+⟦ suc x ⟧ⱽ (γ , _) = ⟦ x ⟧ⱽ γ
 
 ⟦_⟧ : Γ ⊢ A -> ⟦ Γ ⟧ᶜ Δ -> ⟦ A ⟧ᵀ Δ
-⟦_⟧ (` x) η = ⟦ x ⟧ⱽ η
-⟦_⟧ (ƛ N) η = λ ρ v → ⟦ N ⟧ (weaken-env ρ η , v)
-⟦_⟧ (L · M) η = ⟦ L ⟧ η idʳ (⟦ M ⟧ η)
-```
-
-Evaluator for closed terms
-```
-eval : ∅ ⊢ A -> ⟦ A ⟧ᵀ ∅
-eval M = ⟦ M ⟧ tt
+⟦_⟧ (` x) γ = ⟦ x ⟧ⱽ γ
+⟦_⟧ (ƛ N) γ = λ ρ v → ⟦ N ⟧ (weaken-env ρ γ , v)
+⟦_⟧ (L · M) γ = ⟦ L ⟧ γ idʳ (⟦ M ⟧ γ)
 ```
 
 Reify and reflect
@@ -130,11 +124,19 @@ reflect {A = ι}     M = ′ M
 reflect {A = A ⇒ B} L = λ ρ v → reflect (ren-ne ρ L · reify v)
 ```
 
-Normalisation by evaluation
+Reflect environment
 ```
-norm : ∅ ⊢ A -> ∅ ⊢nf A
-norm t = reify (eval t)
+reflectᶜ : ⟦ Γ ⟧ᶜ Γ
+reflectᶜ {∅} = tt
+reflectᶜ {Γ , A} = weaken-env suc (reflectᶜ {Γ}) , reflect (` zero)
 ```
+
+Normalisation-by-evaluation, open terms
+```
+nf : Γ ⊢ A -> Γ ⊢nf A
+nf M = reify (⟦ M ⟧ reflectᶜ)
+```
+
 
 Church numerals
 ```
@@ -162,10 +164,10 @@ one-nf = ƛ (ƛ (′ ` 1 · (′ ` 0)))
 four-nf : ∅ ⊢nf Ch ι
 four-nf = ƛ ƛ (′ ` 1 · (′ ` 1 · (′ ` 1 · (′ ` 1 · (′ ` 0)))))
 
-_ : norm one ≡ one-nf
+_ : nf one ≡ one-nf
 _ = refl
 
-_ : norm four ≡ four-nf
+_ : nf four ≡ four-nf
 _ = refl
 ```
 
