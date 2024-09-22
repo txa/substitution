@@ -14,6 +14,9 @@ paper.tex : paper.lagda naive.lagda subst.lagda laws.lagda init.lagda lib.fmt
 	latexmk -pdf $<
 #	latexmk -pdf -pdflatex="xelatex" paper.tex
 
+supplement.zip : README.txt naive.lagda subst.lagda laws.lagda init.lagda
+	zip supplement.zip README.txt naive.lagda subst.lagda laws.lagda init.lagda
+
 clean:
 	rm *.tex || true
 	rm *.aux || true
@@ -23,3 +26,4 @@ clean:
 	rm *.out || true
 	rm *.ptb || true
 	rm *.pdf || true
+	rm *.zip || true
