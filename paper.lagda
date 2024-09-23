@@ -1,4 +1,5 @@
-\documentclass[sigplan,10pt,natbib,anonymous,review]{acmart}
+\documentclass[sigplan,10pt,natbib]{acmart}
+%\documentclass[sigplan,10pt,natbib,anonymous,review]{acmart}
 \settopmatter{printfolios=true,printccs=false,printacmref=false}
 \citestyle{acmauthoryear}
 %\usepackage{tipa}
