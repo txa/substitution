@@ -109,6 +109,12 @@ V⊑ {q = T} = V⊑T
 ⊔-idem {q = T} = refl
 
 {-# REWRITE ⊔⊔ ⊔V ⊔-idem #-}
+
+⊑⊔-idem : ⊑⊔₁ {r = q} {q = q} ≡ rfl {q = q}
+⊑⊔-idem {q = V} = refl
+⊑⊔-idem {q = T} = refl
+
+{-# REWRITE ⊑⊔-idem #-}
 ```
 
 Variables and terms
@@ -467,6 +473,9 @@ Alternative way to compute _⁺_
   ≡⟨ cong (λ □ → □ ⁺ A) (⨾id φ) ⟩
     φ ⁺ A
   ∎
+
+⁺-def : (φ : Δ ⊨[ q ] Γ) (A : Ty) → φ ⁺ A ≡ φ ⨾ ⤊
+⁺-def φ A = sym (⨾⤊ φ A)
 ```
 
 Alternative way to compute _^_
@@ -498,7 +507,7 @@ Alternative way to compute _^_
 ```
 
 eta law
-
+```
 η : (φ : Δ ⊨[ q ] Γ , A) → ((⤊ ⨾ φ) , Zero {q = q} [ φ ]) ≡ φ
 η {q = q} (φ , P) =
   begin
@@ -506,5 +515,35 @@ eta law
   ≡⟨ cong₂ _,_ (⤊⨾, φ P) (Zero[] {q = q} φ P) ⟩
     φ , P
   ∎
+```
+
+Autosubst rewrites
+```
+{-# REWRITE id⨾ ⨾id ⨾⨾ [id] [][] ⤊⨾, Zero[] Suc[] ⁺-def #-}
+```
+
+## Special cases of substitution
+
+Substitute for the last variable in the environment
+(de Bruijn index zero).
+
+_[_]₀ :
+    (N : Γ , A ⊢ B)
+    (M : Γ ⊢ A)
+  → ----------------
+     Γ ⊢ B
+N [ M ]₀ = N [ id , M ]
+
+This is exactly what we need for beta reduction.
+
+Substitute for the last but one variable in the environment
+(de Bruijn index one).
+
+_[_]₁ :
+    (N : Γ , A , B ⊢ C)
+    (M : Γ ⊢ A)
+  → -------------------
+     Γ , B ⊢ C
+N [ M ]₁ = N [ (id , M) ⨾ ⤊ , Zero ]
 
 
