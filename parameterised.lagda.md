@@ -294,7 +294,7 @@ Right identity
 
 Functor law (signature)
 ```
-[⨾] : (M : Γ ⊢[ q ] A) (φ : Θ ⊨[ r ] Γ) (ψ : Δ ⊨[ s ] Θ)
+[][] : (M : Γ ⊢[ q ] A) (φ : Θ ⊨[ r ] Γ) (ψ : Δ ⊨[ s ] Θ)
         → M [ φ  ] [ ψ ] ≡ M [ φ ⨾ ψ ]
 ```
 
@@ -313,21 +313,22 @@ Suc[] : (P : Γ ⊢[ q ] A) (φ : Δ ⊨[ r ] Γ) (Q : Δ ⊢[ r ] B)
 
 Left identity
 ```
-id⨾′ : (s : Sort) → (φ : Δ ⊨[ q ] Γ) → id ⨾ φ ≡ φ
-id⨾′ s ∅ = refl
-id⨾′ s (φ , P) = cong₂ _,_
+id⨾′ : {r : Sort} → (φ : Δ ⊨[ q ] Γ) → id ⨾ φ ≡ φ
+
+id⨾ : (φ : Δ ⊨[ q ] Γ) → id ⨾ φ ≡ φ
+id⨾ = id⨾′ {r = V}
+{-# INLINE id⨾ #-}
+
+id⨾′ ∅ = refl
+id⨾′ (φ , P) = cong₂ _,_
   (begin
     (id ⁺ _) ⨾ (φ , P)
   ≡⟨ ⁺⨾ id φ P ⟩
     id ⨾ φ
-  ≡⟨ id⨾′ s φ ⟩
+  ≡⟨ id⨾ φ ⟩
     φ
   ∎)
   refl
-
-id⨾ : (φ : Δ ⊨[ q ] Γ) → id ⨾ φ ≡ φ
-id⨾ = id⨾′ V
-{-# INLINE id⨾ #-}
 ```
 
 Beta for Zero, Suc, ⁺ (proved)
@@ -339,7 +340,7 @@ Suc[] {q = V} P φ Q = refl
 Suc[] {q = T} P φ Q =
   begin
     P [ id ⁺ _ ] [ φ , Q ]
-  ≡⟨ [⨾] P (id ⁺ _) (φ , Q) ⟩
+  ≡⟨ [][] P (id ⁺ _) (φ , Q) ⟩
     P [ (id ⁺ _) ⨾ (φ , Q) ]
   ≡⟨ cong (λ □ → P [ □ ]) (⁺⨾ id φ Q)  ⟩
     P [ id ⨾ φ ]
@@ -367,25 +368,25 @@ Context extension for functor law (signature)
 
 Functor law (proof)
 ```
-[⨾] zero (φ , P) ψ = refl
-[⨾] (suc x) (φ , P) ψ = [⨾] x φ ψ
-[⨾] (` x) φ ψ =
+[][] zero (φ , P) ψ = refl
+[][] (suc x) (φ , P) ψ = [][] x φ ψ
+[][] (` x) φ ψ =
   begin
     (lift ⊑T (x [ φ ])) [ ψ ]
   ≡⟨ lift[] (x [ φ ]) ψ ⟩
     lift ⊑T (x [ φ ] [ ψ ])
-  ≡⟨ cong (λ □ → lift ⊑T □) ([⨾] x φ ψ) ⟩
+  ≡⟨ cong (λ □ → lift ⊑T □) ([][] x φ ψ) ⟩
     lift ⊑T (x [ φ ⨾ ψ ])
   ∎
-[⨾] (ƛ_ {A = A} N) φ ψ = cong ƛ_ (
+[][] (ƛ_ {A = A} N) φ ψ = cong ƛ_ (
   begin
     N [ φ ^ A ] [ ψ ^ A ]
-  ≡⟨ [⨾] N (φ ^ A) (ψ ^ A) ⟩
+  ≡⟨ [][] N (φ ^ A) (ψ ^ A) ⟩
     N [ (φ ^ A) ⨾ (ψ ^ A) ]
   ≡⟨ cong (λ □ → N [ □ ]) (⨾^ φ ψ A) ⟩
     N [ (φ ⨾ ψ) ^ A ]
   ∎)
-[⨾] (L · M) φ ψ = cong₂ _·_ ([⨾] L φ ψ) ([⨾] M φ ψ)
+[][] (L · M) φ ψ = cong₂ _·_ ([][] L φ ψ) ([][] M φ ψ)
 ```
 
 Naturality for weakening and instantiation
@@ -403,7 +404,7 @@ Naturality for weakening and instantiation
     M [ (φ ⨾ id) ⁺ A ]
   ≡⟨ cong (λ □ → M [ □ ]) (sym (⨾⁺ φ id A)) ⟩
     M [ φ ⨾ (id ⁺ A) ]
-  ≡⟨ sym ([⨾] M φ (id ⁺ A)) ⟩
+  ≡⟨ sym ([][] M φ (id ⁺ A)) ⟩
     M [ φ ] [ id ⁺ A ]
   ∎
 
@@ -417,7 +418,6 @@ liftZero : (q⊑r : q ⊑ r) → lift q⊑r (Zero {Γ = Γ} {A = A} {q = q}) ≡
 liftZero rfl = refl
 liftZero V⊑T = refl
 ```
-
 
 Context extension for functor law (proof)
 ```
@@ -435,4 +435,5 @@ Context extension for functor law (proof)
   ∎
 ```
 
+Alternative way to compute _⁺_.
 
