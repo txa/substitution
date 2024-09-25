@@ -58,7 +58,7 @@ data Con : Set where
   _,_  : (Γ : Con) (A : Ty) -> Con
 
 variable
-  Γ Δ Θ : Con
+  Γ Δ Θ Φ : Con
 ```
 
 Sort
@@ -104,7 +104,11 @@ V⊑ {q = T} = V⊑T
 ⊔V {q = V} = refl
 ⊔V {q = T} = refl
 
-{-# REWRITE ⊔⊔ ⊔V #-}
+⊔-idem : q ⊔ q ≡ q
+⊔-idem {q = V} = refl
+⊔-idem {q = T} = refl
+
+{-# REWRITE ⊔⊔ ⊔V ⊔-idem #-}
 ```
 
 Variables and terms
@@ -196,7 +200,7 @@ _⊨_ = _⊨[ T ]_
 variable
   ρ ξ ζ : Δ ⊇ Γ
   σ τ υ : Δ ⊨ Γ
-  φ ψ χ : Δ ⊨[ q ] Γ
+  φ ψ θ : Δ ⊨[ q ] Γ
 ```
 
 Instantiate
@@ -435,5 +439,72 @@ Context extension for functor law (proof)
   ∎
 ```
 
-Alternative way to compute _⁺_.
+Associativity
+```
+⨾⨾ : ∀ (φ : Θ ⊨[ q ] Γ) (ψ : Φ ⊨[ r ] Θ) (θ : Δ ⊨ Φ) →
+          (φ ⨾ ψ) ⨾ θ ≡ φ ⨾ (ψ ⨾ θ)
+⨾⨾ ∅ ψ θ = refl
+⨾⨾ (φ , P) ψ θ =
+  begin
+    (((φ ⨾ ψ) ⨾ θ) , ((P [ ψ ]) [ θ ]))
+  ≡⟨ cong₂ _,_ (⨾⨾ φ ψ θ) ([][] P ψ θ) ⟩
+    ((φ ⨾ (ψ ⨾ θ)) , (P [ ψ ⨾ θ ]))
+  ∎
+```
+
+# Relating to the laws in Autosubst paper
+
+Alternative way to compute _⁺_
+```
+⨾⤊ : (φ : Δ ⊨[ q ] Γ) (A : Ty) → φ ⨾ ⤊ ≡ φ ⁺ A
+⨾⤊ φ A =
+  begin
+    φ ⨾ ⤊
+  ≡⟨⟩
+    φ ⨾ (id ⁺ A)
+  ≡⟨ ⨾⁺ φ id A ⟩
+    (φ ⨾ id) ⁺ A
+  ≡⟨ cong (λ □ → □ ⁺ A) (⨾id φ) ⟩
+    φ ⁺ A
+  ∎
+```
+
+Alternative way to compute _^_
+```
+⨾⤊, : (φ : Δ ⊨[ q ] Γ) (A : Ty) → (φ ⨾ ⤊ , Zero) ≡ φ ^ A
+⨾⤊, φ A =
+  begin
+    (φ ⨾ ⤊ , Zero)
+  ≡⟨ cong (λ □ → □ , Zero) (⨾⤊ φ A) ⟩
+    φ ⁺ A , Zero
+  ≡⟨⟩
+    φ ^ A
+  ∎
+```
+
+π₁ law
+```
+⤊⨾, : (φ : Δ ⊨[ q ] Γ) (P : Δ ⊢[ q ] A) → (⤊ ⨾ (φ , P)) ≡ φ
+⤊⨾, φ P =
+  begin
+    (⤊ ⨾ (φ , P))
+  ≡⟨⟩
+    (id ⁺ _) ⨾ (φ , P)
+  ≡⟨ ⁺⨾ id φ P ⟩
+     id ⨾ φ
+  ≡⟨ id⨾ φ ⟩
+    φ
+  ∎
+```
+
+eta law
+
+η : (φ : Δ ⊨[ q ] Γ , A) → ((⤊ ⨾ φ) , Zero {q = q} [ φ ]) ≡ φ
+η {q = q} (φ , P) =
+  begin
+    ((⤊ ⨾ (φ , P)) , (Zero {q = q} [ φ , P ]))
+  ≡⟨ cong₂ _,_ (⤊⨾, φ P) (Zero[] {q = q} φ P) ⟩
+    φ , P
+  ∎
+
 
