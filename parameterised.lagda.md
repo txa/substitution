@@ -313,17 +313,20 @@ Suc[] : (P : Γ ⊢[ q ] A) (φ : Δ ⊨[ r ] Γ) (Q : Δ ⊢[ r ] B)
 
 Left identity
 ```
-id⨾ : (φ : Δ ⊨[ q ] Γ) → id ⨾ φ ≡ φ
-id⨾ ∅ = refl
-id⨾ (φ , P) = cong₂ _,_
+id⨾′ : (s : Sort) → (φ : Δ ⊨[ q ] Γ) → id ⨾ φ ≡ φ
+id⨾′ s ∅ = refl
+id⨾′ s (φ , P) = cong₂ _,_
   (begin
     (id ⁺ _) ⨾ (φ , P)
   ≡⟨ ⁺⨾ id φ P ⟩
     id ⨾ φ
-  ≡⟨ id⨾ φ ⟩
+  ≡⟨ id⨾′ s φ ⟩
     φ
   ∎)
   refl
+
+id⨾ : (φ : Δ ⊨[ q ] Γ) → id ⨾ φ ≡ φ
+id⨾ = id⨾′ V
 {-# INLINE id⨾ #-}
 ```
 
