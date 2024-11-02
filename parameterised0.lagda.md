@@ -1,5 +1,5 @@
 Parameterised development
-Following Substitution with Copy and Paste
+Following: Substitution without Copy and Paste
 
 Philip Wadler, 24 Sep 2024
 ```
@@ -114,8 +114,9 @@ V⊑ {q = T} = V⊑T
 ⊑⊔-idem {q = V} = refl
 ⊑⊔-idem {q = T} = refl
 
-{-# REWRITE ⊑⊔-idem #-}
+-- {-# REWRITE ⊑⊔-idem #-}
 ```
+Last rewrite used to type `Zero[]` in `η`.
 
 Variables and terms
 ```
@@ -128,28 +129,28 @@ _⊢_ = _⊢[ T ]_
 data _⊢[_]_ where
 
   zero :
-      ---------
+      --------------
       Γ , A ⊢[ V ] A
 
   suc  :
       (x : Γ ⊢[ V ] B)
-    → -----------
+    → ----------------
       Γ , A ⊢[ V ] B
 
   `_ :
       (x : Γ ⊢[ V ] A)
-    → -----------
+    → ----------------
       Γ ⊢[ T ] A
 
   ƛ_ :
       (N : Γ , A ⊢[ T ] B)
-    → ---------------
+    → --------------------
       Γ ⊢[ T ] A ⇒ B
 
   _·_ :
       (L : Γ ⊢[ T ] A ⇒ B)
       (M : Γ ⊢[ T ] A)
-    → ---------------
+    → --------------------
       Γ ⊢[ T ] B
 
 variable
