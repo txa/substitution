@@ -510,13 +510,6 @@ Naturality for weakening and instantiation
 ⨾⁺ (φ , P) ψ A = cong₂ _,_ (⨾⁺ φ ψ A) ([⁺] P ψ A)
 ```
 
-Lift Zero
-```
-liftZero : (q⊑r : q ⊑ r) → lift q⊑r (Zero {Γ = Γ} {A = A} {q = q}) ≡ Zero {q = r}
-liftZero rfl = refl
-liftZero V⊑T = refl
-```
-
 Context extension for functor law (proof)
 ```
 ⨾^ {r = r} {s = s} φ ψ A =
@@ -526,7 +519,7 @@ Context extension for functor law (proof)
     ((φ ⁺ A) ⨾ (ψ ^ A)) , Zero {q = r} [ ψ ^ A ]
   ≡⟨ cong₂ _,_ (⁺⨾ φ (ψ ⁺ A) Zero) (Zero[] {q = r} (ψ ⁺ A) (Zero {q = s})) ⟩
     (φ ⨾ (ψ ⁺ A)) , lift (⊑⊔₁ {q = r}) (Zero {q = s})
-  ≡⟨ cong₂ _,_ (⨾⁺ φ ψ A) (liftZero {q = s} (⊑⊔₁ {q = r})) ⟩
+  ≡⟨ cong₂ _,_ (⨾⁺ φ ψ A) (lift-Zero {q = s} (⊑⊔₁ {q = r})) ⟩
     ((φ ⨾ ψ) ⁺ A) , Zero {q = r ⊔ s}
   ≡⟨⟩
     (φ ⨾ ψ) ^ A
