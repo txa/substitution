@@ -112,6 +112,16 @@ V⊑ : V ⊑ q
 V⊑ {q = V} = rfl
 V⊑ {q = T} = V⊑T
 
+⊔V : q ⊔ V ≡ q
+⊔V {q = V} = refl
+⊔V {q = T} = refl
+
+⊔T : q ⊔ T ≡ T
+⊔T {q = V} = refl
+⊔T {q = T} = refl
+
+{-# REWRITE ⊔V ⊔T #-}
+
 ⊑⊔₀ : q ⊑ (q ⊔ r)
 ⊑⊔₀ {q = V} = V⊑
 ⊑⊔₀ {q = T} = rfl
@@ -124,21 +134,21 @@ V⊑ {q = T} = V⊑T
 ⊔⊔ {q = V} = refl
 ⊔⊔ {q = T} = refl
 
-⊔V : q ⊔ V ≡ q
-⊔V {q = V} = refl
-⊔V {q = T} = refl
-
 ⊔-idem : q ⊔ q ≡ q
 ⊔-idem {q = V} = refl
 ⊔-idem {q = T} = refl
 
-{-# REWRITE ⊔⊔ ⊔V ⊔-idem #-}
+{-# REWRITE ⊔⊔ ⊔-idem #-}
 
-⊑⊔-idem : ⊑⊔₁ {r = q} {q = q} ≡ rfl {q = q}
+⊑⊔-idem : ⊑⊔₀ {q = q} {r = q}  ≡ rfl {q = q}
 ⊑⊔-idem {q = V} = refl
 ⊑⊔-idem {q = T} = refl
 
-{-# REWRITE ⊑⊔-idem #-}
+⊑⊔₀-V : ⊑⊔₀ {q = q} {r = V} ≡ rfl
+⊑⊔₀-V {q = V} = refl
+⊑⊔₀-V {q = T} = refl
+
+{-# REWRITE ⊑⊔-idem ⊑⊔₀-V #-}
 
 ⊑→⊔≡ : q ⊑ r → q ⊔ r ≡ r
 ⊑→⊔≡ rfl = refl
@@ -151,8 +161,9 @@ tr : q ⊑ r → r ⊑ s → q ⊑ s
 tr rfl r⊑s = r⊑s
 tr V⊑T rfl = V⊑T
 
-vt : {v⊑t : V ⊑ T} → v⊑t ≡ V⊑T
-vt {V⊑T} = refl
+uniq : (q⊑r q⊑r′ : q ⊑ r) → q⊑r ≡ q⊑r′
+uniq rfl rfl = refl
+uniq V⊑T V⊑T = refl
 ```
 
 Variables and terms
@@ -245,6 +256,14 @@ Promotion
 lift : q ⊑ r → Γ ⊢[ q ] A → Γ ⊢[ r ] A
 lift rfl P = P
 lift V⊑T x = ` x
+
+lift* : q ⊑ r → Γ ⊨[ q ] Δ → Γ ⊨[ r ] Δ
+lift* q⊑r ∅ = ∅
+lift* q⊑r (φ , P) = (lift* q⊑r φ) , (lift q⊑r P)
+
+lift*rfl : (φ : Γ ⊨[ q ] Δ) → lift* rfl φ ≡ φ
+lift*rfl ∅ = refl
+lift*rfl (φ , P) = cong₂ _,_ (lift*rfl φ) refl
 ```
 
 Extension (signature)
@@ -341,16 +360,16 @@ lift-Suc {A = A} V⊑T x =
     ` (x [ id {q = V} ⁺ A ])
   ∎
 
-[id] zero = sym (lift-Zero V⊑)
+[id] {r = r} zero = sym (lift-Zero {q = V} ⊑⊔₀)
 [id] (suc {A = A} x) =
   begin
     x [ id ⁺ A ]
   ≡⟨ [⁺]∋ x id ⟩
     Suc (x [ id ])
   ≡⟨ cong Suc ([id] x) ⟩
-    Suc (lift V⊑ x)
-  ≡⟨ sym (lift-Suc V⊑ x) ⟩
-    lift V⊑ (suc x)
+    Suc (lift ⊑⊔₀ x)
+  ≡⟨ sym (lift-Suc ⊑⊔₀ x) ⟩
+    lift ⊑⊔₀ (suc x)
   ∎
 [id] {r = r} (` x) =
   begin
@@ -359,302 +378,263 @@ lift-Suc {A = A} V⊑T x =
     lift {q = r} ⊑T (lift V⊑ x)
   ≡⟨ lift-lift {r = r} V⊑ ⊑T x ⟩
     lift (tr {r = r} V⊑ ⊑T) x
-  ≡⟨ cong (λ □ → lift □ x) vt ⟩
+  ≡⟨ cong (λ □ → lift □ x) (uniq (tr {r = r} V⊑ ⊑T) V⊑T) ⟩
     ` x
   ∎
 [id] (ƛ N) = cong ƛ_ ([id] N)
 [id] (L · M) = cong₂ _·_ ([id] L) ([id] M)
 ```
 
--- [id] : (q⊑q⊔r : q ⊑ (q ⊔ r)) (P : Γ ⊢[ q ] A) →
---           P [ id {q = r} ] ≡ lift q⊑q⊔r P
--- [id] V⊑T zero = refl
--- [id] V⊑T (suc x) =
---   begin
---     (suc x) [ id ]
---   ≡⟨⟩
---     x [ id ⁺ _ ]
---   ≡⟨ [⁺]∋ x id ⟩
---     Suc (x [ id ])
---   ≡⟨ cong Suc ([id] V⊑T x) ⟩
---     Suc (` x)
---   ≡⟨⟩
---     ` (x [ id {q = V} ⁺ _ ])
---   ≡⟨ cong `_ ([⁺]∋ x id) ⟩
---     ` (suc (x [ id ]))
---   ≡⟨ cong `_ (cong suc ([id] rfl x)) ⟩
---     ` suc x
---   ∎
--- [id] rfl zero    =  refl
--- [id] rfl (suc x) =
---   begin
---     (suc x) [ id ]
---   ≡⟨⟩
---     x [ id ⁺ _ ]
---   ≡⟨ [⁺]∋ x id ⟩
---     suc (x [ id ])
---   ≡⟨ cong suc ([id] rfl x) ⟩
---     suc x
---   ∎
--- [id] rfl (` x)    =  {![id] V⊑T x!}
--- [id] rfl (ƛ N)    =  cong ƛ_ ([id] rfl N)
--- [id] rfl (L · M)  =  cong₂ _·_ ([id] rfl L) ([id] rfl M)
--- -- {-# REWRITE [id] #-}
--- ```
+Right identity
+```
+⨾id : (φ : Δ ⊨[ q ] Γ) → φ ⨾ id {q = r} ≡ lift* (⊑⊔₀ {q = q} {r = r}) φ
+⨾id ∅                =  refl
+⨾id {q = q} (φ , P)  =  cong₂ _,_ (⨾id φ) ([id] P)
+```
 
--- -- Right identity
--- -- ```
--- -- ⨾id : (φ : Δ ⊨[ q ] Γ) → φ ⨾ id {q = q} ≡ φ
--- -- ⨾id ∅        =  refl
--- -- ⨾id (φ , P)  =  cong₂ _,_ (⨾id φ) [id] ⊑⊔ P
--- -- ```
+Functor law (signature)
+```
+[][] : (M : Γ ⊢[ q ] A) (φ : Θ ⊨[ r ] Γ) (ψ : Δ ⊨[ s ] Θ)
+        → M [ φ  ] [ ψ ] ≡ M [ φ ⨾ ψ ]
+```
 
--- -- Functor law (signature)
--- -- ```
--- -- [][] : (M : Γ ⊢[ q ] A) (φ : Θ ⊨[ r ] Γ) (ψ : Δ ⊨[ s ] Θ)
--- --         → M [ φ  ] [ ψ ] ≡ M [ φ ⨾ ψ ]
--- -- ```
+Beta for Zero, Suc, ⁺ (signatures)
+```
+Zero[] : (φ : Δ ⊨[ r ] Γ) (Q : Δ ⊢[ r ] B)
+           → Zero {q = q} [ (φ , Q) ] ≡ lift (⊑⊔₁ {q = q})  Q
 
--- -- Beta for Zero, Suc, ⁺ (signatures)
--- -- ```
--- -- Zero[]′ : (φ : Δ ⊨[ q ] Γ) (Q : Δ ⊢[ q ] B)
--- --             → Zero {q = q} [ φ , Q ] ≡ Q
+Suc[] : (P : Γ ⊢[ q ] A) (φ : Δ ⊨[ r ] Γ) (Q : Δ ⊢[ r ] B)
+           → (Suc {q = q} P) [ (φ , Q) ] ≡ P [ φ ]
 
--- -- Zero[] : (φ : Δ ⊨[ r ] Γ) (Q : Δ ⊢[ r ] B)
--- --            → Zero {q = q} [ (φ , Q) ] ≡ lift (⊑⊔₁ {r = r} {q = q})  Q
+⁺⨾ : (φ : Θ ⊨[ q ] Γ) (ψ : Δ ⊨[ r ] Θ) (Q : Δ ⊢[ r ] A)
+          → (φ ⁺ A) ⨾ (ψ , Q) ≡ φ ⨾ ψ
+```
 
--- -- Suc[] : (P : Γ ⊢[ q ] A) (φ : Δ ⊨[ r ] Γ) (Q : Δ ⊢[ r ] B)
--- --            → (Suc {q = q} P) [ (φ , Q) ] ≡ P [ φ ]
+Left identity
+```
+id⨾ : (φ : Δ ⊨[ r ] Γ) → id {q = q} ⨾ φ ≡ lift* (⊑⊔₁ {q = q}) φ
+id⨾ ∅ = refl
+id⨾ {r = r} {q = q} (φ , P) = cong₂ _,_
+  (begin
+    (id ⁺ _) ⨾ (φ , P)
+  ≡⟨ ⁺⨾ id φ P ⟩
+    id ⨾ φ
+  ≡⟨ id⨾ φ ⟩
+    lift* (⊑⊔₁ {r = r} {q = q}) φ
+  ∎)
+  (Zero[] {r = r} {q = q} φ P)
+```
 
--- -- ⁺⨾ : (φ : Θ ⊨[ q ] Γ) (ψ : Δ ⊨[ r ] Θ) (Q : Δ ⊢[ r ] A)
--- --           → (φ ⁺ A) ⨾ (ψ , Q) ≡ φ ⨾ ψ
--- -- ```
+Beta for Zero, Suc, ⁺ (proved)
+```
+Zero[] {q = V} φ Q = refl
+Zero[] {q = T} φ Q = refl
 
+Suc[] {q = V} P φ Q = refl
+Suc[] {q = T} P φ Q =
+  begin
+    P [ id {q = V} ⁺ _ ] [ φ , Q ]
+  ≡⟨ [][] P (id {q = V} ⁺ _) (φ , Q) ⟩
+    P [ (id {q = V} ⁺ _) ⨾ (φ , Q) ]
+  ≡⟨ cong (λ □ → P [ □ ]) (⁺⨾ id φ Q)  ⟩
+    P [ id {q = V} ⨾ φ ]
+  ≡⟨ cong (λ □ → P [ □ ]) (id⨾ {q = V} φ) ⟩
+    P [ lift* (⊑⊔₁ {q = V}) φ ]
+  ≡⟨ cong (λ □ → P [ □ ]) (lift*rfl φ) ⟩
+    P [ φ ]
+  ∎
 
--- -- Left identity
--- -- ```
--- -- id⨾ : (φ : Δ ⊨[ q ] Γ) → id {q = q} ⨾ φ ≡ φ
--- -- id⨾ ∅ = refl
--- -- id⨾ (φ , P) = cong₂ _,_
--- --   (begin
--- --     (id ⁺ _) ⨾ (φ , P)
--- --   ≡⟨ ⁺⨾ id φ P ⟩
--- --     id ⨾ φ
--- --   ≡⟨ id⨾ φ ⟩
--- --     φ
--- --   ∎)
--- --   ((Zero[]′ φ P))
--- -- ```
+⁺⨾ ∅ ψ Q = refl
+⁺⨾ (φ , P) ψ Q = cong₂ _,_ (⁺⨾ φ ψ Q) (Suc[] P ψ Q)
+```
 
--- -- -- Beta for Zero, Suc, ⁺ (proved)
--- -- -- ```
--- -- -- Zero[]′ {q = V} φ Q = refl
--- -- -- Zero[]′ {q = T} φ Q = refl
+Naturality for lift
+```
+lift[] : (P : Γ ⊢[ q ] A) (φ : Δ ⊨[ r ] Γ)
+  → (lift ⊑T P) [ φ ] ≡ lift ⊑T (P [ φ ])
+lift[] {q = V} P φ = refl
+lift[] {q = T} P φ = refl
+```
 
--- -- -- Zero[] {q = V} φ Q = refl
--- -- -- Zero[] {q = T} φ Q = refl
+Context extension for functor law (signature)
+```
+⨾^ : (φ : Θ ⊨[ r ] Γ) (ψ : Δ ⊨[ s ] Θ) (A : Ty)
+      → (φ ^ A) ⨾ (ψ ^ A) ≡ (φ ⨾ ψ) ^ A
+```
 
--- -- -- Suc[] {q = V} P φ Q = refl
--- -- -- Suc[] {q = T} P φ Q =
--- -- --   begin
--- -- --     P [ id {q = V} ⁺ _ ] [ φ , Q ]
--- -- --   ≡⟨ [][] P (id {q = V} ⁺ _) (φ , Q) ⟩
--- -- --     P [ (id {q = V} ⁺ _) ⨾ (φ , Q) ]
--- -- --   ≡⟨ cong (λ □ → P [ □ ]) (⁺⨾ id φ Q)  ⟩
--- -- --     P [ id {q = V} ⨾ φ ]
--- -- --   ≡⟨ cong (λ □ → P [ □ ]) {!!} ⟩  -- (id⨾ φ)
--- -- --     P [ φ ]
--- -- --   ∎
+Functor law (proof)
+```
+[][] zero (φ , P) ψ = refl
+[][] (suc x) (φ , P) ψ = [][] x φ ψ
+[][] (` x) φ ψ =
+  begin
+    (lift ⊑T (x [ φ ])) [ ψ ]
+  ≡⟨ lift[] (x [ φ ]) ψ ⟩
+    lift ⊑T (x [ φ ] [ ψ ])
+  ≡⟨ cong (λ □ → lift ⊑T □) ([][] x φ ψ) ⟩
+    lift ⊑T (x [ φ ⨾ ψ ])
+  ∎
+[][] (ƛ_ {A = A} N) φ ψ = cong ƛ_ (
+  begin
+    N [ φ ^ A ] [ ψ ^ A ]
+  ≡⟨ [][] N (φ ^ A) (ψ ^ A) ⟩
+    N [ (φ ^ A) ⨾ (ψ ^ A) ]
+  ≡⟨ cong (λ □ → N [ □ ]) (⨾^ φ ψ A) ⟩
+    N [ (φ ⨾ ψ) ^ A ]
+  ∎)
+[][] (L · M) φ ψ = cong₂ _·_ ([][] L φ ψ) ([][] M φ ψ)
+```
 
--- -- -- ⁺⨾ ∅ ψ Q = refl
--- -- -- ⁺⨾ (φ , P) ψ Q = cong₂ _,_ (⁺⨾ φ ψ Q) (Suc[] P ψ Q)
--- -- -- ```
+Naturality for weakening and instantiation
+```
+⨾⁺ : (φ : Θ ⊨[ r ] Γ) (ψ : Δ ⊨[ s ] Θ) (A : Ty)
+        → φ ⨾ (ψ ⁺ A) ≡ (φ ⨾ ψ) ⁺ A
 
--- -- -- Naturality for lift
--- -- -- ```
--- -- -- lift[] : (P : Γ ⊢[ q ] A) (φ : Δ ⊨[ r ] Γ)
--- -- --   → (lift ⊑T P) [ φ ] ≡ lift ⊑T (P [ φ ])
--- -- -- lift[] {q = V} P φ = refl
--- -- -- lift[] {q = T} P φ = refl
--- -- -- ```
+[⁺] : (P : Γ ⊢[ q ] A) (φ : Δ ⊨[ r ] Γ) (A : Ty)
+        → P [ φ ⁺ A ] ≡ Suc (P [ φ ])
+[⁺] {q = V} x φ A = [⁺]∋ x φ
+[⁺] {q = T} M φ A =
+  begin
+    M [ φ ⁺ A ]
+  ≡⟨ cong (λ □ → M [ □ ⁺ A ]) (sym (lift*rfl φ)) ⟩
+    M [ lift* rfl φ ⁺ A ]
+  ≡⟨ cong (λ □ → M [ □ ⁺ A ]) (sym (⨾id φ)) ⟩
+    M [ (φ ⨾ id {q = V}) ⁺ A ]
+  ≡⟨ cong (λ □ → M [ □ ]) (sym (⨾⁺ φ id A)) ⟩
+    M [ φ ⨾ (id {q = V} ⁺ A) ]
+  ≡⟨ sym ([][] M φ (id ⁺ A)) ⟩
+    M [ φ ] [ id {q = V} ⁺ A ]
+  ∎
 
--- -- -- Context extension for functor law (signature)
--- -- -- ```
--- -- -- ⨾^ : (φ : Θ ⊨[ r ] Γ) (ψ : Δ ⊨[ s ] Θ) (A : Ty)
--- -- --       → (φ ^ A) ⨾ (ψ ^ A) ≡ (φ ⨾ ψ) ^ A
--- -- -- ```
+⨾⁺ ∅ ψ A = refl
+⨾⁺ (φ , P) ψ A = cong₂ _,_ (⨾⁺ φ ψ A) ([⁺] P ψ A)
+```
 
--- -- -- Functor law (proof)
--- -- -- ```
--- -- -- [][] zero (φ , P) ψ = refl
--- -- -- [][] (suc x) (φ , P) ψ = [][] x φ ψ
--- -- -- [][] (` x) φ ψ =
--- -- --   begin
--- -- --     (lift ⊑T (x [ φ ])) [ ψ ]
--- -- --   ≡⟨ lift[] (x [ φ ]) ψ ⟩
--- -- --     lift ⊑T (x [ φ ] [ ψ ])
--- -- --   ≡⟨ cong (λ □ → lift ⊑T □) ([][] x φ ψ) ⟩
--- -- --     lift ⊑T (x [ φ ⨾ ψ ])
--- -- --   ∎
--- -- -- [][] (ƛ_ {A = A} N) φ ψ = cong ƛ_ (
--- -- --   begin
--- -- --     N [ φ ^ A ] [ ψ ^ A ]
--- -- --   ≡⟨ [][] N (φ ^ A) (ψ ^ A) ⟩
--- -- --     N [ (φ ^ A) ⨾ (ψ ^ A) ]
--- -- --   ≡⟨ cong (λ □ → N [ □ ]) (⨾^ φ ψ A) ⟩
--- -- --     N [ (φ ⨾ ψ) ^ A ]
--- -- --   ∎)
--- -- -- [][] (L · M) φ ψ = cong₂ _·_ ([][] L φ ψ) ([][] M φ ψ)
--- -- -- ```
+Lift Zero
+```
+liftZero : (q⊑r : q ⊑ r) → lift q⊑r (Zero {Γ = Γ} {A = A} {q = q}) ≡ Zero {q = r}
+liftZero rfl = refl
+liftZero V⊑T = refl
+```
 
--- -- -- Naturality for weakening and instantiation
--- -- -- ```
--- -- -- ⨾⁺ : (φ : Θ ⊨[ r ] Γ) (ψ : Δ ⊨[ s ] Θ) (A : Ty)
--- -- --         → φ ⨾ (ψ ⁺ A) ≡ (φ ⨾ ψ) ⁺ A
+Context extension for functor law (proof)
+```
+⨾^ {r = r} {s = s} φ ψ A =
+  begin
+    (φ ^ A) ⨾ (ψ ^ A)
+  ≡⟨⟩
+    ((φ ⁺ A) ⨾ (ψ ^ A)) , Zero {q = r} [ ψ ^ A ]
+  ≡⟨ cong₂ _,_ (⁺⨾ φ (ψ ⁺ A) Zero) (Zero[] {q = r} (ψ ⁺ A) (Zero {q = s})) ⟩
+    (φ ⨾ (ψ ⁺ A)) , lift (⊑⊔₁ {q = r}) (Zero {q = s})
+  ≡⟨ cong₂ _,_ (⨾⁺ φ ψ A) (liftZero {q = s} (⊑⊔₁ {q = r})) ⟩
+    ((φ ⨾ ψ) ⁺ A) , Zero {q = r ⊔ s}
+  ≡⟨⟩
+    (φ ⨾ ψ) ^ A
+  ∎
+```
 
--- -- -- [⁺] : (P : Γ ⊢[ q ] A) (φ : Δ ⊨[ r ] Γ) (A : Ty)
--- -- --         → P [ φ ⁺ A ] ≡ Suc (P [ φ ])
--- -- -- [⁺] {q = V} x φ A = [⁺]∋ x φ
--- -- -- [⁺] {q = T} M φ A =
--- -- --   begin
--- -- --     M [ φ ⁺ A ]
--- -- --   ≡⟨ cong (λ □ → M [ □ ⁺ A ]) (sym (⨾id φ)) ⟩
--- -- --     M [ (φ ⨾ id) ⁺ A ]
--- -- --   ≡⟨ cong (λ □ → M [ □ ]) (sym (⨾⁺ φ id A)) ⟩
--- -- --     M [ φ ⨾ (id ⁺ A) ]
--- -- --   ≡⟨ sym ([][] M φ (id ⁺ A)) ⟩
--- -- --     M [ φ ] [ id ⁺ A ]
--- -- --   ∎
+Associativity
+```
+⨾⨾ : ∀ (φ : Θ ⊨[ q ] Γ) (ψ : Φ ⊨[ r ] Θ) (θ : Δ ⊨ Φ) →
+          (φ ⨾ ψ) ⨾ θ ≡ φ ⨾ (ψ ⨾ θ)
+⨾⨾ ∅ ψ θ = refl
+⨾⨾ (φ , P) ψ θ =
+  begin
+    (((φ ⨾ ψ) ⨾ θ) , ((P [ ψ ]) [ θ ]))
+  ≡⟨ cong₂ _,_ (⨾⨾ φ ψ θ) ([][] P ψ θ) ⟩
+    ((φ ⨾ (ψ ⨾ θ)) , (P [ ψ ⨾ θ ]))
+  ∎
+```
 
--- -- -- ⨾⁺ ∅ ψ A = refl
--- -- -- ⨾⁺ (φ , P) ψ A = cong₂ _,_ (⨾⁺ φ ψ A) ([⁺] P ψ A)
--- -- -- ```
+-- -- -- -- # Relating to the laws in Autosubst paper
 
--- -- -- Lift Zero
--- -- -- ```
--- -- -- liftZero : (q⊑r : q ⊑ r) → lift q⊑r (Zero {Γ = Γ} {A = A} {q = q}) ≡ Zero {q = r}
--- -- -- liftZero rfl = refl
--- -- -- liftZero V⊑T = refl
--- -- -- ```
+-- -- -- -- Alternative way to compute _⁺_
+-- -- -- -- ```
+-- -- -- -- ⨾⤊ : (φ : Δ ⊨[ q ] Γ) (A : Ty) → φ ⨾ ⤊ ≡ φ ⁺ A
+-- -- -- -- ⨾⤊ φ A =
+-- -- -- --   begin
+-- -- -- --     φ ⨾ ⤊
+-- -- -- --   ≡⟨⟩
+-- -- -- --     φ ⨾ (id ⁺ A)
+-- -- -- --   ≡⟨ ⨾⁺ φ id A ⟩
+-- -- -- --     (φ ⨾ id) ⁺ A
+-- -- -- --   ≡⟨ cong (λ □ → □ ⁺ A) (⨾id φ) ⟩
+-- -- -- --     φ ⁺ A
+-- -- -- --   ∎
 
--- -- -- Context extension for functor law (proof)
--- -- -- ```
--- -- -- ⨾^ {r = r} {s = s} φ ψ A =
--- -- --   begin
--- -- --     (φ ^ A) ⨾ (ψ ^ A)
--- -- --   ≡⟨⟩
--- -- --     ((φ ⁺ A) ⨾ (ψ ^ A)) , Zero {q = r} [ ψ ^ A ]
--- -- --   ≡⟨ cong₂ _,_ (⁺⨾ φ (ψ ⁺ A) Zero) (Zero[] {q = r} (ψ ⁺ A) (Zero {q = s})) ⟩
--- -- --     (φ ⨾ (ψ ⁺ A)) , lift (⊑⊔₁ {q = r}) (Zero {q = s})
--- -- --   ≡⟨ cong₂ _,_ (⨾⁺ φ ψ A) (liftZero {q = s} (⊑⊔₁ {q = r})) ⟩
--- -- --     ((φ ⨾ ψ) ⁺ A) , Zero {q = r ⊔ s}
--- -- --   ≡⟨⟩
--- -- --     (φ ⨾ ψ) ^ A
--- -- --   ∎
--- -- -- ```
+-- -- -- -- ⁺-def : (φ : Δ ⊨[ q ] Γ) (A : Ty) → φ ⁺ A ≡ φ ⨾ ⤊
+-- -- -- -- ⁺-def φ A = sym (⨾⤊ φ A)
+-- -- -- -- ```
 
--- -- -- Associativity
--- -- -- ```
--- -- -- ⨾⨾ : ∀ (φ : Θ ⊨[ q ] Γ) (ψ : Φ ⊨[ r ] Θ) (θ : Δ ⊨ Φ) →
--- -- --           (φ ⨾ ψ) ⨾ θ ≡ φ ⨾ (ψ ⨾ θ)
--- -- -- ⨾⨾ ∅ ψ θ = refl
--- -- -- ⨾⨾ (φ , P) ψ θ =
--- -- --   begin
--- -- --     (((φ ⨾ ψ) ⨾ θ) , ((P [ ψ ]) [ θ ]))
--- -- --   ≡⟨ cong₂ _,_ (⨾⨾ φ ψ θ) ([][] P ψ θ) ⟩
--- -- --     ((φ ⨾ (ψ ⨾ θ)) , (P [ ψ ⨾ θ ]))
--- -- --   ∎
--- -- -- ```
+-- -- -- -- Alternative way to compute _^_
+-- -- -- -- ```
+-- -- -- -- ⨾⤊, : (φ : Δ ⊨[ q ] Γ) (A : Ty) → (φ ⨾ ⤊ , Zero) ≡ φ ^ A
+-- -- -- -- ⨾⤊, φ A =
+-- -- -- --   begin
+-- -- -- --     (φ ⨾ ⤊ , Zero)
+-- -- -- --   ≡⟨ cong (λ □ → □ , Zero) (⨾⤊ φ A) ⟩
+-- -- -- --     φ ⁺ A , Zero
+-- -- -- --   ≡⟨⟩
+-- -- -- --     φ ^ A
+-- -- -- --   ∎
+-- -- -- -- ```
 
--- -- -- # Relating to the laws in Autosubst paper
+-- -- -- -- π₁ law
+-- -- -- -- ```
+-- -- -- -- ⤊⨾, : (φ : Δ ⊨[ q ] Γ) (P : Δ ⊢[ q ] A) → (⤊ ⨾ (φ , P)) ≡ φ
+-- -- -- -- ⤊⨾, φ P =
+-- -- -- --   begin
+-- -- -- --     (⤊ ⨾ (φ , P))
+-- -- -- --   ≡⟨⟩
+-- -- -- --     (id ⁺ _) ⨾ (φ , P)
+-- -- -- --   ≡⟨ ⁺⨾ id φ P ⟩
+-- -- -- --      id ⨾ φ
+-- -- -- --   ≡⟨ id⨾ φ ⟩
+-- -- -- --     φ
+-- -- -- --   ∎
+-- -- -- -- ```
 
--- -- -- Alternative way to compute _⁺_
--- -- -- ```
--- -- -- ⨾⤊ : (φ : Δ ⊨[ q ] Γ) (A : Ty) → φ ⨾ ⤊ ≡ φ ⁺ A
--- -- -- ⨾⤊ φ A =
--- -- --   begin
--- -- --     φ ⨾ ⤊
--- -- --   ≡⟨⟩
--- -- --     φ ⨾ (id ⁺ A)
--- -- --   ≡⟨ ⨾⁺ φ id A ⟩
--- -- --     (φ ⨾ id) ⁺ A
--- -- --   ≡⟨ cong (λ □ → □ ⁺ A) (⨾id φ) ⟩
--- -- --     φ ⁺ A
--- -- --   ∎
+-- -- -- -- eta law
+-- -- -- -- ```
+-- -- -- -- η : (φ : Δ ⊨[ q ] Γ , A) → ((⤊ ⨾ φ) , Zero {q = q} [ φ ]) ≡ φ
+-- -- -- -- η {q = q} (φ , P) =
+-- -- -- --   begin
+-- -- -- --     ((⤊ ⨾ (φ , P)) , (Zero {q = q} [ φ , P ]))
+-- -- -- --   ≡⟨ cong₂ _,_ (⤊⨾, φ P) (Zero[] {q = q} φ P) ⟩
+-- -- -- --     φ , P
+-- -- -- --   ∎
+-- -- -- -- ```
 
--- -- -- ⁺-def : (φ : Δ ⊨[ q ] Γ) (A : Ty) → φ ⁺ A ≡ φ ⨾ ⤊
--- -- -- ⁺-def φ A = sym (⨾⤊ φ A)
--- -- -- ```
+-- -- -- -- Autosubst rewrites
+-- -- -- -- ```
+-- -- -- -- {-# REWRITE id⨾ ⨾id ⨾⨾ [id] [][] ⤊⨾, Zero[] Suc[] ⁺-def #-}
+-- -- -- -- ```
 
--- -- -- Alternative way to compute _^_
--- -- -- ```
--- -- -- ⨾⤊, : (φ : Δ ⊨[ q ] Γ) (A : Ty) → (φ ⨾ ⤊ , Zero) ≡ φ ^ A
--- -- -- ⨾⤊, φ A =
--- -- --   begin
--- -- --     (φ ⨾ ⤊ , Zero)
--- -- --   ≡⟨ cong (λ □ → □ , Zero) (⨾⤊ φ A) ⟩
--- -- --     φ ⁺ A , Zero
--- -- --   ≡⟨⟩
--- -- --     φ ^ A
--- -- --   ∎
--- -- -- ```
+-- -- -- -- ## Special cases of substitution
 
--- -- -- π₁ law
--- -- -- ```
--- -- -- ⤊⨾, : (φ : Δ ⊨[ q ] Γ) (P : Δ ⊢[ q ] A) → (⤊ ⨾ (φ , P)) ≡ φ
--- -- -- ⤊⨾, φ P =
--- -- --   begin
--- -- --     (⤊ ⨾ (φ , P))
--- -- --   ≡⟨⟩
--- -- --     (id ⁺ _) ⨾ (φ , P)
--- -- --   ≡⟨ ⁺⨾ id φ P ⟩
--- -- --      id ⨾ φ
--- -- --   ≡⟨ id⨾ φ ⟩
--- -- --     φ
--- -- --   ∎
--- -- -- ```
+-- -- -- -- Neither of the following can be defined, because
+-- -- -- -- we need id on terms, not variables.
 
--- -- -- eta law
--- -- -- ```
--- -- -- η : (φ : Δ ⊨[ q ] Γ , A) → ((⤊ ⨾ φ) , Zero {q = q} [ φ ]) ≡ φ
--- -- -- η {q = q} (φ , P) =
--- -- --   begin
--- -- --     ((⤊ ⨾ (φ , P)) , (Zero {q = q} [ φ , P ]))
--- -- --   ≡⟨ cong₂ _,_ (⤊⨾, φ P) (Zero[] {q = q} φ P) ⟩
--- -- --     φ , P
--- -- --   ∎
--- -- -- ```
+-- -- -- -- Substitute for the last variable in the environment
+-- -- -- -- (de Bruijn index zero).
 
--- -- -- Autosubst rewrites
--- -- -- ```
--- -- -- {-# REWRITE id⨾ ⨾id ⨾⨾ [id] [][] ⤊⨾, Zero[] Suc[] ⁺-def #-}
--- -- -- ```
+-- -- -- -- _[_]₀ :
+-- -- -- --     (N : Γ , A ⊢ B)
+-- -- -- --     (M : Γ ⊢ A)
+-- -- -- --   → ----------------
+-- -- -- --      Γ ⊢ B
+-- -- -- -- N [ M ]₀ = N [ id , M ]
 
--- -- -- ## Special cases of substitution
+-- -- -- -- This is exactly what we need for beta reduction.
 
--- -- -- Neither of the following can be defined, because
--- -- -- we need id on terms, not variables.
+-- -- -- -- Substitute for the last but one variable in the environment
+-- -- -- -- (de Bruijn index one).
 
--- -- -- Substitute for the last variable in the environment
--- -- -- (de Bruijn index zero).
-
--- -- -- _[_]₀ :
--- -- --     (N : Γ , A ⊢ B)
--- -- --     (M : Γ ⊢ A)
--- -- --   → ----------------
--- -- --      Γ ⊢ B
--- -- -- N [ M ]₀ = N [ id , M ]
-
--- -- -- This is exactly what we need for beta reduction.
-
--- -- -- Substitute for the last but one variable in the environment
--- -- -- (de Bruijn index one).
-
--- -- -- _[_]₁ :
--- -- --     (N : Γ , A , B ⊢ C)
--- -- --     (M : Γ ⊢ A)
--- -- --   → -------------------
--- -- --      Γ , B ⊢ C
--- -- -- N [ M ]₁ = N [ (id , M) ⨾ ⤊ , Zero ]
+-- -- -- -- _[_]₁ :
+-- -- -- --     (N : Γ , A , B ⊢ C)
+-- -- -- --     (M : Γ ⊢ A)
+-- -- -- --   → -------------------
+-- -- -- --      Γ , B ⊢ C
+-- -- -- -- N [ M ]₁ = N [ (id , M) ⨾ ⤊ , Zero ]
 
 
