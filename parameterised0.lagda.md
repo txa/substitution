@@ -4,7 +4,7 @@ Following Substitution with Copy and Paste
 Philip Wadler, 24 Sep 2024
 ```
 {-# OPTIONS --rewriting #-}
-module parameterised where
+module parameterised0 where
 
 open import Agda.Builtin.FromNat
 import Relation.Binary.PropositionalEquality as EQ
