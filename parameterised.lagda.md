@@ -1,35 +1,65 @@
 Parameterised development
-Following Substitution with Copy and Paste
+based on
+Substitution without Copy and Paste
 
-New version with id polymorphic in q
-Based on new treatment of ⊑ in terms of ⊔.
+Philip Wadler, 26 Sep--3 Nov 2024
 
-Previous version required id to be a renaming,
-but we also need id as a substitution to define
-beta reduction:
+
+The previous version required id to be a renaming, but we also need id
+as a substitution to define beta reduction:
 
    (ƛ N) V --> N [ id , V ]
 
-Alas, this means some equations become more clumsy.
+Alas, this means some equations become more clumsy:
 
-    id⨾ : (φ : Δ ⊨[ r ] Γ) → id {q = q} ⨾ φ ≡ lift* (⊑⊔₁ {q = q} {r = r}) φ
+    id⨾ : (φ : Δ ⊨[ r ] Γ) → id {q = q} ⨾ φ ≡ lift* (⊑⊔₁ {q = q}) φ
 
-Here
+Here we define
 
     lift* : (q ⊑ r) → Δ ⊨[ q ] Γ → Δ ⊨[ r ] Γ
 
-An alternative may be to eliminate `lift*` by restricting our
-equation to the cases where q ⊑ r:
+(An alternative may be to eliminate `lift*` by restricting our
+equation to cases where q ⊑ r:
 
     id⨾′ : {q ⊑ r} → (φ : Δ ⊨[ r ] Γ) → id {q = q} ⨾ φ ≡ φ
 
-but I'm not sure how to get the equation to typecheck under that resriction,
-even thouqh `q ⊑ r` holds exactly when `q ⊔ r ≡ r` which is exactly what we
-need for `id⨾′` to be well typed.
+but I'm not sure how to get the equation to typecheck under that
+resriction, even thouqh `q ⊑ r` holds exactly when `q ⊔ r ≡ r` which
+is exactly what we need for `id⨾′` to be well typed.)
+
+The following paper
+
+  Schäfer, Steven, Tobias Tebbi, and Gert Smolka. ‘Autosubst: Reasoning
+  with de Bruijn Terms and Parallel Substitutions’. In Interactive
+  Theorem Proving, edited by Christian Urban and Xingyuan Zhang,
+  359–74. Lecture Notes in Computer Science. Cham: Springer
+  International Publishing, 2015.
+  https://doi.org/10.1007/978-3-319-22102-1_24.
+
+defines twelve rules which are confluent over open terms and complete
+for the given model of λ-calculus.
+
+  (st)[σ] ≡ (s[σ])(t[σ])
+  (λ.s)[σ] ≡λ.(s[0·σ◦↑])
+  0[s · σ] ≡ s
+  ↑ ◦ (s · σ) ≡ σ
+  s[id] ≡ s
+  0[σ]·(↑∘σ) ≡ σ
+  id◦σ ≡ σ
+  σ◦id ≡σ
+  (σ ◦ τ) ◦ θ ≡ σ ◦ (τ ◦ θ)
+  (s · σ) ◦ τ ≡ s[τ] · σ ◦ τ
+  s[σ][τ] ≡ s[σ ◦ τ]
+  0 · ↑ ≡ id
+
+(Their s·σ is our σ,N and their σ∘τ is our σ⨾τ.)
+
+I'd like to have the same twelve rules as either equationally true or
+as rewrites. I define rewrites in this direction toward the end but
+they fail to work, as indicated by the final example.
 
 
 
-Philip Wadler, 26 Sep 2024
 ```
 {-# OPTIONS --rewriting #-}
 module parameterised where
@@ -400,8 +430,8 @@ Right identity
 
 Functor law (signature)
 ```
-[][] : (M : Γ ⊢[ q ] A) (φ : Θ ⊨[ r ] Γ) (ψ : Δ ⊨[ s ] Θ)
-        → M [ φ  ] [ ψ ] ≡ M [ φ ⨾ ψ ]
+[][] : (P : Γ ⊢[ q ] A) (φ : Θ ⊨[ r ] Γ) (ψ : Δ ⊨[ s ] Θ)
+        → P [ φ  ] [ ψ ] ≡ P [ φ ⨾ ψ ]
 ```
 
 Beta for Zero, Suc, ⁺ (signatures)
@@ -634,8 +664,25 @@ _[_]₁ :
 N [ M ]₁ = N [ (id , M) ⨾ ⤊ , Zero ]
 ```
 
--- Exercise 1
--- ```
--- introduction : N [ ⤊ ] [ M ]₀ ≡ N
--- introduction = refl
--- ```
+Exercise 1
+```
+ex1 : ∀ (N : Γ ⊢ B) (M : Γ ⊢ A) → N [ ⤊ ] [ M ]₀ ≡ N
+ex1 N M =
+  begin
+    N [ ⤊ ] [ M ]₀
+  ≡⟨⟩
+    N [ ⤊ ] [ id , M ]
+  ≡⟨ [][] N ⤊ (id , M) ⟩
+    N [ ⤊ ⨾ (id , M) ]
+  ≡⟨ cong (λ □ → N [ □ ]) (⤊⨾, id M) ⟩
+    N [ id ]
+  ≡⟨ [id] N ⟩
+    N
+  ∎
+```
+This should occur automatically via rewrite, but does not for
+some reason.
+```
+ex1′ : ∀ (N : Γ ⊢ B) (M : Γ ⊢ A) → N [ ⤊ ] [ M ]₀ ≡ N
+ex1′ N M = ?
+```
