@@ -636,7 +636,12 @@ eta law
 
 Autosubst rewrites
 ```
-{-# REWRITE [][] [id] id⨾ ⨾id ⨾⨾ ⤊⨾, Zero[] Suc[] ⁺-def #-}
+{-# REWRITE [][] [id] id⨾ ⨾id ⨾⨾ ⤊⨾, #-}
+```
+I've commented out the rewrites below because with them Agda
+tends to go into an infinite loop.
+```
+-- {-# REWRITE Zero[] Suc[] ⁺-def #-}
 ```
 
 ## Special cases of substitution
@@ -675,8 +680,8 @@ ex1 N M =
   ≡⟨ [][] N ⤊ (id , M) ⟩
     N [ ⤊ ⨾ (id , M) ]
   ≡⟨ cong (λ □ → N [ □ ]) (⤊⨾, id M) ⟩
-    N [ id ]
-  ≡⟨ [id] N ⟩
+    N [ id {q = T} ]
+  ≡⟨ [id] {r = T} N ⟩
     N
   ∎
 ```
@@ -684,5 +689,6 @@ This should occur automatically via rewrite, but does not for
 some reason.
 ```
 ex1′ : ∀ (N : Γ ⊢ B) (M : Γ ⊢ A) → N [ ⤊ ] [ M ]₀ ≡ N
-ex1′ N M = ?
+ex1′ N M = {! refl!}
 ```
+
