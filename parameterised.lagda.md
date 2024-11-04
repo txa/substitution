@@ -482,6 +482,19 @@ Suc[] {q = T} P φ Q =
 
 ⁺⨾ ∅ ψ Q = refl
 ⁺⨾ (φ , P) ψ Q = cong₂ _,_ (⁺⨾ φ ψ Q) (Suc[] P ψ Q)
+
+⤊⨾ : (ψ : Δ ⊨[ r ] Θ) (Q : Δ ⊢[ r ] A)
+          → ⤊ ⨾ (ψ , Q) ≡ ψ
+⤊⨾ ψ Q =
+  begin
+    ⤊ ⨾ (ψ , Q)
+  ≡⟨⟩
+    (id ⁺ _) ⨾  (ψ , Q)
+  ≡⟨ ⁺⨾ id ψ Q ⟩
+    id ⨾ ψ
+  ≡⟨ id⨾ ψ ⟩
+    ψ
+  ∎
 ```
 
 Naturality for lift
@@ -635,8 +648,22 @@ eta law
 ```
 
 Autosubst rewrites
+
+Nathaniel notes that `[][]` needs to be specialised to type
+without the `⊔⊔` rewrite before it will itself work as a
+rewrite.
 ```
-{-# REWRITE [][] [id] id⨾ ⨾id ⨾⨾ ⤊⨾, #-}
+idᵀ : Γ ⊨[ T ] Γ
+idᵀ = id {q = T}
+
+[][]ᵀ : (M : Γ ⊢ A) (φ : Θ ⊨[ r ] Γ) (ψ : Δ ⊨[ s ] Θ)
+        → M [ φ  ] [ ψ ] ≡ M [ φ ⨾ ψ ]
+[][]ᵀ = [][]
+
+[id]ᵀ : (M : Γ ⊢ A) → M [ idᵀ ] ≡ M
+[id]ᵀ = [id]
+
+{-# REWRITE [][]ᵀ [id]ᵀ id⨾ ⨾id ⨾⨾ ⤊⨾, #-}
 ```
 I've commented out the rewrites below because with them Agda
 tends to go into an infinite loop.
@@ -669,10 +696,10 @@ _[_]₁ :
 N [ M ]₁ = N [ (id , M) ⨾ ⤊ , Zero ]
 ```
 
-Exercise 1
+Warm up
 ```
-ex1 : ∀ (N : Γ ⊢ B) (M : Γ ⊢ A) → N [ ⤊ ] [ M ]₀ ≡ N
-ex1 N M =
+warmup : ∀ (N : Γ ⊢ B) (M : Γ ⊢ A) → N [ ⤊ ] [ M ]₀ ≡ N
+warmup N M =
   begin
     N [ ⤊ ] [ M ]₀
   ≡⟨⟩
@@ -685,10 +712,52 @@ ex1 N M =
     N
   ∎
 ```
-This should occur automatically via rewrite, but does not for
-some reason.
+Here is the automatic version.
 ```
-ex1′ : ∀ (N : Γ ⊢ B) (M : Γ ⊢ A) → N [ ⤊ ] [ M ]₀ ≡ N
-ex1′ N M = {! refl!}
+warmup′ : ∀ (N : Γ ⊢ B) (M : Γ ⊢ A) → N [ ⤊ ] [ M ]₀ ≡ N
+warmup′ N M =  refl
 ```
 
+First challenge
+```
+double-subst : ∀ (N : Γ , A , B ⊢ C) (M : Γ ⊢ A) (L : Γ ⊢ B) →
+  N [ M ]₁ [ L ]₀ ≡ N [ L [ ⤊ ] ]₀ [ M ]₀
+double-subst N M L =
+  begin
+    N [ M ]₁ [ L ]₀
+  ≡⟨⟩
+    N [ (id , M) ⨾ ⤊ , Zero ] [ id , L ]
+  ≡⟨ [][] N ((id , M) ⨾ ⤊ , Zero) (id , L) ⟩
+    N [ ((id , M) ⨾ ⤊ , Zero) ⨾ (id , L) ]    
+  ≡⟨⟩
+    N [ (((id , M) ⨾ ⤊) ⨾ (id , L)) , Zero {q = T} [ id , L ] ]
+  ≡⟨ cong₂ (λ □₀ □₁ → N [ □₀ , □₁ ]) (⨾⨾ (id , M) ⤊ (id , L)) (Zero[] {q = T} id L) ⟩
+    N [ ((id , M) ⨾ (⤊ ⨾ (id , L))) , L ]
+  ≡⟨ cong (λ □ → N [ ((id , M) ⨾ □) , L ]) (⤊⨾, id L) ⟩
+    N [ ((id , M) ⨾ id {q = T}) , L ]
+  ≡⟨ cong (λ □ → N [ □ , L ]) (⨾id {r = T} (id , M)) ⟩
+    N [ id , M , L ]
+  ≡⟨ cong (λ □ → N [ id , M , □ ]) (sym ([id] {r = T} L)) ⟩
+    N [ id , M , L [ id {q = T} ] ]
+  ≡⟨ cong (λ □ → N [ id , M , L [ □ ] ]) (⤊⨾ id M) ⟩
+    N [ id , M , L [ ⤊ ⨾ (id , M) ] ]
+  ≡⟨ cong₂ (λ □₀ □₁ → N [ □₀ , □₁ ]) (sym (id⨾ {q = T} (id , M))) ([][] L (⤊) (id , M)) ⟩
+    N [ (id {q = T} ⨾ (id , M)) , (L [ ⤊ ] [ id , M ]) ]
+  ≡⟨⟩
+    N [ (id , (L [ ⤊ ])) ⨾ (id , M) ]
+  ≡⟨ sym ([][] N (id , (L [ ⤊ ])) (id , M)) ⟩
+    N [ id , (L [ ⤊ ]) ] [ id , M ]
+  ≡⟨⟩
+    N [ L [ ⤊ ] ]₀ [ M ]₀
+  ∎
+
+double-subst′ : ∀ (N : Γ , A , B ⊢ C) (M : Γ ⊢ A) (L : Γ ⊢ B) →
+  N [ M ]₁ [ L ]₀ ≡ N [ L [ ⤊ ] ]₀ [ M ]₀
+double-subst′ N M L = {!refl!}
+```
+
+Second challenge
+```
+commute-subst : N [ M ]₀ [ L ]₀ ≡ N [ L ]₁ [ M [ L ]₀ ]₀
+commute-subst = {! !}
+```
