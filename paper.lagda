@@ -17,17 +17,25 @@
 \affiliation{%
   \institution{University of Nottingham}
   \city{Nottingham}
-  \country{United Kingdom}}
+  \country{United Kingdom}
+  }
 \email{thorsten.altenkirch@@nottingham.ac.uk}
 
 \author{Nathaniel Burke}
 \affiliation{
   \institution{Imperial College London}
   \city{London}
-  \country{United Kingdom}}
+  \country{United Kingdom}
+  }
 \email{nathaniel.burke21@@imperial.ac.uk}
 
-\author{Phil Wadler}
+\author{Philip Wadler}
+\affiliation{
+  \institution{University of Edinburgh}
+  \city{Edinburgh}
+  \country{United Kingdom}
+  }
+\email{wadler@@inf.ed.ac.uk}
 
 \begin{abstract}
 When defining substitution recursively for a language with binders
