@@ -62,12 +62,14 @@ they fail to work, as indicated by the final example.
 
 ```
 {-# OPTIONS --rewriting #-}
-module parameterised-phil-unfold where
+module parameterised-unfold where
 
 open import Agda.Builtin.FromNat
 import Relation.Binary.PropositionalEquality as EQ
 open EQ using (_≡_; refl; cong; cong₂; sym; trans; subst)
-open EQ.≡-Reasoning using (begin_; step-≡; _≡⟨⟩_; _∎)
+-- Agda stdlib version difference
+open EQ.≡-Reasoning using (begin_; step-≡-∣; step-≡-⟩; _∎)
+-- open EQ.≡-Reasoning using (begin_; step-≡; _≡⟨⟩_; _∎)
 {-# BUILTIN REWRITE _≡_ #-}
 
 open import Data.Unit using (⊤; tt)
@@ -257,16 +259,9 @@ _ = 2
 
 List of variables or terms
 ```
-record Empty⊨ : Set where
-  constructor ∅
-
-_⊨[_]_ : Con → Sort → Con → Set 
-Δ ⊨[ q ] ∅       = Empty⊨
-Δ ⊨[ q ] (Γ , A) = (Δ ⊨[ q ] Γ) × (Δ ⊢[ q ] A)
-
--- data _⊨[_]_ (Δ : Con) (q : Sort) : Con → Set where
---   ∅ : Δ ⊨[ q ] ∅
---   _,_ : Δ ⊨[ q ] Γ → Δ ⊢[ q ] A → Δ ⊨[ q ] (Γ , A)
+data _⊨[_]_ (Δ : Con) (q : Sort) : Con → Set where
+  ∅ : Δ ⊨[ q ] ∅
+  _,_ : Δ ⊨[ q ] Γ → Δ ⊢[ q ] A → Δ ⊨[ q ] (Γ , A)
 
 _⊇_ _⊨_ : Con → Con → Set
 _⊇_ = _⊨[ V ]_
@@ -285,8 +280,8 @@ lift rfl P = P
 lift V⊑T x = ` x
 
 lift* : q ⊑ r → Γ ⊨[ q ] Δ → Γ ⊨[ r ] Δ
-lift* {Δ = ∅} q⊑r ∅ = ∅
-lift* {Δ = _ , _} q⊑r (φ , P) = (lift* q⊑r φ) , (lift q⊑r P)
+lift* q⊑r ∅ = ∅
+lift* q⊑r (φ , P) = (lift* q⊑r φ) , (lift q⊑r P)
 
 liftrfl : ∀ {q⊑r : q ⊑ q} → (x : Γ ⊢[ q ] A) → lift q⊑r x ≡ x
 liftrfl {q⊑r = rfl} x = refl
@@ -323,8 +318,8 @@ id {Γ = Γ , A} = id ^ _
 Composition
 ```
 _⨾_ : Θ ⊨[ q ] Γ → Δ ⊨[ r ] Θ → Δ ⊨[ q ⊔ r ] Γ
-_⨾_ {Γ = ∅}     ∅       ψ = ∅
-_⨾_ {Γ = _ , _} (φ , P) ψ = (φ ⨾ ψ) , (P [ ψ ])
+∅ ⨾ ψ = ∅
+(φ , P) ⨾ ψ = (φ ⨾ ψ) , (P [ ψ ])
 ```
 
 Zero and Shift
@@ -336,8 +331,8 @@ Zero {q = T}  =  ` zero
 Suc : Δ ⊢[ q ] B → Δ , A ⊢[ q ] B
 
 _⁺_ : Δ ⊨[ q ] Γ → (A : Ty) → Δ , A ⊨[ q ] Γ
-_⁺_ {Γ = ∅}   ∅       A  =  ∅
-_⁺_ {Γ = _ , _} (φ , P) A  =  φ ⁺ A , Suc P
+∅       ⁺ A  =  ∅
+(φ , P) ⁺ A  =  φ ⁺ A , Suc P
 
 Suc {q = V} x  =  suc x
 Suc {q = T} M  =  M [ id {q = V} ⁺ _ ]
@@ -345,7 +340,7 @@ Suc {q = T} M  =  M [ id {q = V} ⁺ _ ]
 
 Extension (definition)
 ```
--- φ ^ A = φ ⨾ (id {q = V} ⁺ A) , Zero
+-- φ ^ A = φ ⨾ ⤊ {q = V} , Zero
 -- {-# INLINE _^_ #-}
 
 φ ^ A = φ ⁺ A , Zero
@@ -423,8 +418,8 @@ lift-Suc {A = A} V⊑T x =
 Right identity
 ```
 ⨾id : (φ : Δ ⊨[ q ] Γ) → φ ⨾ id {q = r} ≡ lift* (⊑⊔₀ {r = r}) φ
-⨾id {Γ = ∅} ∅                =  refl
-⨾id {q = q} {Γ = _ , _} (φ , P)  =  cong₂ _,_ (⨾id φ) ([id] P)
+⨾id ∅                =  refl
+⨾id {q = q} (φ , P)  =  cong₂ _,_ (⨾id φ) ([id] P)
 ```
 
 Functor law (signature)
@@ -448,8 +443,8 @@ Suc[] : (P : Γ ⊢[ q ] A) (φ : Δ ⊨[ r ] Γ) (Q : Δ ⊢[ r ] B)
 Left identity
 ```
 id⨾ : (φ : Δ ⊨[ r ] Γ) → id {q = q} ⨾ φ ≡ lift* (⊑⊔₁ {q = q}) φ
-id⨾ {Γ = ∅} ∅ = refl
-id⨾ {Γ = _ , _} {q = q} (φ , P) = cong₂ _,_
+id⨾ ∅ = refl
+id⨾ {q = q} (φ , P) = cong₂ _,_
   (begin
     (id ⁺ _) ⨾ (φ , P)
   ≡⟨ ⁺⨾ id φ P ⟩
@@ -479,8 +474,8 @@ Suc[] {q = T} P φ Q =
     P [ φ ]
   ∎
 
-⁺⨾ {Γ = ∅} ∅ ψ Q = refl
-⁺⨾ {Γ = _ , _} (φ , P) ψ Q = cong₂ _,_ (⁺⨾ φ ψ Q) (Suc[] P ψ Q)
+⁺⨾ ∅ ψ Q = refl
+⁺⨾ (φ , P) ψ Q = cong₂ _,_ (⁺⨾ φ ψ Q) (Suc[] P ψ Q)
 ```
 
 Naturality for lift
@@ -541,8 +536,8 @@ Naturality for weakening and instantiation
     M [ φ ] [ id {q = V} ⁺ A ]
   ∎
 
-⨾⁺ {Γ = ∅} ∅ ψ A = refl
-⨾⁺ {Γ = _ , _} (φ , P) ψ A = cong₂ _,_ (⨾⁺ φ ψ A) ([⁺] P ψ A)
+⨾⁺ ∅ ψ A = refl
+⨾⁺ (φ , P) ψ A = cong₂ _,_ (⨾⁺ φ ψ A) ([⁺] P ψ A)
 ```
 
 Context extension for functor law (proof)
@@ -565,8 +560,8 @@ Associativity
 ```
 ⨾⨾ : ∀ (φ : Θ ⊨[ q ] Γ) (ψ : Φ ⊨[ r ] Θ) (θ : Δ ⊨ Φ) →
           (φ ⨾ ψ) ⨾ θ ≡ φ ⨾ (ψ ⨾ θ)
-⨾⨾ {Γ = ∅} ∅ ψ θ = refl
-⨾⨾ {Γ = _ , _} (φ , P) ψ θ =
+⨾⨾ ∅ ψ θ = refl
+⨾⨾ (φ , P) ψ θ =
   begin
     (((φ ⨾ ψ) ⨾ θ) , ((P [ ψ ]) [ θ ]))
   ≡⟨ cong₂ _,_ (⨾⨾ φ ψ θ) ([][] P ψ θ) ⟩
@@ -580,7 +575,6 @@ Alternative way to compute _⁺_
 ```
 opaque
   unfolding ⤊
-  
   ⨾⤊ : (φ : Δ ⊨[ q ] Γ) (A : Ty) → φ ⨾ ⤊ ≡ φ ⁺ A
   ⨾⤊ φ A =
     begin
@@ -610,6 +604,24 @@ Alternative way to compute _^_
   ∎
 ```
 
+```
+opaque
+  unfolding ⤊
+  
+  ⤊⨾ : (ψ : Δ ⊨[ r ] Θ) (Q : Δ ⊢[ r ] A)
+            → ⤊ ⨾ (ψ , Q) ≡ ψ
+  ⤊⨾ ψ Q =
+    begin
+      ⤊ ⨾ (ψ , Q)
+    ≡⟨⟩
+      (id ⁺ _) ⨾  (ψ , Q)
+    ≡⟨ ⁺⨾ id ψ Q ⟩
+      id ⨾ ψ
+    ≡⟨ id⨾ ψ ⟩
+      ψ
+    ∎
+```
+
 π₁ law
 ```
 opaque
@@ -636,6 +648,48 @@ eta law
     ((⤊ ⨾ (φ , P)) , (Zero {q = q} [ φ , P ]))
   ≡⟨ cong₂ _,_ (⤊⨾, φ P) (Zero[] {q = q} φ P) ⟩
     φ , P
+  ∎
+```
+
+## Special cases of substitution
+
+Substitute for the last variable in the environment
+(de Bruijn index zero).
+```
+_[_]₀ :
+    (N : Γ , A ⊢ B)
+    (M : Γ ⊢ A)
+  → ----------------
+     Γ ⊢ B
+N [ M ]₀ = N [ id , M ]
+```
+This is exactly what we need for beta reduction.
+
+Substitute for the last but one variable in the environment
+(de Bruijn index one).
+```
+_[_]₁ :
+    (N : Γ , A , B ⊢ C)
+    (M : Γ ⊢ A)
+  → -------------------
+     Γ , B ⊢ C
+N [ M ]₁ = N [ (id , M) ⨾ ⤊ , Zero ]
+```
+
+Warm up
+```
+warmup : ∀ (N : Γ ⊢ B) (M : Γ ⊢ A) → N [ ⤊ ] [ M ]₀ ≡ N
+warmup N M =
+  begin
+    N [ ⤊ ] [ M ]₀
+  ≡⟨⟩
+    N [ ⤊ ] [ id , M ]
+  ≡⟨ [][] N ⤊ (id , M) ⟩
+    N [ ⤊ ⨾ (id , M) ]
+  ≡⟨ cong (λ □ → N [ □ ]) (⤊⨾, id M) ⟩
+    N [ id {q = T} ]
+  ≡⟨ [id] {r = T} N ⟩
+    N
   ∎
 ```
 
@@ -686,89 +740,71 @@ T⨾⨾ = ⨾⨾
 
 {-# REWRITE [][] [id] id⨾ ⨾id ⨾⨾ ⤊⨾, ⨾⨾ Zero[] Suc[] ⁺-def #-}
 
+
+
 {-# REWRITE V[][] T[][] []V[] []T[] #-}
 {-# REWRITE V⨾⨾ T⨾⨾ ⨾V⨾ ⨾T⨾ #-}
-
 ```
 
-## Special cases of substitution
-
-Substitute for the last variable in the environment
-(de Bruijn index zero).
+Here is the automatic version
 ```
-_[_]₀ :
-    (N : Γ , A ⊢ B)
-    (M : Γ ⊢ A)
-  → ----------------
-     Γ ⊢ B
-N [ M ]₀ = N [ id , M ]
-```
-This is exactly what we need for beta reduction.
-
-Substitute for the last but one variable in the environment
-(de Bruijn index one).
-```
-_[_]₁ :
-    (N : Γ , A , B ⊢ C)
-    (M : Γ ⊢ A)
-  → -------------------
-     Γ , B ⊢ C
-N [ M ]₁ = N [ (id , M) ⨾ ⤊ , Zero ]
-
+warmup′ : ∀ (N : Γ ⊢ B) (M : Γ ⊢ A) → N [ ⤊ ] [ M ]₀ ≡ N
+warmup′ N M = refl
 ```
 
-Exercise 1
+We need an extra rewrite to remove the lifts in the next challenge
 ```
-ex1 : ∀ (N : Γ ⊢ B) (M : Γ ⊢ A) → N [ ⤊ ] [ M ]₀ ≡ N
-ex1 N M =
+lift-⨾ : lift* V⊑T φ ⨾ ψ ≡ lift* ⊑T (φ ⨾ ψ) 
+lift-⨾ {φ = ∅}     = refl
+lift-⨾ {φ = φ , P} {ψ = ψ} 
+  = cong (_, lift ⊑T (P [ ψ ])) (lift-⨾ {φ = φ} {ψ = ψ})
+{-# REWRITE lift-⨾ #-}
+```
+
+First challenge
+```
+double-subst : ∀ (N : Γ , A , B ⊢ C) (M : Γ ⊢ A) (L : Γ ⊢ B) →
+  N [ M ]₁ [ L ]₀ ≡ N [ L [ ⤊ ] ]₀ [ M ]₀
+double-subst N M L =
   begin
-    N [ ⤊ ] [ M ]₀
+    N [ M ]₁ [ L ]₀
   ≡⟨⟩
-    N [ ⤊ ] [ id , M ]
-  ≡⟨ [][] N ⤊ (id , M) ⟩
-    N [ ⤊ ⨾ (id , M) ]
-  ≡⟨ cong (λ □ → N [ □ ]) (⤊⨾, id M) ⟩
-    N [ id {q = T} ]
-  ≡⟨ [id] {r = T} N ⟩
-    N
+    N [ (id , M) ⨾ ⤊ , Zero ] [ id , L ]
+  ≡⟨ [][] N ((id , M) ⨾ ⤊ , Zero) (id , L) ⟩
+    N [ ((id , M) ⨾ ⤊ , Zero) ⨾ (id , L) ]    
+  ≡⟨⟩
+    N [ (((id , M) ⨾ ⤊) ⨾ (id , L)) , Zero {q = T} [ id , L ] ]
+  ≡⟨ cong₂ (λ □₀ □₁ → N [ □₀ , □₁ ]) (⨾⨾ (id , M) ⤊ (id , L)) (Zero[] {q = T} id L) ⟩
+    N [ ((id , M) ⨾ (⤊ ⨾ (id , L))) , L ]
+  ≡⟨ cong (λ □ → N [ ((id , M) ⨾ □) , L ]) (⤊⨾, id L) ⟩
+    N [ ((id , M) ⨾ id {q = T}) , L ]
+  ≡⟨ cong (λ □ → N [ □ , L ]) (⨾id {r = T} (id , M)) ⟩
+    N [ id , M , L ]
+  ≡⟨ cong (λ □ → N [ id , M , □ ]) (sym ([id] {r = T} L)) ⟩
+    N [ id , M , L [ id {q = T} ] ]
+  ≡⟨ cong (λ □ → N [ id , M , L [ □ ] ]) (⤊⨾ id M) ⟩
+    N [ id , M , L [ ⤊ ⨾ (id , M) ] ]
+  ≡⟨ cong₂ (λ □₀ □₁ → N [ □₀ , □₁ ]) (sym (id⨾ {q = T} (id , M))) ([][] L (⤊) (id , M)) ⟩
+    N [ (id {q = T} ⨾ (id , M)) , (L [ ⤊ ] [ id , M ]) ]
+  ≡⟨⟩
+    N [ (id , (L [ ⤊ ])) ⨾ (id , M) ]
+  ≡⟨ sym ([][] N (id , (L [ ⤊ ])) (id , M)) ⟩
+    N [ id , (L [ ⤊ ]) ] [ id , M ]
+  ≡⟨⟩
+    N [ L [ ⤊ ] ]₀ [ M ]₀
   ∎
+
+double-subst′ : ∀ (N : Γ , A , B ⊢ C) (M : Γ ⊢ A) (L : Γ ⊢ B) →
+  N [ M ]₁ [ L ]₀ ≡ N [ L [ ⤊ ] ]₀ [ M ]₀
+double-subst′ N M L = refl
 ```
 
-We also need some more rewrites to remove `lift`s.
-
+Second challenge
 ```
-Suc-lift : ∀ {q⊑r : q ⊑ r} → Suc {A = A} (lift q⊑r P) ≡ lift q⊑r (Suc P)
-Suc-lift {q⊑r = rfl} = refl
-Suc-lift {P = P} {q⊑r = V⊑T} = cong `_ ([⁺]∋ P id)
+commute-subst : N [ M ]₀ [ L ]₀ ≡ N [ L ]₁ [ M [ L ]₀ ]₀
+commute-subst = {!!}
 
-lift*-⁺ : ∀ {q⊑r : q ⊑ r} {φ : Δ ⊨[ q ] Γ} 
-        → lift* q⊑r φ ⁺ A ≡ lift* q⊑r (φ ⁺ A)
-lift*-⁺ {Γ = ∅} {φ = ∅} = refl
-lift*-⁺ {Γ = Γ , A} {q⊑r = q⊑r} {φ = φ , P} 
-  = cong₂ _,_ (lift*-⁺ {q⊑r = q⊑r}) (Suc-lift {q⊑r = q⊑r})
-
-lift*-id : ∀ {q⊑r : q ⊑ r} → lift* q⊑r (id {Γ = Γ}) ≡ id
-lift*-id {q⊑r = rfl} = refl
-lift*-id {Γ = ∅}     {q⊑r = V⊑T} = refl
-lift*-id {Γ = Γ , A} {q⊑r = V⊑T} = cong (_, ` zero) 
-  (begin
-    lift* V⊑T (id ⁺ A)
-  ≡⟨ sym (lift*-⁺ {q⊑r = V⊑T}) ⟩
-    lift* V⊑T id ⁺ A
-  ≡⟨ cong (_⁺ A) (lift*-id {q⊑r = V⊑T}) ⟩
-    id ⁺ A
-  ∎)
-
-ex1′ : ∀ (N : Γ ⊢ B) (M : Γ ⊢ A) → N [ ⤊ ] [ M ]₀ ≡ N
-ex1′ N M = refl
-
--- Other examples
-ex2′ : ∀ {N : (Γ , A) ⊢ B} {φ : Δ ⊨[ q ] Γ} 
-     → (ƛ N) [ φ ] ≡ ƛ (N [ (φ ⨾ ⤊) , Zero ]) 
-ex2′ = refl
-
-ex3′ : {φ : Δ ⊨[ q ] Γ , A} → ((⤊ ⨾ φ) , Zero {q = q} [ φ ]) ≡ φ
-ex3′ = refl
-
+commute-subst′ : N [ M ]₀ [ L ]₀ ≡ N [ L ]₁ [ M [ L ]₀ ]₀
+commute-subst′ = refl
 ```
-  
+   
