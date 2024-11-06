@@ -59,6 +59,7 @@ open import Agda.Builtin.FromNat
 import Relation.Binary.PropositionalEquality as EQ
 open EQ using (_≡_; refl; cong; cong₂; sym; trans; subst)
 open EQ.≡-Reasoning using (begin_; step-≡-∣; step-≡-⟩; _∎)
+-- open EQ.≡-Reasoning using (begin_; step-≡; _≡⟨⟩_; _∎)
 {-# BUILTIN REWRITE _≡_ #-}
 
 open import Data.Unit using (⊤; tt)
@@ -872,21 +873,37 @@ double-subst N M L =
   ≡⟨⟩
     N [ L ⤊ _ ]₀ [ M ]₀
   ∎
+```
+We need a couple extra 'lift' lemmas
+```
+lift*-⇑ : {φ : Δ ⊨[ V ] Γ} 
+        → lift* V⊑T φ ⇑ A ≡ lift* V⊑T (φ ⇑ A)
+lift*-⇑ {Γ = ∅} {φ = ∅} = refl
+lift*-⇑ {Γ = Γ , A} {φ = φ , P} 
+  = cong₂ _,_ (lift*-⇑ {φ = φ}) (cong `_ ([⇑]∋ P (id V)))
 
+lift*-id : lift* V⊑T (id {Γ = Γ} V) ≡ id T
+lift*-id {Γ = ∅}     = refl
+lift*-id {Γ = Γ , A} = cong₂ _,_ (
+  begin
+    lift* V⊑T (id V ⇑ A)
+  ≡⟨ sym (lift*-⇑ {φ = id V}) ⟩
+    lift* V⊑T (id V) ⇑ A
+  ≡⟨ cong (_⇑ A) lift*-id ⟩
+    id T ⇑ A
+  ∎) refl
+
+{-# REWRITE lift*-id lift*-⇑ #-}
+
+```
 double-subst′ : ∀ (N : Γ , A , B ⊢ C) (M : Γ ⊢ A) (L : Γ ⊢ B) →
   N [ M ]₁ [ L ]₀ ≡ N [ L ⤊ _ ]₀ [ M ]₀
-double-subst′ N M L = {! refl!}
+double-subst′ N M L = refl
 ```
 
-Above fails with:
-/Users/wadler/papers-substitution/streamlined.lagda.md:878,25-29
-M [ (id V ⇑ B) ⨾ (idᵀ , L) ] != M of type Γ ⊢[ T ⊔ T ] A
-when checking that the expression refl has type
-((N [ M ]₁) [ L ]₀) ≡ (N [ idᵀ , M , L ])
-
-
 -- Second challenge
--- ```
--- commute-subst : N [ M ]₀ [ L ]₀ ≡ N [ L ]₁ [ M [ L ]₀ ]₀
--- commute-subst = {! !}
--- ```
+```
+commute-subst : N [ M ]₀ [ L ]₀ ≡ N [ L ]₁ [ M [ L ]₀ ]₀
+commute-subst = refl
+```
+ 
