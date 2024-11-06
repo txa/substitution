@@ -807,4 +807,19 @@ commute-subst = {!!}
 commute-subst′ : N [ M ]₀ [ L ]₀ ≡ N [ L ]₁ [ M [ L ]₀ ]₀
 commute-subst′ = refl
 ```
+
+More examples:
+```
+lambda-subst : (ƛ N) [ φ ] ≡ ƛ (N [ (φ ⨾ ⤊) , Zero ])
+lambda-subst = refl
+
+-- We could even make this fully definitional if we defined '_⊨[_]_' by 
+-- recursion on the domain context 
+-- (i.e. Δ ⊨[ q ] (Γ , A) = (Δ ⊨[ q ] Γ) × (Δ ⊢[ q ] A))
+--
+-- Of course, this makes '_⊨[_]_' a bit more awkward to work with (cannot
+-- pattern on substitutions without also matching on the context)
+eta : (φ : Δ ⊨[ q ] Γ , A) → ((⤊ ⨾ φ) , Zero {q = q} [ φ ]) ≡ φ
+eta (_ , _) = refl
+```
    
