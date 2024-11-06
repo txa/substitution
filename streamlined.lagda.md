@@ -58,8 +58,8 @@ module streamlined where
 open import Agda.Builtin.FromNat
 import Relation.Binary.PropositionalEquality as EQ
 open EQ using (_≡_; refl; cong; cong₂; sym; trans; subst)
--- open EQ.≡-Reasoning using (begin_; step-≡-∣; step-≡-⟩; _∎)
-open EQ.≡-Reasoning using (begin_; step-≡; _≡⟨⟩_; _∎)
+open EQ.≡-Reasoning using (begin_; step-≡-∣; step-≡-⟩; _∎)
+-- open EQ.≡-Reasoning using (begin_; step-≡; _≡⟨⟩_; _∎)
 {-# BUILTIN REWRITE _≡_ #-}
 
 open import Data.Unit using (⊤; tt)
@@ -907,4 +907,3 @@ double-subst′ N M L = refl
 commute-subst : N [ M ]₀ [ L ]₀ ≡ N [ L ]₁ [ M [ L ]₀ ]₀
 commute-subst = refl
 ```
- 
