@@ -81,13 +81,12 @@ def tmslen : Tms q Δ Γ → Nat
   | .ε     => 0
   | δ -, x => .succ (tmslen δ + tmlen x)
 
--- Work-in-progress (I think the 'termination_by' criteria I have given is not
--- quite right yet)
--- I think there is a possibility that once we get the 'termination_by' criteria
--- right, Lean will be able to infer the 'decreasing_by' proof, which would
--- make this actually quite nice.
-
--- I also think we could probably get away with taking a sort and projecting out
+-- I think it's a bit sad that Lean can't synthesise these 'decreasing_by'
+-- proofs as they are all pretty easy. I imagine there are probably fancier
+-- tactics that could solve these goals immediately, which would make this
+-- quite a bit more convenient though.
+--
+-- I think we could probably get away with taking a sort and projecting out
 -- the 'Nat' instead of taking the 'Nat' and proof separately.
 mutual
   def suc : ∀ n p, Tm (sort.mk n p) Γ B → Tm (sort.mk n p) (Γ ▷ A) B
@@ -104,11 +103,9 @@ mutual
     | n, p, δ -, x, A => sucs n _ δ A -, suc n _ x
   termination_by n p δ => (n, 0, tmslen δ)
   decreasing_by
-  . simp!
-    exact (.right _ (.right _
+  . exact (.right _ (.right _
           ((Nat.lt_succ_of_le (Nat.le_add_right _ (tmlen x))))))
-  . simp!
-    exact (.right _ (.right _
+  . exact (.right _ (.right _
           ((Nat.lt_succ_of_le (Nat.le_add_left _ _)))))
 
   def identity : ∀ n p Γ, Tms (sort.mk n p) Γ Γ
@@ -116,9 +113,8 @@ mutual
     | n, p, Γ ▷ A => sucs n _ (identity n _ Γ) _ -, zero
   termination_by n _ Γ => (n, ctxlen Γ, 0)
   decreasing_by
-  . simp!
-    exact (.right _ (.left _ _ (Nat.lt_succ_self _)))
-  . exact (.right _ (.left _ _ sorry)) -- TODO
+  . exact (.right _ (.left _ _ (Nat.lt_succ_self _)))
+  . exact (.right _ (.left _ _ (Nat.zero_lt_succ _)))
 
   def subst : ∀ n p m q, Tm (sort.mk n p) Γ A → Tms (sort.mk m q) Δ Γ
             → Tm ((sort.mk n p) ⊔ (sort.mk m q)) Δ A
@@ -129,15 +125,11 @@ mutual
     | 1, p, m, q, .app t u, δ      => .app (subst _ _ _ _ t δ) (subst _ _ _ _ u δ)
   termination_by n p m q x δ  => (m, tmlen x, tmslen δ)
   decreasing_by
-  . simp!
-    exact (.right _ (.left _ _ (Nat.lt_succ_self _)))
-  . simp!
-    exact (.right _ (.left _ _ (Nat.lt_succ_self _)))
-  . simp!
-    exact (.right _ (.left _ _ (Nat.zero_lt_succ _)))
-  . exact (.right _ sorry) -- TODO
-  . simp!
-    exact (.right _ (.left _ _ (Nat.lt_succ_of_le (Nat.le_add_right _ _))))
+  . exact (.right _ (.left _ _ (Nat.lt_succ_self _)))
+  . exact (.right _ (.left _ _ (Nat.lt_succ_self _)))
+  . exact (.right _ (.left _ _ (Nat.zero_lt_succ _)))
+  . exact (.right _ (.left _ _ (Nat.lt_succ_self _)))
+  . exact (.right _ (.left _ _ (Nat.lt_succ_of_le (Nat.le_add_right _ _))))
   . exact (.right _ (.left _ _ (Nat.lt_succ_of_le (Nat.le_add_left _ _))))
 end
 
