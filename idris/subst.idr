@@ -75,6 +75,9 @@ lift : Leq q r -> Tm q g a -> Tm r g a
 lift VT  t = Var t
 lift Rfl x = x
 
+zero : {q : Sort} -> Tm q (g -. a) a
+zero {q = V}    = VZ
+zero {q = T VV} = Var VZ
 
 subst : {r : Sort} -> {d : Ctx} -> Tm q g a -> Tms r d g -> Tm (lub q r) d a
 (^)   : {q : Sort} -> {d : Ctx} -> Tms q d g -> (a : Ty) 
@@ -87,10 +90,6 @@ suc'  : {r : Sort} -> {g : Ctx} -> q = r -> Tm q g b -> (a : Ty)
 suc   : {g : Ctx} -> Tm q g b -> (a : Ty) 
      -> Tm q (g -. a) b
 id    : {q : Sort} -> {g : Ctx} -> Tms q g g
-
-zero : {q : Sort} -> Tm q (g -. a) a
-zero {q = V}    = VZ
-zero {q = T VV} = Var VZ
 
 id {g = Nil}    = Eps
 id {g = g -. a} = id ^ a
