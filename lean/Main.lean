@@ -82,48 +82,45 @@ def tmslen : Tms q Δ Γ → Nat
   | δ -, x => .succ (tmslen δ + tmlen x)
 
 -- I think it's a bit sad that Lean can't synthesise these 'decreasing_by'
--- proofs as they are all pretty easy. I imagine there are probably fancier
--- tactics that could solve these goals immediately, which would make this
--- quite a bit more convenient though.
---
--- I think we could probably get away with taking a sort and projecting out
--- the 'Nat' instead of taking the 'Nat' and proof separately.
+-- proofs automatically, as they are all pretty easy.
+-- I expect there are probably fancy tactics that could solve these goals
+-- immediately though, which would make this a lot more convenient though.
 mutual
-  def suc : ∀ n p, Tm (sort.mk n p) Γ B → Tm (sort.mk n p) (Γ ▷ A) B
-    | 0, p, i => .vs i
-    | 1, p, t => subst _ _ _ _ t (sucs 0 (Nat.zero_lt_succ _) (identity 0 (Nat.zero_lt_succ _) Γ) _)
-  termination_by n p x => (n, 0, tmlen x)
+  def suc : ∀ q, Tm q Γ B → Tm q (Γ ▷ A) B
+    | .mk 0 _, i => .vs i
+    | .mk 1 _, t => subst _ _ t (sucs V (identity V Γ) _)
+  termination_by q x => (q.n, 0, tmlen x)
   decreasing_by
   . exact (.left _ _ Nat.zero_lt_one)
   . exact (.left _ _ Nat.zero_lt_one)
   . exact (.left _ _ Nat.zero_lt_one)
 
-  def sucs : ∀ n p, Tms (sort.mk n p) Δ Γ → ∀ A, Tms (sort.mk n p) (Δ ▷ A) Γ
-    | n, p, .ε    , A => .ε
-    | n, p, δ -, x, A => sucs n _ δ A -, suc n _ x
-  termination_by n p δ => (n, 0, tmslen δ)
+  def sucs : ∀q, Tms q Δ Γ → ∀ A, Tms q (Δ ▷ A) Γ
+    | q, .ε    , A => .ε
+    | q, δ -, x, A => sucs q δ A -, suc q x
+  termination_by q δ => (q.n, 0, tmslen δ)
   decreasing_by
   . exact (.right _ (.right _
           ((Nat.lt_succ_of_le (Nat.le_add_right _ (tmlen x))))))
   . exact (.right _ (.right _
           ((Nat.lt_succ_of_le (Nat.le_add_left _ _)))))
 
-  def identity : ∀ n p Γ, Tms (sort.mk n p) Γ Γ
-    | n, p, .ε    => .ε
-    | n, p, Γ ▷ A => sucs n _ (identity n _ Γ) _ -, zero
-  termination_by n _ Γ => (n, ctxlen Γ, 0)
+  def identity : ∀ q Γ, Tms q Γ Γ
+    | q, .ε    => .ε
+    | q, Γ ▷ A => sucs q (identity q Γ) _ -, zero
+  termination_by q Γ => (q.n, ctxlen Γ, 0)
   decreasing_by
   . exact (.right _ (.left _ _ (Nat.lt_succ_self _)))
   . exact (.right _ (.left _ _ (Nat.zero_lt_succ _)))
 
-  def subst : ∀ n p m q, Tm (sort.mk n p) Γ A → Tms (sort.mk m q) Δ Γ
-            → Tm ((sort.mk n p) ⊔ (sort.mk m q)) Δ A
-    | 0, p, m, q, .vz     , δ -, u => u
-    | 0, p, m, q, .vs i   , δ -, u => subst _ _ _ _ i δ
-    | 1, p, m, q, .var i  , δ      => lift qT (subst _ _ _ _ i δ)
-    | 1, p, m, q, .lam t  , δ      => .lam (subst _ _ _ _ t (sucs _ _ δ _ -, zero))
-    | 1, p, m, q, .app t u, δ      => .app (subst _ _ _ _ t δ) (subst _ _ _ _ u δ)
-  termination_by n p m q x δ  => (m, tmlen x, tmslen δ)
+  def subst : ∀ q r, Tm q Γ A → Tms r Δ Γ
+            → Tm (q ⊔ r) Δ A
+    | .mk 0 _, _, .vz     , δ -, u => u
+    | .mk 0 _, _, .vs i   , δ -, u => subst _ _ i δ
+    | .mk 1 _, _, .var i  , δ      => lift qT (subst _ _ i δ)
+    | .mk 1 _, _, .lam t  , δ      => .lam (subst _ _ t (sucs _ δ _ -, zero))
+    | .mk 1 _, _, .app t u, δ      => .app (subst _ _ t δ) (subst _ _ u δ)
+  termination_by q r x δ  => (r.n, tmlen x, tmslen δ)
   decreasing_by
   . exact (.right _ (.left _ _ (Nat.lt_succ_self _)))
   . exact (.right _ (.left _ _ (Nat.lt_succ_self _)))
