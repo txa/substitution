@@ -69,8 +69,8 @@ def zero : Tm q (Γ ▷ A) A := match q with
   | .mk 0 _ => .vz
   | .mk 1 _ => .var .vz
 
--- I think Lean can derive these size functions with 'sizeOf' but defining these
--- functions manually seems to make the goal types a bit simpler
+-- I think Lean can derive these size functions with 'sizeOf' but defining them
+-- manually seems to make the goal types a bit simpler
 def ctxlen : Ctx → Nat
   | .ε    => 0
   | Γ ▷ _ => .succ (ctxlen Γ)
@@ -89,7 +89,7 @@ def tmslen : Tms q Δ Γ → Nat
 -- I think it's a bit sad that Lean can't synthesise these 'decreasing_by'
 -- proofs automatically, as they are all pretty easy.
 -- I expect there are probably fancy tactics that could solve these goals
--- immediately though, which would make this a lot more convenient though.
+-- immediately though, which would make this a lot more convenient.
 mutual
   def suc : ∀ q, Tm q Γ B → Tm q (Γ ▷ A) B
     | .mk 0 _, i => .vs i

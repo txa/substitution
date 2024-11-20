@@ -84,7 +84,6 @@ subst : {r : Sort} -> {d : Ctx} -> Tm q g a -> Tms r d g -> Tm (lub q r) d a
      -> Tms q (d -. a) (g -. a)
 sucs  : {d : Ctx} -> Tms q d g -> (a : Ty) 
      -> Tms q (d -. a) g
--- Instead of matching
 suc'  : {r : Sort} -> {g : Ctx} -> q = r -> Tm q g b -> (a : Ty) 
      -> Tm q (g -. a) b
 suc   : {g : Ctx} -> Tm q g b -> (a : Ty) 
@@ -109,5 +108,3 @@ subst (VS i)    (ys ~. y) = subst i ys
 subst (Var i)   ys        = lift qT (subst i ys)
 subst (Lam t)   ys        = Lam (subst t (ys ^ _))
 subst (App t u) ys        = App (subst t ys) (subst u ys)
-
-
