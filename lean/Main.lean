@@ -6,6 +6,11 @@ def ack : Nat → Nat → Nat
   | .succ m, .zero   => ack m 1
   | .succ m, .succ n => ack m (ack (.succ m) n)
 
+-- Given the termination proof has to be manual anyway, we might as well just
+-- use a boolean for the sort (plus a function that calculates the size for
+-- termination) but I wanted to try a 'Nat'-based 'sort' to give Lean a chance
+-- at infering lexicographic termination order.
+--
 -- It might also worth be trying just leaving 'sort' as 'Nat' and use the fact
 -- that there exists no 'Tm (.succ (.succ n)) Γ A' as proof it is < 2
 structure sort where
