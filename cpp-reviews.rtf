@@ -1,0 +1,415 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2761
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fnil\fcharset0 HelveticaNeue;\f1\fnil\fcharset0 AppleSymbols;\f2\fnil\fcharset0 LucidaGrande;
+\f3\fnil\fcharset0 Menlo-Regular;}
+{\colortbl;\red255\green255\blue255;\red27\green27\blue27;\red255\green255\blue255;\red0\green0\blue233;
+\red66\green1\blue120;}
+{\*\expandedcolortbl;;\cssrgb\c14118\c14118\c14118;\cssrgb\c100000\c100000\c100000;\cssrgb\c0\c0\c93333;
+\cssrgb\c33333\c10196\c54510;}
+\paperw11905\paperh16837\margl1133\margr1133\margb1133\margt1133
+\deftab720
+\pard\pardeftab720\partightenfactor0
+
+\f0\fs29\fsmilli14667 \cf2 \cb3 \up0 \nosupersub \ulnone Dear Philip,\
+\
+On behalf of the CPP 2025 Program Committee, we regret to inform you\
+that your submission #102 has been rejected.\
+\
+* Title: Substitution without copy and paste\
+\pard\pardeftab720\partightenfactor0
+\cf2 * Site: {\field{\*\fldinst{HYPERLINK "https://cpp2025.hotcrp.com/paper/102"}}{\fldrslt \cf4 \ul \ulc4 https://cpp2025.hotcrp.com/paper/102}}\
+\pard\pardeftab720\partightenfactor0
+\cf2 \
+We received 51 submissions, and we accepted 20 of them. There were many\
+high-quality submissions, and we had to make some difficult decisions.\
+\
+Reviews and possibly additional comments for your submission are\
+appended to this email. We hope you will find them useful.\
+\
+We also hope to see you at CPP 2025. The conference will be co-located\
+with POPL 2025 and will take place on 20-21 January in Denver, USA.\
+\
+More information about the program will soon be posted on the conference\
+website.\
+\
+We thank you for submitting to CPP.\
+\
+Best wishes,\
+\
+Sandrine Blazy and Nicolas Tabareau\
+\
+(CPP 2025 PC chairs)\
+\
+Review #102A\
+===========================================================================\
+\
+Overall merit\
+-------------\
+4. Accept\
+\
+Paper summary\
+-------------\
+This paper presents an innovative approach to implementing substitution for the simply-typed lambda calculus in Agda without resorting to code duplication. The authors address a common challenge in formalizing languages with binders: the need to define and prove properties separately for variables/renamings and terms/substitutions, often leading to duplicative code and proofs.\
+\
+The key contribution is the introduction of a \'93Sort\'94 type with two values, `V` (for variables/renamings) and `T` (for terms/substitutions), allowing for a unified treatment of these concepts. By exploiting singleton indexed types to define `V` as structurally smaller than `T`, the authors leverage Agda's termination checker to verify the recursive definitions and proofs.\
+\
+The paper demonstrates how this technique can be used to define substitution, prove key properties such as associativity of substitution composition, and construct a simply-typed category with families (CwF). The authors further show that their recursive definition of substitution gives rise to a CwF isomorphic to the initial simply-typed CwF, effectively proving the correctness of their approach.\
+\
+While focused on the simply-typed lambda calculus, the authors position this work as a stepping stone towards handling more complex systems, particularly dependent type theory. They also discuss some limitations of Agda's termination checker encountered during their development and suggest potential improvements.\
+\
+Comments for authors\
+--------------------\
+The paper is well-written, and sections 1, 2, 3, and 6 were pleasant and easy to read.\'a0 (Sections 4 and 5 were heavy on proof details, but it is impressive that it seems all details managed to fit into the body of the paper.)\
+\
+Although I disagree with the author\'92s motivation (\'94If there is one guideline of good software engineering then it is **Do not write code by copy and paste** and this\
+applies even more so to formal proofs.\'94) \'97 many of my most poorly designed and unmaintainable code has been driven by excessive elimination of copy-paste \'97 the trick used here to avoid copy-paste is clever and does not seem to overly complicate the code.\
+\
+While the problem is not particularly exciting, I find the reasoning in the conclusion compelling:\
+\
+> [\'85] it is a stepping stone to more exciting open questions. But before you can run you need to walk and we believe that the construction here can be useful to others.\
+>\
+\
+Question about a design alternative that does not seem to be discussed:\
+\
+While perhaps the idea to introduce sorts as a datatype with the structure of a boolean algebra is obvious in hindsight, the decision to merge the constructors of `_
+\f1 \uc0\u8715 
+\f0 _` into `_
+\f1 \uc0\u8866 
+\f0 _` *without changing what terms can be represented* is not much discussed.\'a0 Since we already dealing with unreduced terms rather than normal form, a natural alternative would be to replace `suc` with a general `suc-tm` constructor.\'a0 I would like to see at least a brief discussion of the trade-offs of having term weakening as a constructor vs. as a definition.\'a0 What are the considerations here?\
+\
+Since I have not much more of substance to add, simply going through the review criteria in the CFP:\
+\
+- (Thoroughly discuss the theory or design choices underpinning the formalization. Provide a detailed explanation of the formalization decisions, including alternative approaches and reasons for rejecting them.) I am generally satisfied with the introduction and the background in section 2, modulo my question above about a `suc-tm` constructor.\
+- (Examine related literature on formalization choices and techniques. Compare the design choices to those made in other libraries.) I am satisfied with the discussion of section 1.2.\
+- (Offer feedback on the features of the computer proof assistant used, noting any that are missing. Draw conclusions that can guide future formalization efforts in the same or other proof assistants.) I am satisfied with the discussion of section 6.\
+\
+\
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
+\
+\
+Review #102B\
+===========================================================================\
+\
+Overall merit\
+-------------\
+1. Reject\
+\
+Paper summary\
+-------------\
+# Overall Summary\
+\
+## Paper content\
+\
+This paper presents the usual problem one encounters when\
+presenting a formal treatment of a lexically scoped language\
+with binders in a proof assistant: in order to implement\
+substition, one first needs to implement renaming, a morally\
+identical traversal.\
+\
+The authors explain a trick allowing them to avoid code\
+duplication by implementing a single traversal that can be\
+instantiated to both renaming and substitution.\
+\
+The core of the trick is to reify the notion of sorts involved\
+(variables & terms) in such a way that the termination checker\
+internalises the idea that the sort of variables is morally\
+smaller than that of terms.\
+\
+This saving on code duplication carries over to proofs\
+that renaming and substitution interact well by allowing\
+the authors to prove a single sort-polymorphic fusion result\
+that can be instantiated to recover classic lemmas.\
+\
+Finally, the authors give a (postulated) QITT definition\
+of a small CwF and prove their syntax is indeed the initial\
+such object.\
+\
+## Critical analysis\
+\
+This is an interesting technique well worthy of publication\
+however I believe that the paper in its current state should\
+not be accepted.\
+\
+It fails to adequately identify the exact Type Theory\
+required for this trick to be used and, even worse,\
+seemingly minimises the requirements.\
+This makes it hard to evaluate how widely usable it is.\
+In it current state I don't believe it could be ported to\
+Rocq or Lean, and a variant of the encoding suggested in\
+the running text would be rejected by those two as well\
+as Idris 2.\
+\
+Additionnally, the authors brush over some technicalities\
+as "hacky" and do not provide adequate justification for\
+why these hacks with surprising results are justified and\
+not simply uncovered bugs in the implementation of Agda.\
+\
+Comments for authors\
+--------------------\
+# Important Points\
+\
+## Explaining Termination\
+\
+This is the point you brush off as "hacky" but requires\
+extensive explanations.\
+\
+l1290 As you say it would be nice if Agda could explain\
+termination. If Agda was compiled with debugging options\
+on, you can pass an option to at least get a look at the\
+size-change matrices that it computes:\
+> -vterm.matrices:50\
+\
+However, the fact (a user-friendly version of this) feature\
+is not available does not give you a pass when it comes to\
+carefully explaining why adding a useless argument to the\
+function definition suddenly makes the complex mutual block\
+terminating.\
+\
+Have you found a bug in Agda or can you convince us that\
+your definition is indeed well-founded? As you say multiple\
+times in the paper, some tempting definitions are in fact\
+not well-founded (and luckily for us these ones are indeed\
+rejected by Agda).\
+\
+Looking at the supplementary material, the fact that id
+\f1 \uc0\u8728 
+\f0 \uc0\u8242 's\
+useless argument is of type `Sort` is not crucial to make\
+the termination checker happy e.g. replacing it with (note\
+the use of `0` in one call and `T` in the other)\
+\
+```agda\
+id
+\f1 \uc0\u8728 
+\f0 \uc0\u8242  : \{A : Set\} 
+\f2 \uc0\u8594 
+\f0  A 
+\f2 \uc0\u8594 
+\f0  \{xs : \uc0\u915  
+\f1 \uc0\u8872 
+\f0 [ r ] \uc0\u916 \}\
+\'a0\'a0\'a0\'a0 
+\f2 \uc0\u8594 
+\f0  id 
+\f1 \uc0\u8728 
+\f0  xs 
+\f1 \uc0\u8801 
+\f0  xs\
+\
+id
+\f1 \uc0\u8728 
+\f0 \uc0\u8242  _ \{xs = xs , x\} =\
+\'a0\'a0 (...)\
+\'a0\'a0\'a0\'a0 
+\f1 \uc0\u8801 \u10216 
+\f0  id
+\f1 \uc0\u8728 
+\f0 \uc0\u8242  0 
+\f1 \uc0\u10217 
+\f0 \
+\
+(...)\
+\
+suc[] \{q = T\} \{x = x\} \{y = y\} \{ys = ys\} =\
+\'a0 (...)\
+\'a0 
+\f1 \uc0\u8801 \u10216 
+\f0  cong (\uc0\u955  \u961  
+\f2 \uc0\u8594 
+\f0  x [ \uc0\u961  ]) (id
+\f1 \uc0\u8728 
+\f0 \uc0\u8242  T) 
+\f1 \uc0\u10217 
+\f0 \
+```\
+\
+also appeases the termination checker. But the termination\
+checker has not internalised anything about pairs of a Set\
+and a value of that Set getting smaller. This should ring\
+alarm bells!\
+\
+Look at Keller & Altenkirch's "Hereditary substitutions\
+for simple types, formalized" for a good explanation of\
+a non-obvious termination argument being carefully laid\
+out to convince the audience the program is indeed\
+\pard\pardeftab720\partightenfactor0
+\cf2 meaningful: {\field{\*\fldinst{HYPERLINK "https://dl.acm.org/doi/10.1145/1863597.1863601"}}{\fldrslt \cf4 \ul \ulc4 https://dl.acm.org/doi/10.1145/1863597.1863601}}\
+\pard\pardeftab720\partightenfactor0
+\cf2 \
+## Agda features\
+\
+This paper is heavily reliant on non-standard features of\
+type theory yet you claim on l143 onwards that you\
+"only use plain Agda, inductive definitions and structurally\
+recursive programs and proofs".\
+\
+In order to let your reader assess how portable the technique\
+is, you need to describe your requirements a lot more precisely\
+than that.\
+\
+Putting aside the heavy use of REWRITE for now (cf. missing\
+references), we still have:\
+\
+### Inductive-inductive types\
+\
+l305-312 here you use an inductive-inductive definition\
+(mutally defining a type and a predicate over it when\
+introducing Sort & IsV) which would make the approach\
+as it is presented not portable to e.g. Rocq or Lean.\
+\
+Luckily as per Nordvall Forsberg and Sestini, inductive inductive\
+definitions are equivalent to indexed inductive ones\
+in extensional type theory so one should be able to\
+encode the results.\
+\pard\pardeftab720\partightenfactor0
+\cf2 For the encoding & simple eliminator: {\field{\*\fldinst{HYPERLINK "https://personal.cis.strath.ac.uk/fredrik.nordvall-forsberg/thesis/thesis.pdf"}}{\fldrslt \cf4 \ul \ulc4 https://personal.cis.strath.ac.uk/fredrik.nordvall-forsberg/thesis/thesis.pdf}}\
+For the full eliminator: {\field{\*\fldinst{HYPERLINK "https://fsestini.github.io/pdfs/phd-draft.pdf"}}{\fldrslt \cf4 \ul \ulc4 https://fsestini.github.io/pdfs/phd-draft.pdf}}\
+\pard\pardeftab720\partightenfactor0
+\cf2 \
+The reduction would yield (in Rocq)\
+\
+```rocq\
+Inductive Sort : Set :=\
+\'a0 | V : Sort\
+\'a0 | T : forall (s : Sort), Sort.\
+\
+Inductive IsVorT: Sort -> Set :=\
+\'a0 | isV : IsVorT V\
+\'a0 | isT : IsVorT (T V).\
+```\
+\
+However this should be discussed explicitly as it\
+does nuance the straightforward applicability / ergonomics\
+of the technique as presented.\
+\
+### Telescopic datatype definitions\
+\
+l314 you say that you could replace the IsV\
+inductive-inductive predicate by using an\
+equality constraint.\
+However that relies on Agda's scoping rules\
+which make a data declaration telescopic:\
+earlier constructors are in scope for the definition\
+of the type of further constructors.\
+\
+This is a feature that is not standard in usual\
+axiomatisations of plain (indexed) inductive data types\
+and such a definition would for instance be rejected in\
+Rocq, Lean, or Idris 2. E.g. in Rocq:\
+\
+```rocq\
+Inductive Sort : Set :=\
+\'a0| V : Sort\
+\'a0| T : forall (s : Sort), s = V -> Sort.\
+```\
+\
+gives back\
+\
+> Error: The reference V was not found in the current environment.\
+\
+This is a feature that is common in Higher/Quotient\
+Inductive Types and is discussed e.g. by Dijkstra\
+\pard\pardeftab720\partightenfactor0
+\cf2 (Section 4.2 of {\field{\*\fldinst{HYPERLINK "https://gdijkstra.github.io/thesis.pdf)"}}{\fldrslt \cf4 \ul \ulc4 https://gdijkstra.github.io/thesis.pdf)}}\
+\pard\pardeftab720\partightenfactor0
+\cf2 but clearly worth discussing in somewhat depth as\
+another potential limitation of the applicability of\
+the technique.\
+\
+## Alternative designs\
+\
+* l549 not using REWRITE means manually deploying subst\
+\'a0 or, as your reference Saffrich et al. advocates, stating\
+\'a0 lemmas using heterogenenous equality. And then recovering\
+\'a0 the lemmas you're interested in as direct corollaries\
+\'a0 (once the sorts are concrete everything computes and\
+\'a0 heterogeneous equality implies homogeneous equality).\
+\
+\'a0 This is worth discussing too.\
+\
+## Missing references\
+\
+On top of the references already mentioned discussing\
+the subtleties of non-standard inductive definitions\
+in type theory, you should discuss\
+\
+* Formal metatheory of second-order abstract syntax\
+\'a0 Authors: Marcelo Fiore, Dmitrij Szamozvancev\
+\pard\pardeftab720\partightenfactor0
+\cf2 \'a0 {\field{\*\fldinst{HYPERLINK "https://www.cl.cam.ac.uk/~ds709/agda-soas/"}}{\fldrslt \cf4 \ul \ulc4 https://www.cl.cam.ac.uk/~ds709/agda-soas/}}\
+\pard\pardeftab720\partightenfactor0
+\cf2 \'a0 {\field{\*\fldinst{HYPERLINK "https://dl.acm.org/doi/10.1145/3498715"}}{\fldrslt \cf5 \ul \ulc5 https://dl.acm.org/doi/10.1145/3498715}}\
+\pard\pardeftab720\partightenfactor0
+\cf2 \
+\'a0 which is explicitly about a categorical framework\
+\'a0 to represent simply typed lambda calculi\
+\
+* Extensionality in the Calculus of Constructions\
+\'a0 Authors: Nicolas Oury\
+\pard\pardeftab720\partightenfactor0
+\cf2 \'a0 {\field{\*\fldinst{HYPERLINK "https://link.springer.com/chapter/10.1007/11541868_18"}}{\fldrslt \cf4 \ul \ulc4 https://link.springer.com/chapter/10.1007/11541868_18}}\
+\pard\pardeftab720\partightenfactor0
+\cf2 \
+\'a0 which justifies your fast & loose use of REWRITE to\
+\'a0 (l384) "allow a selective use of extensional TT" by\
+\'a0 explaining how such proofs can be elaborated to proofs\
+\'a0 in intensional TT.\
+\
+# Minor remarks\
+\
+## Tone\
+\
+* l353 "Yes, this is just boolean algebra" reads too casual to me.\
+\
+## Typos\
+\
+* l107 Section 1.2 "de Bruijn" -> "De Bruijn" when used without a\
+\'a0 first name\
+\
+* l253 missing underscores around "v^+" used infix on the next\
+\'a0 lines\
+\
+* l282 "we must to" -> either "we must" or "we need to"\
+\
+* l520 weird kerning for "
+\f2 \uc0\u9702 
+\f0 id"\
+\
+\
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\
+\
+\
+Review #102C\
+===========================================================================\
+\
+Overall merit\
+-------------\
+2. Weak reject\
+\
+Paper summary\
+-------------\
+The paper presents a formalization of simply typed \uc0\u955 -calculus in Agda, using an intrinsic typing approach. Its main contribution is the development of a theoretical framework that unifies renaming and parallel substitution, including their respective lemmas. This is achieved by generalizing the underlying data types, allowing a unified representation of variables, terms, renamings, and substitutions.\
+\
+While the core idea of generalizing the data types to achieve this unification is conceptually straightforward, implementing it requires careful attention to termination. The authors handle this challenge with some clever techniques, managing to obtain a formalization that is accepted by Agda's type checker.\
+\
+The second part of the paper delves into a more theoretical exploration. The authors show how to formalize metatheoretical properties, particularly those expressed within the framework of Categories with Families (CwF), using their proposed setup. They further demonstrate that simply typed lambda calculus gives rise to a simply typed CwF, and that it is indeed isomorphic to the initial simply typed CwF. This confirms the soundness and viability of their approach for future developments.\
+\
+Overall, the paper is well-written and presents an interesting and valuable contribution to the field. The proposed method avoids the common repetition of arguments when verifying categorical properties in systems with binders, providing a more streamlined and elegant solution.\
+\
+Comments for authors\
+--------------------\
+While the paper presents an original and intriguing approach to dealing with substitution and renaming in higher-order languages, I believe it is not yet ready for acceptance in its current form. The discussion on termination, in particular, requires significant deepening. The authors could improve the paper by focusing on two main independent aspects: (1) providing a more compelling, informal, and intuitive argument regarding termination; and (2) offering a more detailed explanation of why Agda's termination checker accepts the formalization. Addressing these points would significantly enhance the strength and maturity of the contribution.\
+\
+Moreover, the paper lacks an analysis of how dependent the proposed approach is on Agda and whether it could be adapted to other dependent type-based proof assistants, such as Coq, Lean, or Idris. Since the reasons behind Agda's termination checker accepting the formalization are not clearly explained (see point (2) above), it is uncertain whether the same approach could be utilized with other proof assistants.\
+\
+\
+Comment @A1 by Reviewer A\
+---------------------------------------------------------------------------\
+Meta-review: The reviewers agreed that this problem has a clear appeal, and the proposed technique deserves to be presented.\'a0 However, there are significant doubts regarding the termination analysis, which is the most important part of this work; @Reviewer A mentions the undiscussed alternative of making `suc-tm` a constructor, which would significantly simplify the termination analysis, and @Reviewer B gives detailed criticism and guidance around the termination argument itself.\
+\
+Additionally, the paper claims to use "plain Agda" while actually requiring non-standard type theory features, without adequately discussing these requirements or potential portability to other proof assistants.\
+\
+We encourage a revision that provides more rigorous termination arguments (or at least does not rely on potential bugs in Agda), more clearly identifies its type-theoretical requirements, and analyzes implementation possibilities in other proof assistants. The reviews provide detailed guidance for addressing these issues in a future submission.\
+\
+One additional point that came up during discussion is that the use of inductive-inductive types and telescopic datatype definitions does not seem to be essential to appease Agda's termination checker, and `\uc0\u931  
+\f3 \uc0\u8469 
+\f0  (_< 2)` may be used in place of `Sort`.}
