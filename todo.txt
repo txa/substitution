@@ -1,0 +1,16 @@
+
+ 
+1.       Explain the termination analysis done by agda. [Nathaniel]
+2.       Discuss the possibility of using the same approach in other systems (or not) [Nathaniel]
+3.       Explain why a suc_tm constructor wouldn’t work. [phil]  = explicit weakening
+ 
+ 
+4.                Why do we want a recursive definition? [thor]
+ 
+5. Discuss using functions instead of an inductive defns [thor[
+•	Yes it is easier
+•	but it doesn’t work for dependent types
+ 
+6. Discuss how to avoid ind-ind [thor]
+ 
+Internal deadline Monday 3/2, meet on Monday 13:00 UK time
