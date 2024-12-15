@@ -2,7 +2,7 @@ Parameterised development
 based on
 Substitution without Copy and Paste
 
-Philip Wadler, 26 Sep--3 Nov 2024
+Thorsten Altenkirch & Nathaniel Burke & Philip Wadler, 26 Sep--6 Nov 2024
 
 
 The previous version required id to be a renaming, but we also need id
@@ -121,7 +121,7 @@ Sort
 ```
 data Sort : Set where
   V : Sort
-  T>V : (v : Sort) → v ≡ V → Sort
+  T>V : (q : Sort) → q ≡ V → Sort
 
 pattern T = T>V V refl
 
@@ -260,8 +260,16 @@ _ = 2
 List of variables or terms
 ```
 data _⊨[_]_ (Δ : Con) (q : Sort) : Con → Set where
-  ∅ : Δ ⊨[ q ] ∅
-  _,_ : Δ ⊨[ q ] Γ → Δ ⊢[ q ] A → Δ ⊨[ q ] (Γ , A)
+
+  ∅ :
+      ----------
+      Δ ⊨[ q ] ∅
+
+  _,_ :
+      (φ : Δ ⊨[ q ] Γ)
+      (P : Δ ⊢[ q ] A)
+    → ----------------
+      Δ ⊨[ q ] (Γ , A)
 
 _⊇_ _⊨_ : Con → Con → Set
 _⊇_ = _⊨[ V ]_
@@ -651,48 +659,6 @@ eta law
   ∎
 ```
 
-## Special cases of substitution
-
-Substitute for the last variable in the environment
-(de Bruijn index zero).
-```
-_[_]₀ :
-    (N : Γ , A ⊢ B)
-    (M : Γ ⊢ A)
-  → ----------------
-     Γ ⊢ B
-N [ M ]₀ = N [ id , M ]
-```
-This is exactly what we need for beta reduction.
-
-Substitute for the last but one variable in the environment
-(de Bruijn index one).
-```
-_[_]₁ :
-    (N : Γ , A , B ⊢ C)
-    (M : Γ ⊢ A)
-  → -------------------
-     Γ , B ⊢ C
-N [ M ]₁ = N [ (id , M) ⨾ ⤊ , Zero ]
-```
-
-Warm up
-```
-warmup : ∀ (N : Γ ⊢ B) (M : Γ ⊢ A) → N [ ⤊ ] [ M ]₀ ≡ N
-warmup N M =
-  begin
-    N [ ⤊ ] [ M ]₀
-  ≡⟨⟩
-    N [ ⤊ ] [ id , M ]
-  ≡⟨ [][] N ⤊ (id , M) ⟩
-    N [ ⤊ ⨾ (id , M) ]
-  ≡⟨ cong (λ □ → N [ □ ]) (⤊⨾, id M) ⟩
-    N [ id {q = T} ]
-  ≡⟨ [id] {r = T} N ⟩
-    N
-  ∎
-```
-
 Autosubst rewrites
 ```
 -- Silly extra rewrites
@@ -739,20 +705,11 @@ T⨾⨾ = ⨾⨾
 ⨾T⨾ = ⨾⨾
 
 {-# REWRITE [][] [id] id⨾ ⨾id ⨾⨾ ⤊⨾, ⨾⨾ Zero[] Suc[] ⁺-def #-}
-
-
-
 {-# REWRITE V[][] T[][] []V[] []T[] #-}
 {-# REWRITE V⨾⨾ T⨾⨾ ⨾V⨾ ⨾T⨾ #-}
 ```
 
-Here is the automatic version
-```
-warmup′ : ∀ (N : Γ ⊢ B) (M : Γ ⊢ A) → N [ ⤊ ] [ M ]₀ ≡ N
-warmup′ N M = refl
-```
-
-We need an extra rewrite to remove the lifts in the next challenge
+We need an extra rewrite to remove the lifts in the first challenge
 ```
 lift-⨾ : lift* V⊑T φ ⨾ ψ ≡ lift* ⊑T (φ ⨾ ψ) 
 lift-⨾ {φ = ∅}     = refl
@@ -761,10 +718,62 @@ lift-⨾ {φ = φ , P} {ψ = ψ}
 {-# REWRITE lift-⨾ #-}
 ```
 
+## Special cases of substitution
+
+Substitute for the last variable in the environment
+(de Bruijn index zero).
+```
+_[_]₀ :
+    (N : Γ , A ⊢ B)
+    (M : Γ ⊢ A)
+  → ----------------
+     Γ ⊢ B
+N [ M ]₀ = N [ id , M ]
+```
+This is exactly what we need for beta reduction.
+
+Substitute for the last but one variable in the environment
+(de Bruijn index one).
+```
+_[_]₁ :
+    (N : Γ , A , B ⊢ C)
+    (M : Γ ⊢ A)
+  → -------------------
+     Γ , B ⊢ C
+N [ M ]₁ = N [ (id , M) ⨾ ⤊ , Zero ]
+```
+
+Warm up
+```
+warmup : ∀ (N : Γ ⊢ B) (M : Γ ⊢ A) → N [ ⤊ ] [ M ]₀ ≡ N
+warmup N M =
+  begin
+    N [ ⤊ ] [ M ]₀
+  ≡⟨⟩
+    N [ ⤊ ] [ id , M ]
+  ≡⟨ [][] N ⤊ (id , M) ⟩
+    N [ ⤊ ⨾ (id , M) ]
+  ≡⟨ cong (λ □ → N [ □ ]) (⤊⨾, id M) ⟩
+    N [ id {q = T} ]
+  ≡⟨ [id] {r = T} N ⟩
+    N
+  ∎
+```
+
+Here is the automatic version
+```
+warmup′ : ∀ (N : Γ ⊢ B) (M : Γ ⊢ A) → N [ ⤊ ] [ M ]₀ ≡ N
+warmup′ N M = refl
+```
+
 First challenge
 ```
-double-subst : ∀ (N : Γ , A , B ⊢ C) (M : Γ ⊢ A) (L : Γ ⊢ B) →
-  N [ M ]₁ [ L ]₀ ≡ N [ L [ ⤊ ] ]₀ [ M ]₀
+double-subst double-subst′ :
+    (N : Γ , A , B ⊢ C)
+    (M : Γ ⊢ A)
+    (L : Γ ⊢ B)
+  → ---------------------------------------
+    N [ M ]₁ [ L ]₀ ≡ N [ L [ ⤊ ] ]₀ [ M ]₀
 double-subst N M L =
   begin
     N [ M ]₁ [ L ]₀
@@ -794,18 +803,25 @@ double-subst N M L =
     N [ L [ ⤊ ] ]₀ [ M ]₀
   ∎
 
-double-subst′ : ∀ (N : Γ , A , B ⊢ C) (M : Γ ⊢ A) (L : Γ ⊢ B) →
-  N [ M ]₁ [ L ]₀ ≡ N [ L [ ⤊ ] ]₀ [ M ]₀
 double-subst′ N M L = refl
 ```
 
 Second challenge
 ```
-commute-subst : N [ M ]₀ [ L ]₀ ≡ N [ L ]₁ [ M [ L ]₀ ]₀
-commute-subst = {!!}
+commute-subst commute-subst′ :
+   (N : Γ , A , B ⊢ C)
+   (M : Γ ⊢ A)
+   (L : Γ ⊢ B)
+ → ---------------------------------------
+    N [ M ]₁ [ L ]₀ ≡ N [ L [ ⤊ ] ]₀ [ M ]₀
+commute-subst N M L =
+  begin
+    N [ M ]₁ [ L ]₀
+  ≡⟨⟩
+    N [ L [ ⤊ ] ]₀ [ M ]₀
+  ∎
 
-commute-subst′ : N [ M ]₀ [ L ]₀ ≡ N [ L ]₁ [ M [ L ]₀ ]₀
-commute-subst′ = refl
+commute-subst′ N M L = refl
 ```
 
 More examples:

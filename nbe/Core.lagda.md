@@ -81,7 +81,7 @@ data _∋_ : Con -> Ty -> Set where
       ---------
       Γ , A ∋ A
 
-  suc  :
+  suc :
       (x : Γ ∋ B)
     → -----------
       Γ , A ∋ B
@@ -234,6 +234,18 @@ idʳʳ⨾ʳ : idʳ ʳ⨾ʳ ξ ==ʳ ξ
 idʳʳ⨾ʳ x = refl
 ```
 
+Congruence of instantiation
+```
+cong^ʳ : ρ ==ʳ ξ → ρ ^ʳ A ==ʳ ξ ^ʳ A
+cong^ʳ e zero = refl
+cong^ʳ e (suc x) = cong suc (e x)
+
+cong[]ʳ : (M : Γ ⊢ A) → ρ ==ʳ ξ → M [ ρ ]ʳ ≡ M [ ξ ]ʳ
+cong[]ʳ (` x) e = cong `_ (e x)
+cong[]ʳ (ƛ N) e = cong ƛ_ (cong[]ʳ N (cong^ʳ e))
+cong[]ʳ (L · M) e = cong₂ _·_ (cong[]ʳ L e) (cong[]ʳ M e)
+```
+
 ## Weaken and rename
 
 ```
@@ -242,6 +254,8 @@ idʳʳ⨾ʳ x = refl
   begin
     (M ↑ A) [ ρ ^ʳ A ]ʳ
   ≡⟨ []ʳ[]ʳ (λ x → refl) M ⟩
+    M [ suc ʳ⨾ʳ (ρ ^ʳ A) ]ʳ
+  ≡⟨⟩
     M [ ρ ʳ⨾ʳ suc ]ʳ
   ≡⟨ []ʳ[]ʳ (λ x → refl) M ⟨
     (M [ ρ ]ʳ) ↑ A
@@ -253,7 +267,7 @@ idʳʳ⨾ʳ x = refl
 Substitutions
 ```
 _⊨_ : Con → Con → Set
-Δ ⊨ Γ  =  ∀ {A} → Γ ∋ A → Δ ⊢ A
+Δ ⊨ Γ  =  ∀ {A : Ty} → Γ ∋ A → Δ ⊢ A
 
 variable
   σ τ υ : Δ ⊨ Γ
@@ -283,7 +297,7 @@ _[_] : Γ ⊢ A → Δ ⊨ Γ → Δ ⊢ A
 Nil and Cons
 ```
 nil : Δ ⊨ ∅
-nil {A = A} ()
+nil ()
 
 _▷_ : Δ ⊨ Γ → Δ ⊢ A → Δ ⊨ Γ , A
 (σ ▷ M) zero  =  M
@@ -300,7 +314,16 @@ Instantiate identity
 ```
 id^ : σ == id → σ ^ A == id
 id^ e zero = refl
-id^ e (suc x) rewrite e x = refl
+id^ {σ = σ} {A = A} e (suc x) =
+  begin
+    (σ ^ A) (suc x)
+  ≡⟨⟩
+    σ x ↑ A
+  ≡⟨ cong (_↑ A) (e x) ⟩
+    ` x ↑ A
+  ≡⟨⟩
+    id (suc x)
+  ∎
 
 [id] : σ == id → ∀ (M : Γ ⊢ A) → M [ σ ] ≡ M
 [id] e (` x) = e x
@@ -342,13 +365,10 @@ _⨾ʳ_ : Θ ⊨ Γ → Δ ⊇ Θ → Δ ⊨ Γ
 (σ ⨾ʳ ξ) x  =  (σ x) [ ξ ]ʳ
 ```
 
-Lemmas with nil and cons
+Lemmas with nil (TODO: may also need lemma with cons)
 ```
-postulate
-  extensionality : ∀ {σ τ : Δ ⊨ Γ} → σ == τ → _≡_ {A = Δ ⊨ Γ} σ τ
-
-nil⨾ʳ : nil ⨾ʳ ρ ≡ nil
-nil⨾ʳ {ρ = ρ} = extensionality {σ = nil ⨾ʳ ρ} {τ = nil} (λ{()})
+nil⨾ʳ : nil ⨾ʳ ρ == nil
+nil⨾ʳ ()
 ```
 
 Instantiate twice
@@ -371,6 +391,18 @@ Instantiate twice
 
 [][]ʳ-corollary : M [ σ ] [ ξ ]ʳ ≡ M [ σ ⨾ʳ ξ ]
 [][]ʳ-corollary {M = M} = [][]ʳ (λ x → refl) M
+```
+
+Congruence of instantiation
+```
+cong^ : σ == τ → σ ^ A == τ ^ A
+cong^ e zero = refl
+cong^ {A = A} e (suc x) = cong (_↑ A) (e x)
+
+cong[] : (M : Γ ⊢ A) → σ == τ → M [ σ ] ≡ M [ τ ]
+cong[] (` x) e = e x
+cong[] (ƛ N) e = cong ƛ_ (cong[] N (cong^ e))
+cong[] (L · M) e = cong₂ _·_ (cong[] L e) (cong[] M e)
 ```
 
 ## Weaken and substitute

@@ -94,7 +94,7 @@ Interpretation of types and contexts
 ```
 ⟦_⟧ᵀ : Ty -> Con -> Set
 ⟦ ι ⟧ᵀ     Γ = Γ ⊢nf ι
-⟦ A ⇒ B ⟧ᵀ Γ = ∀ {Δ} → Δ ⊇ Γ → ⟦ A ⟧ᵀ Δ → ⟦ B ⟧ᵀ Δ
+⟦ A ⇒ B ⟧ᵀ Γ = ∀ {Δ : Con} → Δ ⊇ Γ → ⟦ A ⟧ᵀ Δ → ⟦ B ⟧ᵀ Δ
 
 ⟦_⟧ᶜ : Con -> Con -> Set
 ⟦ ∅ ⟧ᶜ     Δ = ⊤
@@ -146,7 +146,7 @@ reflectᶜ {Γ , A} = weaken-env suc (reflectᶜ {Γ}) , reflect (` zero)
 Normalisation-by-evaluation, open terms
 ```
 nf : Γ ⊢ A -> Γ ⊢nf A
-nf M = reify (⟦ M ⟧ reflectᶜ)
+nf {Γ = Γ} M = reify (⟦ M ⟧ (reflectᶜ {Γ}))
 ```
 
 
