@@ -50,6 +50,10 @@ substitution gives rise to a simply typed category with families (CwF)
 and indeed that it is isomorphic to the initial simply typed CwF.
 \end{abstract}
 
+% PLW: I added this here because I couldn't find the right place for it.
+% PLW: Please move it to the right place and tell me where that is!
+\DeclareUnicodeCharacter{9679}{\textbullet}
+
 \begin{document}
 \maketitle
 
@@ -266,7 +270,31 @@ all quite mechanical, which perhaps implies there is room for Agda's termination
 checking to be extended.
 Finally, it would be nice if the termination checker
 provided independently-checkable evidence that its non-trivial reasoning is 
-sound. 
+sound.
+
+% PLW: added following
+One reviewer asked about an alternative: since we are merging |_∋_| and |_⊢_|
+why not go further and merge them entirely? Instead of a separate type for
+variables, one could have a term corresponding to de Bruijn index zero
+(written |●| below) and an explicit weakening operator on terms (written |_↑|).
+\begin{code}
+data _⊢′_ : Con → Ty → Set where
+  ●    : Γ ▷ A ⊢′ A
+  _↑   : Γ ⊢′ B → Γ ▷ A ⊢′ B
+  _·_  : Γ ⊢ A ⇒ B → Γ ⊢ A → Γ ⊢ B
+  ƛ_   : Γ ▷ A ⊢ B → Γ ⊢ A ⇒ B  
+\end{code}
+This has the unfortunate property that there is now more than one way to
+write terms that used to be identical. For instance, the terms
+|● ↑ ↑ · ● ↑ · ●| and |(● ↑ · ●) ↑ · ●| are equivalent, where |● ↑ ↑|
+corresponds to the variable with de Bruijn index two. A development
+along these lines is explored in \cite{wadler_explicit_2024}. It
+leads to a compact development, but one where the
+natural normal form appears to be to push weakening to the outside,
+so that the second of the two terms above is considered normal rather
+than the first. It may be a useful alternative, but we think it is at
+least as interesting to pursue the development given here, where
+terms retain their familiar normal form.
 
 This paper can also be seen as a preparation for the harder problem to
 implement recursive substitution for dependent types. This is harder,
@@ -275,8 +303,9 @@ substitution laws. While such a M\"unchhausian \cite{altenkirch2023munchhausen}
 construction
 \footnote{The reference is to Baron Münchhausen, who allegedly pulled himself 
 out of a swamp by his own hair.
-We call definitions in type theory whose typing depends on equations about 
-themselves \emph{M\"unchhausian}.
+% PLW: deleted the following as redundant
+% We call definitions in type theory whose typing depends on equations about 
+% themselves \emph{M\"unchhausian}.
 }
 should actually be possible in Agda, the theoretical underpinning of
 inductive-inductive-recursive definitions is mostly unexplored (with
