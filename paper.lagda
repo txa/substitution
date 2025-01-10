@@ -50,10 +50,6 @@ substitution gives rise to a simply typed category with families (CwF)
 and indeed that it is isomorphic to the initial simply typed CwF.
 \end{abstract}
 
-% PLW: I added this here because I couldn't find the right place for it.
-% PLW: Please move it to the right place and tell me where that is!
-\DeclareUnicodeCharacter{9679}{\textbullet}
-
 \begin{document}
 \maketitle
 

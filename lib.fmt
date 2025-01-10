@@ -419,3 +419,8 @@
 
 %format Con≡   = Con "\!" ≡
 %format Ty≡    = Ty "\!" ≡
+
+%format ′      = "^{\prime}"
+%format ⊢′     = ⊢ ′
+%format _⊢′_   = "\_" ⊢′ "\_"
+%format ●      = "\bullet"
