@@ -1,6 +1,5 @@
-import «Lean»
-
--- Ackermann
+-- Lean supports inferring lexicographic termination for individual definition,
+-- but unfortunately this does not seem to work for 'mutual' blocks
 def ack : Nat → Nat → Nat
   | .zero  , n       => .succ n
   | .succ m, .zero   => ack m 1
@@ -86,15 +85,12 @@ def tmslen : Tms q Δ Γ → Nat
   | .ε     => 0
   | δ -, x => .succ (tmslen δ + tmlen x)
 
--- I think it's a bit sad that Lean can't synthesise these 'decreasing_by'
--- proofs automatically, as they are all pretty easy.
--- I expect there are probably fancy tactics that could solve these goals
--- immediately though, which would make this a lot more convenient.
+-- See 'WithTactics.lean' for a cleaner version
 mutual
   def suc : ∀ q, Tm q Γ B → Tm q (Γ ▷ A) B
     | .mk 0 _, i => .vs i
     | .mk 1 _, t => subst _ _ t (sucs V (identity V Γ) _)
-  termination_by q x => (q.n, 0, tmlen x)
+  termination_by q _ => (q.n, 0, 0)
   decreasing_by
   . exact (.left _ _ Nat.zero_lt_one)
   . exact (.left _ _ Nat.zero_lt_one)
@@ -125,7 +121,7 @@ mutual
     | .mk 1 _, _, .var i  , δ      => lift qT (subst _ _ i δ)
     | .mk 1 _, _, .lam t  , δ      => .lam (subst _ _ t (sucs _ δ _ -, zero))
     | .mk 1 _, _, .app t u, δ      => .app (subst _ _ t δ) (subst _ _ u δ)
-  termination_by q r x δ  => (r.n, tmlen x, tmslen δ)
+  termination_by q r x _  => (r.n, tmlen x, 0)
   decreasing_by
   . exact (.right _ (.left _ _ (Nat.lt_succ_self _)))
   . exact (.right _ (.left _ _ (Nat.lt_succ_self _)))
@@ -134,6 +130,3 @@ mutual
   . exact (.right _ (.left _ _ (Nat.lt_succ_of_le (Nat.le_add_right _ _))))
   . exact (.right _ (.left _ _ (Nat.lt_succ_of_le (Nat.le_add_left _ _))))
 end
-
-def main : IO Unit :=
-  IO.println s!"Hello!"
