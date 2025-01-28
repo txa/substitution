@@ -5,10 +5,9 @@ def ack : Nat → Nat → Nat
   | .succ m, .zero   => ack m 1
   | .succ m, .succ n => ack m (ack (.succ m) n)
 
--- Given the termination proof has to be manual anyway, we might as well just
--- use a boolean for the sort (plus a function that calculates the size for
--- termination) but I wanted to try a 'Nat'-based 'sort' to give Lean a chance
--- at infering lexicographic termination order.
+-- Given we are doing the termination proof manually here anyway, we might as
+-- well just use a boolean for the sort (plus a function that calculates the
+-- size for termination).
 --
 -- It might also worth be trying just leaving 'sort' as 'Nat' and use the fact
 -- that there exists no 'Tm (.succ (.succ n)) Γ A' as proof it is < 2
@@ -85,7 +84,9 @@ def tmslen : Tms q Δ Γ → Nat
   | .ε     => 0
   | δ -, x => .succ (tmslen δ + tmlen x)
 
--- See 'WithTactics.lean' for a cleaner version
+-- See 'WithTactics.lean' for a version where Lean can infer all the
+-- 'decreasing_by' proofs (it turns out we only need to annotate 'V' and 'T' as
+-- @[reducible]!)
 mutual
   def suc : ∀ q, Tm q Γ B → Tm q (Γ ▷ A) B
     | .mk 0 _, i => .vs i
