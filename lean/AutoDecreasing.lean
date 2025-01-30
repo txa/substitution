@@ -3,9 +3,9 @@ structure sort where
   prf : n < 2
 
 @[reducible]
-def V : sort := sort.mk 0 (Nat.zero_lt_succ _)
+def V : sort := .mk 0 (Nat.zero_lt_succ _)
 @[reducible]
-def T : sort := sort.mk 1 (Nat.lt_succ_self _)
+def T : sort := .mk 1 (Nat.lt_succ_self _)
 
 inductive SortRel : sort → sort → Type where
 | vt  : SortRel V T
@@ -59,7 +59,7 @@ def zero : Tm q (Γ ▷ A) A := match q with
 mutual
   def suc : ∀ q, Tm q Γ B → Tm q (Γ ▷ A) B
     | .mk 0 _, i => .vs i
-    | .mk 1 _, t => subst _ _ t (sucs V (identity V Γ) _)
+    | .mk 1 _, t => subst _ t (sucs V (identity V Γ) _)
   termination_by q _ => (q.n, 0, 0)
 
   def sucs : ∀q, Tms q Δ Γ → ∀ A, Tms q (Δ ▷ A) Γ
@@ -67,17 +67,20 @@ mutual
     | q, δ -, x, A => sucs q δ A -, suc q x
   termination_by q δ => (q.n, 0, sizeOf δ)
 
+  -- 'identity : ∀ Γ, Tms V Γ Γ' with 'termination_by Γ => (0, sizeOf Γ, 0)'
+  -- also works, but then we would need to also define lifting for lists of
+  -- terms to build single-substitutions.
   def identity : ∀ q Γ, Tms q Γ Γ
     | q, .ε    => .ε
-    | q, Γ ▷ A => sucs q (identity q Γ) _ -, zero
+    | q, Γ ▷ A => sucs q (identity q Γ) A -, zero
   termination_by q Γ => (q.n, sizeOf Γ, 0)
 
-  def subst : ∀ q r, Tm q Γ A → Tms r Δ Γ
+  def subst : ∀ r, Tm q Γ A → Tms r Δ Γ
             → Tm (q ⊔ r) Δ A
-    | .mk 0 _, _, .vz     , δ -, u => u
-    | .mk 0 _, _, .vs  i  , δ -, u => subst _ _ i δ
-    | .mk 1 _, _, .var i  , δ      => lift qT (subst _ _ i δ)
-    | .mk 1 _, _, .lam t  , δ      => .lam (subst _ _ t (sucs _ δ _ -, zero))
-    | .mk 1 _, _, .app t u, δ      => .app (subst _ _ t δ) (subst _ _ u δ)
-  termination_by q r x _  => (r.n, sizeOf x, 0)
+    | _, .vz     , δ -, u => u
+    | _, .vs  i  , δ -, u => subst _ i δ
+    | _, .var i  , δ      => lift qT (subst _ i δ)
+    | _, .lam t  , δ      => .lam (subst _ t (sucs _ δ _ -, zero))
+    | _, .app t u, δ      => .app (subst _ t δ) (subst _ u δ)
+  termination_by r x _ => (r.n, sizeOf x, 0)
 end

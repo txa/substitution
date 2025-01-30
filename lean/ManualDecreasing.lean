@@ -15,8 +15,8 @@ structure sort where
   n   : Nat
   prf : n < 2
 
-def V : sort := sort.mk 0 (Nat.zero_lt_succ _)
-def T : sort := sort.mk 1 (Nat.lt_succ_self _)
+def V : sort := .mk 0 (Nat.zero_lt_succ _)
+def T : sort := .mk 1 (Nat.lt_succ_self _)
 
 inductive SortRel : sort → sort → Type where
 | vt  : SortRel V T
@@ -90,14 +90,14 @@ def tmslen : Tms q Δ Γ → Nat
 mutual
   def suc : ∀ q, Tm q Γ B → Tm q (Γ ▷ A) B
     | .mk 0 _, i => .vs i
-    | .mk 1 _, t => subst _ _ t (sucs V (identity V Γ) _)
+    | .mk 1 _, t => subst _ t (sucs V (identity V Γ) _)
   termination_by q _ => (q.n, 0, 0)
   decreasing_by
   . exact (.left _ _ Nat.zero_lt_one)
   . exact (.left _ _ Nat.zero_lt_one)
   . exact (.left _ _ Nat.zero_lt_one)
 
-  def sucs : ∀q, Tms q Δ Γ → ∀ A, Tms q (Δ ▷ A) Γ
+  def sucs : ∀ q, Tms q Δ Γ → ∀ A, Tms q (Δ ▷ A) Γ
     | q, .ε    , A => .ε
     | q, δ -, x, A => sucs q δ A -, suc q x
   termination_by q δ => (q.n, 0, tmslen δ)
@@ -115,14 +115,14 @@ mutual
   . exact (.right _ (.left _ _ (Nat.lt_succ_self _)))
   . exact (.right _ (.left _ _ (Nat.zero_lt_succ _)))
 
-  def subst : ∀ q r, Tm q Γ A → Tms r Δ Γ
+  def subst : ∀ r, Tm q Γ A → Tms r Δ Γ
             → Tm (q ⊔ r) Δ A
-    | .mk 0 _, _, .vz     , δ -, u => u
-    | .mk 0 _, _, .vs i   , δ -, u => subst _ _ i δ
-    | .mk 1 _, _, .var i  , δ      => lift qT (subst _ _ i δ)
-    | .mk 1 _, _, .lam t  , δ      => .lam (subst _ _ t (sucs _ δ _ -, zero))
-    | .mk 1 _, _, .app t u, δ      => .app (subst _ _ t δ) (subst _ _ u δ)
-  termination_by q r x _  => (r.n, tmlen x, 0)
+    | _, .vz     , δ -, u => u
+    | _, .vs  i  , δ -, u => subst _ i δ
+    | _, .var i  , δ      => lift qT (subst _ i δ)
+    | _, .lam t  , δ      => .lam (subst _ t (sucs _ δ _ -, zero))
+    | _, .app t u, δ      => .app (subst _ t δ) (subst _ u δ)
+  termination_by r x _  => (r.n, tmlen x, 0)
   decreasing_by
   . exact (.right _ (.left _ _ (Nat.lt_succ_self _)))
   . exact (.right _ (.left _ _ (Nat.lt_succ_self _)))
