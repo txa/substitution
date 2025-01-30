@@ -196,7 +196,9 @@ zero    [ xs , x ]   =  x
 We use |_⊔_| here to take care of the fact that substitution will only return a 
 variable if both inputs are variables / renamings. We also
 need to use |tm⊑| to take care of the two cases when substituting for
-a variable. We can also define |id| using |_^_|:
+a variable. 
+
+We can also define |id| using |_^_|:
 \begin{spec}
 id : Γ ⊨[ V ] Γ
 id {Γ = •}     =  ε
@@ -278,7 +280,8 @@ considered as decreasing in the case of term weakening (|suc[ T ] t A|).
 
 Luckily, there is an easy solution here: making |id| |Sort|-polymorphic and
 instantiating with |V| at the call-sites
-adds new rows/columns corresponding to the |Sort| argument to the call matrices
+adds new rows/columns (corresponding to the |Sort| argument) to the call
+matrices
 involving |id|, enabling the decrease
 to be tracked and termination to be correctly inferred by Agda.
 We present the call graph diagramatically (inlining |_^_|), 
@@ -329,9 +332,9 @@ Function & Measure \\
 
 We now have a working implementation of substitution. In preparation for
 a similar termination issue we will encounter later though, we note that, 
-perhaps surprisingly, adding a ``dummy argument'' of
-a completely unrelated type, such as |Bool| to |id| also satisfies Agda.
-That is, we can define
+perhaps surprisingly, adding a ``dummy argument'' to |id| of
+a completely unrelated type, such as |Bool| also satisfies Agda.
+That is, we can write
 
 \begin{spec}
 id′ : Bool → Γ ⊨[ V ] Γ
@@ -343,15 +346,15 @@ id = id′ true
 {-# INLINE id #-} 
 \end{spec}
 
-This result was at first a little surprising, but Agda's
+This result was a little surprising at first, but Agda's
 implementation reveals answers. It turns out that Agda considers
-``base constructors'' (constructors
-taking no arguments) to be structurally smaller-than-or-equal-to all
-arguments. This enables Agda to infer |true ≤ T| in |suc[ T ] t A| and |V ≤ T|
-in
+``base constructors'' (data constructors
+taking with arguments) to be structurally smaller-than-or-equal-to all
+parameters of the caller. This enables Agda to infer |true ≤ T| in 
+|suc[ T ] t A| and |V ≤ true| in
 |id′ {Γ = Γ ▷ A}|; we don't get a strict decrease in |Sort| like before,
 but we do have preservation, and it turns out
-(by making use of some slightly more complicated termination measures) this is
+(making use of some slightly more complicated termination measures) this is
 enough:
 
 \begin{tikzcd}[scaleedge cd=1.1, sep=large]
