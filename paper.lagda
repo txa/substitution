@@ -4,12 +4,20 @@
 \citestyle{acmauthoryear}
 %\usepackage{tipa}
 %\usepackage{fontspec}
+\usepackage{tikz-cd}
 \let\Bbbk\relax % to avoid conflict
 %include lhs2TeX.fmt
 %include agda.fmt
 %include lib.fmt
 
 %include is-full.lagda
+
+% From https://tex.stackexchange.com/questions/325297/how-to-scale-a-tikzcd-diagram
+\tikzcdset{scale cd/.style={every label/.append style={scale=#1},
+    cells={nodes={scale=#1}}}}
+
+\tikzcdset{scaleedge cd/.style={every label/.append style={scale=#1}}}
+\tikzcdset{scalecell cd/.style={cells={nodes={scale=#1}}}}
 
 \title{Substitution without copy and paste}
 
