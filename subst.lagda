@@ -372,6 +372,9 @@ enough:
 \arrow[in=300, out=240, loop, swap, "\substack{|r₁′ = r₁| \\ |t₁′ < t₁|}"]
 \end{tikzcd}
 
+% I could justify this claim by linking to the PR
+% https://github.com/agda/agda/pull/7695
+% But this feels like it would break anonymity of the review process? 
 This ``dummy argument'' approach perhaps is interesting because one could 
 imagine automating this process during elaboration.
 Ultimately the details of ensuring termination here does not matter
