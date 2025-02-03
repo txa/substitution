@@ -201,7 +201,9 @@ zero    [ xs , x ]   =  x
 We use |_⊔_| here to take care of the fact that substitution will only return a 
 variable if both inputs are variables / renamings. We also
 need to use |tm⊑| to take care of the two cases when substituting for
-a variable. We can also define |id| using |_^_|:
+a variable. 
+
+We can also define |id| using |_^_|:
 \begin{spec}
 id : Γ ⊨[ V ] Γ
 id {Γ = •}     =  ε
@@ -258,38 +260,141 @@ And now we define:
 xs ^ A                 =  xs ⁺ A , zero[ _ ]
 \end{code}
 
-Unfortunately, we now hit a termination error.
+Unfortunately (as of Agda 2.7.0.1), we now hit a termination error.
 \begin{spec}
 Termination checking failed for the following functions:
   _^_, _[_], id, _⁺_, suc[_]
 \end{spec}
 
-The cause turns out to be |id|. 
-Termination here hinges on the fact that |id| is a renaming - i.e. a sequences 
-of variables, for which weakening is trivial. Note that if we implemented 
-weakening for variables as |i [ id ⁺ A ]|, this would be type-correct, but our
-substitutions would genuinely loop, so perhaps Agda is right to be careful.
+The cause turns out to be |id|. Termination here hinges on weakening for terms
+(|suc[ T ] t A|) building
+and applying a renaming (i.e. a sequence of variables, for which weakening is
+trivial) rather than a full substutution. Note that if |id| produced
+|Tms[ T ] Γ Γ|s, or if we implemented 
+weakening for variables (|suc[ V ] i A|) with |i [ id ⁺ A ]|, our operations
+would still be
+type-correct, but would genuinely loop, so perhaps Agda is right to be
+careful.
 
-Of course, we have specialised our weakening for variables, so we now must ask 
+Of course, we have specialised weakening for variables, so we now must ask 
 why Agda still doesn't accept our program. The limitation is ultimately a 
 technical one: Agda only looks at the direct arguments to function calls when 
 building the call graph from which it identifies termination order 
 \cite{alti:jfp02}. Because |id| is not passed a sort, the sort cannot be 
 considered as decreasing in the case of term weakening (|suc[ T ] t A|).
 
-Luckily, working around this is not difficult. We can implement |id| 
-sort-polymorphically and then define an abbreviation which specialises this to 
-variables.
+Luckily, there is an easy solution here: making |id| |Sort|-polymorphic and
+instantiating with |V| at the call-sites
+adds new rows/columns (corresponding to the |Sort| argument) to the call
+matrices
+involving |id|, enabling the decrease
+to be tracked and termination to be correctly inferred by Agda.
+We present the call graph diagramatically (inlining |_^_|), 
+in the style of \cite{keller2010hereditary}.
+
+\begin{tikzcd}[scaleedge cd=1.1, sep=large]
+& |suc[ q₄ ] t₄q₄Γ₄|
+\arrow[dd, bend left, "\substack{|r₃ < q₄|}"]
+\arrow[ldd, bend right, swap, "\substack{|r₂ < q₄|}"]
+\arrow[rdd, bend left, "|r₁ < q₄|"]
+\\
+\\
+|idr₂Γ₂| 
+\arrow[r, swap, "\substack{|r₃ = r₂|}"]
+\arrow[in=300, out=240, loop, swap, "\substack{|r₂′ = r₂| \\ |Γ₂′ < Γ₂|}"]
+& |σ₃r₃Δ₃Γ₃ ⁺ A| 
+\arrow[uu, bend left, "\substack{|q₄ = r₃|}"]
+\arrow[in=300, out=240, loop, swap, "\substack{|r₃′ = r₃| \\ |σ₃′ < σ₃|}"]
+& |t₁q₁Γ₁ [ σ₁r₁Δ₁Γ₁ ]|
+\arrow[l, "|r₃ = r₁|"]
+\arrow[in=300, out=240, loop, swap, "\substack{|r₁′ = r₁| \\ |t₁′ < t₁|}"]
+\end{tikzcd}
+
+To justify termination formally, we note that along all cycles in the graph,
+either the 
+|Sort| strictly decreases
+in size, or the size of the |Sort| is preserved and some other argument
+(the context, substitution or term) gets smaller. We can therefore
+assign decreasing measures as 
+follows:
+
+\renewcommand{\arraystretch}{1.2}
+\begin{center}
+\begin{tabular}{ ||c||c||c|| }
+\hline
+Function & Measure \\
+\hline \hline
+|t₁q₁Γ₁ [ σ₁r₁Δ₁Γ₁ ]| & |(r₁ , t₁)| \\ [0.2ex]
+\hline
+|idr₂Γ₂| & |(r₂ , Γ₂)| \\ [0.2ex]
+\hline
+|σ₃r₃Δ₃Γ₃ ⁺ A| & |(r₃ , σ₃)| \\ [0.2ex]
+\hline
+|suc[ q₄ ] t₄q₄Γ₄| & |(q₄)| \\ [0.2ex]
+\hline
+\end{tabular}
+\end{center}
+
+We now have a working implementation of substitution. In preparation for
+a similar termination issue we will encounter later though, we note that, 
+perhaps surprisingly, adding a ``dummy argument'' to |id| of
+a completely unrelated type, such as |Bool| also satisfies Agda.
+That is, we can write
 
 \begin{spec}
-id-poly : Γ ⊨[ q ] Γ 
-id-poly {Γ = •} = ε
-id-poly {Γ = Γ ▷ A} = id-poly ^ A
+id′ : Bool → Γ ⊨[ V ] Γ
+id′ {Γ = •}      d = ε
+id′ {Γ = Γ ▷ A}  d = id′ d ^ A
 
 id : Γ ⊨[ V ] Γ 
-id = id-poly
-{-# \Keyword{INLINE} id #-}
+id = id′ true
+{-# INLINE id #-} 
 \end{spec}
+
+This result was a little surprising at first, but Agda's
+implementation reveals answers. It turns out that Agda considers
+``base constructors'' (data constructors
+taking with arguments) to be structurally smaller-than-or-equal-to all
+parameters of the caller. This enables Agda to infer |true ≤ T| in 
+|suc[ T ] t A| and |V ≤ true| in
+|id′ {Γ = Γ ▷ A}|; we do not get a strict decrease in |Sort| like before,
+but it is at least preserved, and it turns out
+(making use of some slightly more complicated termination measures) this is
+enough:
+
+\begin{tikzcd}[scaleedge cd=1.1, sep=large]
+& |suc[ q₄ ] t₄q₄Γ₄|
+\arrow[dd, bend left, "\substack{|r₃ < q₄|}"]
+\arrow[ldd, bend right, swap, "\substack{|d₂ ≤ q₄| \\ |Γ₂ = Γ₄|}"]
+\arrow[rdd, bend left, "\substack{|r₁ < q₄|}"]
+\\
+\\
+|id′Γ₂ d₂| 
+\arrow[r, swap, "\substack{|q₃ ≤ d₂| \\ |Δ₃ < Γ₂|}"]
+\arrow[in=300, out=240, loop, swap, "\substack{|d₂′ = d₂| \\ |Γ₂′ < Γ₂|}"]
+& |σ₃r₃Δ₃Γ₃ ⁺ A| 
+\arrow[uu, bend left, "\substack{|q₄ = r₃| \\ |Γ₄ = Δ₃|}"]
+\arrow[in=300, out=240, loop, swap, "\substack{|r₃′ = r₃| \\ |Δ₃′ = Δ₃| \\ |σ₃′ < σ₃|}"]
+& |t₁q₁Γ₁ [ σ₁r₁Δ₁Γ₁ ]|
+\arrow[l, "|r₃ = r₁|"]
+\arrow[in=300, out=240, loop, swap, "\substack{|r₁′ = r₁| \\ |t₁′ < t₁|}"]
+\end{tikzcd}
+
+% TODO: Should we link to the PR?
+% https://github.com/agda/agda/pull/7695
+This ``dummy argument'' approach perhaps is interesting because one could 
+imagine automating this process (i.e. via elaboration or
+directly inside termination checking). In fact, a
+PR featuring exactly this extension is currently open on the Agda
+GitHub repository.
+
+Ultimately the details behind how termination is ensured do not matter
+though here though: both appaoraches provide effectively the same
+interface.\sidenote{Technically, a |Sort|-polymorphic |id| provides a direct
+way to build identity substitutions as well as identity
+renamings, which are useful to build single substitutions (|< t > = id , t|), 
+but we can easily recover this for a monomorphic |id| by extending |tm⊑| to 
+lists of terms.}
 
 Finally, we define composition by folding substitution:
 \begin{code}
@@ -297,7 +402,3 @@ _∘_ : Γ ⊨[ q ] Θ → Δ ⊨[ r ] Γ → Δ ⊨[ q ⊔ r ] Θ
 ε ∘ ys         = ε
 (xs , x) ∘ ys  = (xs ∘ ys) , x [ ys ]
 \end{code}
-
-Clearly, the definitions are very recursive and exploit the structural
-ordering on terms and the order on sorts. We can leave the details to
-the termination checker.

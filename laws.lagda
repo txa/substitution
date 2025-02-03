@@ -120,23 +120,38 @@ id∘ : {xs : Γ ⊨[ r ] Δ}
 \end{code}
 
 Similarly to |id|, Agda will not accept a direct implementation of |id∘| as 
-structurally recursive, though we solve this error in a slightly more hacky way.
-We declare a version of |id∘| which takes an unused |Sort| argument, and then
-implement our desired left-identity law by instantiating this unused sort with 
-|V|.
+structurally recursive. Unfortunately, adapting the law to deal with a
+|Sort|-polymorphic |id| complicates matters: when |xs| is a renaming 
+(i.e. at sort |V|)
+composed with an identity substition (i.e. at sort |T|), its sort must be lifted
+on
+the RHS (e.g. by extending the |tm⊑| functor to lists of terms) to
+obey |_⊔_|. 
+Accounting for this lifting is certainly do-able, but in keeping with the
+single-responsibility principle of software design, we argue it is neater
+to consider only |V|-sorted |id| here and worry about equations involving
+|Sort|-coercions later.
+
+We therefore use the dummy argument trick, declaring a version of |id∘| 
+which takes an unused argument, and 
+implementing our desired left-identity law by instantiating with a 
+suitable base constructor.
 \footnote{Alternatively, we could extend sort coercions, |tm⊑|, to 
 renamings/substitutions. The proofs end up a bit clunkier this way 
 (requiring explicit insertion and removal of these extra coercions).}
 
 \begin{code}
-id∘′ : Sort → {xs : Γ ⊨[ r ] Δ}
+data Dummy : Set where
+   ⟨⟩ : Dummy
+
+id∘′ : Dummy → {xs : Γ ⊨[ r ] Δ}
   → id ∘ xs ≡ xs
 
-id∘ = id∘′ V
+id∘ = id∘′ ⟨⟩
 \end{code}
 
 \begin{spec}
-{-# \Keyword{INLINE} $id \circ \;$ #-}
+{-# \Keyword{INLINE} $\text{id} \circ \;$ #-}
 \end{spec}
 
 %if False

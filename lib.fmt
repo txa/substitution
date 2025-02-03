@@ -424,3 +424,47 @@
 %format ⊢′     = ⊢ ′
 %format _⊢′_   = "\_" ⊢′ "\_"
 %format ●      = "\bullet"
+%format id′    = id ′
+
+%format ≤ = "\leq"
+%format < = "\ensuremath{<}"
+
+%format ₁  = "_1"
+%format ₂  = "_2"
+%format ₃  = "_3"
+%format ₄  = "_4"
+
+%format t₁ = t ₁
+%format q₁ = q ₁
+%format r₁ = r ₁
+%format Γ₁ = Γ ₁
+%format Δ₁ = Δ ₁
+%format σ₁ = σ ₁
+%format Γ₂ = Γ ₂
+%format q₂ = q ₂
+%format r₂ = r ₂
+%format d₂  = d ₂
+%format q₃ = q ₃
+%format r₃ = r ₃
+%format σ₃ = σ ₃
+%format Γ₃ = Γ ₃
+%format Δ₃ = Δ ₃
+%format t₄ = t ₄
+%format Γ₄ = Γ ₄
+%format q₄ = q ₄
+
+%format r₁′ = r₁ ′
+%format t₁′ = t₁ ′
+%format r₂′ = r₂ ′
+%format Γ₂′ = Γ₂ ′
+%format d₂′ = d₂ ′
+%format r₃′ = r₃ ′
+%format σ₃′ = σ₃ ′
+%format Δ₃′ = Δ₃ ′
+
+%format t₁q₁Γ₁    = t₁ "\vphantom{a}" "_{" Γ₁ "}" "^{" q₁ "}"
+%format σ₁r₁Δ₁Γ₁  = "^{" r₁ "}" σ₁ "\vphantom{a}" "_{" Γ₁ "}" "^{" Δ₁ "}"
+%format idr₂Γ₂    = id "_{" Γ₂ "}" "^{" r₂ "}"
+%format id′Γ₂     = id "_{" Γ₂ "}" ′
+%format σ₃r₃Δ₃Γ₃ = "^{" r₃ "}" σ₃ "\vphantom{a}" "_{" Γ₃ "}" "^{" Δ₃ "}"
+%format t₄q₄Γ₄   = t₄ "\vphantom{a}" "_{" Γ₄ "}" "^{" q₄ "}"
