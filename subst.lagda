@@ -67,7 +67,12 @@ variable
 %endif
 
 Here the predicate |isV| only holds for |V|. We could avoid this mutual
-definition by using equality |_≡_|.
+definition by using equality |_≡_|:
+\begin{spec}
+data Sort where
+  V : Sort
+  T>V : (s : Sort) → s ≡ V → Sort
+\end{spec}
 
 We can now define |T = T>V V isV : Sort| but, even better, we can tell Agda that
 this is a derived pattern
