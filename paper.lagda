@@ -1,7 +1,10 @@
-\documentclass[sigplan,10pt,natbib]{acmart}
+\documentclass[a4paper,UKenglish,cleveref, autoref, thm-restate]{lipics-v2021}
+% \documentclass[sigplan,10pt,natbib]{acmart}
 %\documentclass[sigplan,10pt,natbib,anonymous,review]{acmart}
-\settopmatter{printfolios=true,printccs=false,printacmref=false}
-\citestyle{acmauthoryear}
+
+
+% \settopmatter{printfolios=true,printccs=false,printacmref=false}
+% \citestyle{acmauthoryear}
 %\usepackage{tipa}
 %\usepackage{fontspec}
 \usepackage{tikz-cd}
@@ -19,31 +22,49 @@
 \tikzcdset{scaleedge cd/.style={every label/.append style={scale=#1}}}
 \tikzcdset{scalecell cd/.style={cells={nodes={scale=#1}}}}
 
+\bibliographystyle{plainurl}
+
 \title{Substitution without copy and paste}
 
-\author{Thorsten Altenkirch}
-\affiliation{%
-  \institution{University of Nottingham}
-  \city{Nottingham}
-  \country{United Kingdom}
-  }
-\email{thorsten.altenkirch@@nottingham.ac.uk}
+% \author{Thorsten Altenkirch}
+% \affiliation{%
+%   \institution{University of Nottingham}
+%   \city{Nottingham}
+%   \country{United Kingdom}
+%   }
+% \email{thorsten.altenkirch@@nottingham.ac.uk}
+% 
+% \author{Nathaniel Burke}
+% \affiliation{
+%   \institution{Imperial College London}
+%   \city{London}
+%   \country{United Kingdom}
+%   }
+% \email{nathaniel.burke21@@imperial.ac.uk}
+% 
+% \author{Philip Wadler}
+% \affiliation{
+%   \institution{University of Edinburgh}
+%   \city{Edinburgh}
+%   \country{United Kingdom}
+%   }
+% \email{wadler@@inf.ed.ac.uk}
 
-\author{Nathaniel Burke}
-\affiliation{
-  \institution{Imperial College London}
-  \city{London}
-  \country{United Kingdom}
-  }
-\email{nathaniel.burke21@@imperial.ac.uk}
+%TODO Add ORCIDs?
+\author{Thorsten Altenkirch}{University of Nottingham, Nottingham, United Kingdom}{thorsten.altenkirch@@nottingham.ac.uk}{}{}
+\author{Nathaniel Burke}{Imperial College London, London, United Kingdom}{nathaniel.burke21@@imperial.ac.uk}{}{}
+\author{Philip Wadler}{University of Edinburgh, Edinburgh, United Kingdom}{wadler@@inf.ed.ac.uk}{}{}
 
-\author{Philip Wadler}
-\affiliation{
-  \institution{University of Edinburgh}
-  \city{Edinburgh}
-  \country{United Kingdom}
-  }
-\email{wadler@@inf.ed.ac.uk}
+\authorrunning{T. Altenkirch, N. Burk and P. Wadler}
+\Copyright{Thorsten Altenkirch, Nathaniel Burke and Philip Wadler}
+
+% TODO Pick ACM 2012 Classifications from https://dl.acm.org/ccs/ccs_flat.cfm 
+\ccsdesc[100]{\textcolor{red}{Replace ccsdesc macro with valid one}}
+% TODO Keywords
+\keywords{Dummy keyword}
+
+\begin{document}
+\maketitle
 
 \begin{abstract}
 When defining substitution recursively for a language with binders
@@ -59,7 +80,6 @@ and indeed that it is isomorphic to the initial simply typed CwF.
 \end{abstract}
 
 \begin{document}
-\maketitle
 
 \section{Introduction}
 \label{sec:introduction}

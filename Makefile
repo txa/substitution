@@ -18,12 +18,12 @@ supplement.zip : README.txt naive.lagda subst.lagda laws.lagda init.lagda
 	zip supplement.zip README.txt naive.lagda subst.lagda laws.lagda init.lagda
 
 clean:
-	rm *.tex || true
+	rm paper.tex || true
 	rm *.aux || true
 	rm *.fdb_latexmk || true
 	rm *.fls || true
 	rm *.log || true
 	rm *.out || true
 	rm *.ptb || true
-	rm *.pdf || true
+	rm paper.pdf || true
 	rm *.zip || true

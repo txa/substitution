@@ -510,7 +510,7 @@
     \leavevmode
     \hb@xt@1em{\@makefnmark\hss}#1}
 \usepackage{microtype}
-\usepackage[utf8]{inputenc}
+\usepackage[utf8x]{inputenc}
 \ifx\pdfa\relax%
 	\IfFileExists{glyphtounicode.tex}{
 		\input glyphtounicode
