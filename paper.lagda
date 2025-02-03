@@ -79,8 +79,6 @@ substitution gives rise to a simply typed category with families (CwF)
 and indeed that it is isomorphic to the initial simply typed CwF.
 \end{abstract}
 
-\begin{document}
-
 \section{Introduction}
 \label{sec:introduction}
 
@@ -89,12 +87,12 @@ and indeed that it is isomorphic to the initial simply typed CwF.
 \begin{quote}
 Some half dozen persons have written technically on combinatory logic,
 and most of these, including ourselves, have published something
-erroneous. \citet{curry1958combinatory}
+erroneous. \cite{curry1958combinatory}
 \end{quote}
 
 % It is notoriously difficult to define substitution correctly
 % in the presence of binding operators. A pleasing solution is
-% suggested by \citet{debruijn1972lambda}, which not only
+% suggested by \cite{debruijn1972lambda}, which not only
 % introduces his eponymous indices but also the notion of
 % simultaneous substitution. However, to make the recursive
 % definition well-founded there is a necessary
@@ -110,7 +108,7 @@ erroneous. \citet{curry1958combinatory}
 % the left, and again on the right); and this leads to
 % fundamental properties that require four proofs, closely
 % related by cut and paste. There are techniques for factoring
-% these definitions and proofs, for instance as suggested by \citet{allais2017type},
+% these definitions and proofs, for instance as suggested by \cite{allais2017type},
 % but these are far from elementary.
 
 % [PHIL: End alternative introduction. Having written it, I think
@@ -199,7 +197,7 @@ substitutions are the \emph{substitution normal forms}.
 \subsection{Related work}
 \label{sec:related-work}
 
-\citet{de_bruijn_lambda_1972} introduces his eponymous indices and
+\cite{de_bruijn_lambda_1972} introduces his eponymous indices and
 also the notion of simultaneous substitution. We are here using a
 typed version of de Bruijn indices, e.g. see \cite{alti:csl99} where
 the problem of showing termination of a simple definition of
