@@ -358,10 +358,12 @@ taking with arguments) to be structurally smaller-than-or-equal-to all
 parameters of the caller. This enables Agda to infer |true ≤ T| in 
 |suc[ T ] t A| and |V ≤ true| in
 |id′ {Γ = Γ ▷ A}|; we do not get a strict decrease in |Sort| like before,
-but it is at least preserved, and it turns out
+but the size is at least preserved, and it turns out
 (making use of some slightly more complicated termination measures) this is
 enough:
 
+% TODO: We could probably fit the tweaked termination measures to the right of
+% the call-graph diagram
 \begin{tikzcd}[scaleedge cd=1.1, sep=large]
 & |suc[ q₄ ] t₄q₄Γ₄|
 \arrow[dd, bend left, "\substack{|r₃ < q₄|}"]
@@ -388,13 +390,17 @@ directly inside termination checking). In fact, a
 PR featuring exactly this extension is currently open on the Agda
 GitHub repository.
 
-Ultimately the details behind how termination is ensured do not matter
-though here though: both appaoraches provide effectively the same
-interface.\sidenote{Technically, a |Sort|-polymorphic |id| provides a direct
-way to build identity substitutions as well as identity
-renamings, which are useful to build single substitutions (|< t > = id , t|), 
-but we can easily recover this for a monomorphic |id| by extending |tm⊑| to 
-lists of terms.}
+Ultimately the details behind how termination is ensured do not matter here 
+though: both approaches provide effectively the same
+interface.
+\footnote{Technically, a |Sort|-polymorphic |id| provides a direct
+way to build identity \texit{substitutions} as well as identity
+\textit{renamings}, which are useful for implementing single substitutions 
+(|< t > = id , t|), 
+but we can easily recover this with a monomorphic |id| by extending |tm⊑| to 
+lists of terms (see \ref{sec::cwf-recurs-subst}). For the rest of the paper, 
+we will use |id : Γ ⊨[ V ] Γ| without assumptions about how it is 
+implemented.}
 
 Finally, we define composition by folding substitution:
 \begin{code}

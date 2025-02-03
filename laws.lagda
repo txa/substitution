@@ -130,7 +130,7 @@ obey |_⊔_|.
 Accounting for this lifting is certainly do-able, but in keeping with the
 single-responsibility principle of software design, we argue it is neater
 to consider only |V|-sorted |id| here and worry about equations involving
-|Sort|-coercions later.
+|Sort|-coercions later (in \ref{sec::cwf-recurs-subst}).
 
 We therefore use the dummy argument trick, declaring a version of |id∘| 
 which takes an unused argument, and 

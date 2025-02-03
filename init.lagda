@@ -328,11 +328,7 @@ interleaved mutual
 The lack of flexibility over sorts when constructing substitutions does, 
 however, make identity a little trickier. 
 |id| doesn't fit |CwF.id| directly as it produces a renaming |Γ ⊨[ V ] Γ|. 
-We need the equivalent substitution |Γ ⊨[ T ] Γ|. 
-Technically, |id-poly| would suit this purpose but for reasons that will become 
-clear soon, we take a slightly more indirect approach.
-\footnote{Also, |id-poly| was ultimately just an implementation detail 
-to satisfy the termination checker, so we'd rather not rely on it.}
+We need the equivalent substitution |Γ ⊨[ T ] Γ|.
 
 We first extend |tm⊑| to sequences of variables/terms:
 \begin{spec}
