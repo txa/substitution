@@ -66,12 +66,13 @@ variable
 \end{code}
 %endif
 
-Here the predicate |isV| only holds for |V|. We could avoid this mutual
-definition by using equality |_≡_|:
+Here the predicate |isV| only holds for |V|. This particular encoding makes
+use of Agda's support for inductive-inductive datatypes (IITs), but merely a
+pair of a natural number |n| and a proof |n ≤ 1| is sufficient:
+
 \begin{spec}
-data Sort where
-  V : Sort
-  T>V : (s : Sort) → s ≡ V → Sort
+Sort : Set
+Sort = Σ ℕ (_≤ 1)
 \end{spec}
 
 We can now define |T = T>V V isV : Sort| but, even better, we can tell Agda that
@@ -80,8 +81,8 @@ this is a derived pattern
 pattern T = T>V V isV
 \end{code}
 This means we can pattern match over |Sort| just with |V| and |T|,
-but now |V| is visibly (to Agda's termination checker) structurally smaller than
-|T|.
+while ensuring |V| is visibly (to Agda's termination checker) structurally 
+smaller than |T|.
 
 We can now define terms and variables in one go (|x, y, z|):
 \begin{code}
