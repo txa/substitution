@@ -179,25 +179,33 @@ substitutions are the \emph{substitution normal forms}.
 \subsection{Related work}
 \label{sec:related-work}
 
-\citet{de_bruijn_lambda_1972} introduces his eponymous indices and also
-the notion of simultaneous substitution. We are here using a typed
-version of de Bruijn indices, e.g. see \cite{alti:csl99} where the
-problem of showing termination of a simple definition of substitution
-(for the untyped $\lambda$-calculus) is addressed using a well-founded
-recursion. However, this is only applied to the definition and the
-categorical laws (which follow from the monad laws) were not formally
-verified. Also the present approach seems to be simpler and scales
-better, avoiding well-founded recursion.  The monadic approach has been
-further investigated in \cite{mcbride2006type}. The structure of the
-proofs is explained in \cite{allais2017type} from a monadic
-perspective. Indeed this example is one of the motivations for
-relative monads \cite{altenkirch2015monads}.
+\citet{de_bruijn_lambda_1972} introduces his eponymous indices and
+also the notion of simultaneous substitution. We are here using a
+typed version of de Bruijn indices, e.g. see \cite{alti:csl99} where
+the problem of showing termination of a simple definition of
+substitution (for the untyped $\lambda$-calculus) is addressed using a
+well-founded recursion. Also the present approach seems to be
+simpler and scales better, avoiding well-founded recursion.
+Andreas Abel used a very similar approach
+to ours in his unpublished agda proof \cite{abel:subst11} for untyped
+$\lambda$-terms when implementing \cite{alti:csl99}.
 
-We avoid the monadic perspective here for two reasons: first we want
-to give a simple self-contained proof avoiding too many advanced
-categorical construction; second, we are interested in the application to 
-dependent types where it is not clear how the monadic approach can be applied
-without using very dependent types.
+The
+monadic approach has been further investigated in
+\cite{mcbride2006type}. The structure of the proofs is explained in
+\cite{allais2017type} from a monadic perspective. Indeed this example
+is one of the motivations for relative monads
+\cite{altenkirch2015monads}.
+
+In the monadic approach we represent substitutions as functions,
+however it is not clear how to extend this to depedent types without
+using very dependent types.
+
+% We avoid the monadic perspective which here for two reasons: first we want
+% to give a simple self-contained proof avoiding too many advanced
+% categorical constructions; second, we are interested in the application to 
+% dependent types where it is not clear how the monadic approach can be applied
+% without using very dependent types.
 
 There are a number of publications on formalising substitution laws.
 Just to mention a few recent ones: 
@@ -211,6 +219,7 @@ typed CwFs we are using in section \ref{sec:initiality}.
 \emph{kits}. \cite{saffrich2024intrinsically} instead uses intrinsic syntax,
 but with renamings and substitutions defined separately, and relevant 
 substitution lemmas repeated for all required combinations.
+
 
 \subsection{Using Agda}
 \label{sec:using-agda}
@@ -275,6 +284,13 @@ checking to be extended.
 Finally, it would be nice if the termination checker
 provided independently-checkable evidence that its non-trivial reasoning is 
 sound.
+
+We could avoid a recursive definition of substitution altogether and
+only use to the initial simply typed CWF which can be defined as a QIIT. However, this is
+unsatiosfactory for two reasons: first of all we would like to repalte
+the quotiented view of $\lambda$-terms to the traditional definitionl second
+when proving properties of $\lambda$-terms it is preferable to to
+induction over terms then always have to use quotients.
 
 % PLW: added following
 One reviewer asked about an alternative: since we are merging |_∋_| and |_⊢_|
