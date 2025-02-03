@@ -260,7 +260,7 @@ And now we define:
 xs ^ A                 =  xs ⁺ A , zero[ _ ]
 \end{code}
 
-Unfortunately, we now hit a termination error.
+Unfortunately (as of Agda 2.7.0.1), we now hit a termination error.
 \begin{spec}
 Termination checking failed for the following functions:
   _^_, _[_], id, _⁺_, suc[_]
@@ -357,8 +357,8 @@ implementation reveals answers. It turns out that Agda considers
 taking with arguments) to be structurally smaller-than-or-equal-to all
 parameters of the caller. This enables Agda to infer |true ≤ T| in 
 |suc[ T ] t A| and |V ≤ true| in
-|id′ {Γ = Γ ▷ A}|; we don't get a strict decrease in |Sort| like before,
-but we do have preservation, and it turns out
+|id′ {Γ = Γ ▷ A}|; we do not get a strict decrease in |Sort| like before,
+but it is at least preserved, and it turns out
 (making use of some slightly more complicated termination measures) this is
 enough:
 
@@ -380,13 +380,21 @@ enough:
 \arrow[in=300, out=240, loop, swap, "\substack{|r₁′ = r₁| \\ |t₁′ < t₁|}"]
 \end{tikzcd}
 
-% I could justify this claim by linking to the PR
+% TODO: Should we link to the PR?
 % https://github.com/agda/agda/pull/7695
-% But this feels like it would break anonymity of the review process? 
 This ``dummy argument'' approach perhaps is interesting because one could 
-imagine automating this process during elaboration.
-Ultimately the details of ensuring termination here does not matter
-though, as long as we end up with some way of building identity renamings.
+imagine automating this process (i.e. via elaboration or
+directly inside termination checking). In fact, a
+PR featuring exactly this extension is currently open on the Agda
+GitHub repository.
+
+Ultimately the details behind how termination is ensured do not matter
+though here though: both appaoraches provide effectively the same
+interface.\sidenote{Technically, a |Sort|-polymorphic |id| provides a direct
+way to build identity substitutions as well as identity
+renamings, which are useful to build single substitutions (|< t > = id , t|), 
+but we can easily recover this for a monomorphic |id| by extending |tm⊑| to 
+lists of terms.}
 
 Finally, we define composition by folding substitution:
 \begin{code}
