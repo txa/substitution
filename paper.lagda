@@ -184,10 +184,10 @@ also the notion of simultaneous substitution. We are here using a
 typed version of de Bruijn indices, e.g. see \cite{alti:csl99} where
 the problem of showing termination of a simple definition of
 substitution (for the untyped $\lambda$-calculus) is addressed using a
-well-founded recursion. Also the present approach seems to be
+well-founded recursion. The present approach seems to be
 simpler and scales better, avoiding well-founded recursion.
-Andreas Abel used a very similar approach
-to ours in his unpublished agda proof \cite{abel:subst11} for untyped
+Andreas Abel used a very similar technique
+to ours in his unpublished Agda proof \cite{abel:subst11} for untyped
 $\lambda$-terms when implementing \cite{alti:csl99}.
 
 The
@@ -197,9 +197,10 @@ monadic approach has been further investigated in
 is one of the motivations for relative monads
 \cite{altenkirch2015monads}.
 
-In the monadic approach we represent substitutions as functions,
-however it is not clear how to extend this to depedent types without
-using very dependent types.
+In the monadic approach, we represent substitutions as functions,
+however it is not clear how to extend this to dependent types without
+% Cite very dependent types?
+``very dependent'' types.
 
 % We avoid the monadic perspective which here for two reasons: first we want
 % to give a simple self-contained proof avoiding too many advanced
@@ -283,17 +284,59 @@ all quite mechanical, which perhaps implies there is room for Agda's termination
 checking to be extended.
 Finally, it would be nice if the termination checker
 provided independently-checkable evidence that its non-trivial reasoning is 
-sound.
+sound (being able to print termination matrices with |-v term:5| is a
+useful feature, but is not quite as convincing as actually elaborating 
+to well-founded induction like e.g. Lean).
+
+It is perhaps worth mentioning that the convenience of our solution
+heavily relies on Agda's built-in 
+support for lexicographic termination \cite{alti:jfp02}. 
+This is in contrast to Rocq and Lean; the
+former's |Fixpoint| command merely supports structural recursion on a
+single argument and the latter has only raw elimination principles as
+primitive. Luckily, both of these proof assistants layer on additional
+commands/tactics to support more natural use of non-primitive induction.
+
+For example, Lean features a pair of tactics |termination_by| and 
+|decreasing_by| for specifying per-function termination measures and
+proving that these measures strictly decrease, similarly to our
+approach to justifying termination in \ref{sec:termination}. 
+The slight extra complication is
+that Lean requires the provided measures to strictly decrease along 
+every
+mutual function call as opposed to over every cycle in the call graph.
+In the case of our substitution operations, adapting for this is not to onerous,
+requiring e.g. replacing the measures for |id| and |_⁺_| from
+|(r₂ , Γ₂)| and |(r₃ , σ₃)| to |(r₂ , Γ₂ , 0)| and |(r₃ , 0 , σ₃)|, ensuring
+a strict decrease when calling |_⁺_| in |id {Γ = Γ ▷ A}|.
+
+Conveniently, after specifying the correct measures, Lean is able to
+automatically solve the |decreasing_by| proof obligations, and so our
+approach to defining substitution remains concise even without quite-as-robust 
+support
+for lexicographic termination\footnote{In fact, specifying termination
+measures manually has some advantages: we no longer need to use a
+complicated |Sort| datatype to make the ordering on constructors
+obvious: computing
+sizes with |if b then 1 else 0| is sufficient.}.
+ Of course, doing the analysis to work out which
+termination measures were appropriate took some time, and one could imagine
+an expanded Lean tactic being able to infer termination
+with no assistance, using a similar algorithm to Agda.
 
 We could avoid a recursive definition of substitution altogether and
-only use to the initial simply typed CWF which can be defined as a QIIT. However, this is
-unsatiosfactory for two reasons: first of all we would like to repalte
-the quotiented view of $\lambda$-terms to the traditional definitionl second
-when proving properties of $\lambda$-terms it is preferable to to
-induction over terms then always have to use quotients.
+only work with the initial simply typed CwF as a QIIT. 
+However, this is
+unsatisfactory for two reasons: first of all, we would like to relate
+the quotiented view of $\lambda$-terms to the their definitional
+presentation, and, 
+second, when proving properties of $\lambda$-terms it is preferable to do so
+by induction over terms rather than use quotients (i.e. no need to consider
+cases for non-canonical elements or prove that equations are preserved).
 
 % PLW: added following
-One reviewer asked about an alternative: since we are merging |_∋_| and |_⊢_|
+One reviewer asked about another alternative: since we are merging |_∋_| and
+|_⊢_|
 why not go further and merge them entirely? Instead of a separate type for
 variables, one could have a term corresponding to de Bruijn index zero
 (written |●| below) and an explicit weakening operator on terms (written |_↑|).
@@ -310,10 +353,12 @@ write terms that used to be identical. For instance, the terms
 corresponds to the variable with de Bruijn index two. A development
 along these lines is explored in \cite{wadler_explicit_2024}. It
 leads to a compact development, but one where the
-natural normal form appears to be to push weakening to the outside,
+natural normal form appears to be to push weakening to the outside
+(such as in \cite{mcbride2018everybody}),
 so that the second of the two terms above is considered normal rather
-than the first. It may be a useful alternative, but we think it is at
-least as interesting to pursue the development given here, where
+than the first. 
+It may be a useful alternative, but we think it is
+also interesting to pursue the development given here, where
 terms retain their familiar normal form.
 
 This paper can also be seen as a preparation for the harder problem to

@@ -70,7 +70,8 @@ additional structure to model simply typed $\lambda$-calculus (section
 \ref{sec:simply-typed-cwfs}) and then we show that the recursive
 definition of substitution gives rise to a simply typed CwF (section
 \ref{sec:cwf-recurs-subst}). We can define the initial CwF as a
-Quotient Inductive-Inductive Type. To simplify our development, rather than 
+Quotient Inductive-Inductive Type (QIIT). To simplify our development, rather 
+than 
 using a Cubical Agda HIT,
 \footnote{Cubical Agda still lacks some essential automation,
   e.g. integrating no-confusion properties into pattern matching.}

@@ -261,6 +261,9 @@ And now we define:
 xs ^ A                 =  xs ⁺ A , zero[ _ ]
 \end{code}
 
+\subsection{Termination}
+\label{sec:termination}
+
 Unfortunately (as of Agda 2.7.0.1), we now hit a termination error.
 \begin{spec}
 Termination checking failed for the following functions:
@@ -395,7 +398,7 @@ Ultimately the details behind how termination is ensured do not matter here
 though: both approaches provide effectively the same
 interface.
 \footnote{Technically, a |Sort|-polymorphic |id| provides a direct
-way to build identity \texit{substitutions} as well as identity
+way to build identity \textit{substitutions} as well as identity
 \textit{renamings}, which are useful for implementing single substitutions 
 (|< t > = id , t|), 
 but we can easily recover this with a monomorphic |id| by extending |tm⊑| to 

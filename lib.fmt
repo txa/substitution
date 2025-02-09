@@ -426,8 +426,9 @@
 %format ●      = "\bullet"
 %format id′    = id ′
 
-%format ≤ = "\leq"
-%format < = "\ensuremath{<}"
+%format ≤  = "\leq"
+%format _≤ = "\_" ≤
+%format <  = "\ensuremath{<}"
 
 %format ₁  = "_1"
 %format ₂  = "_2"
