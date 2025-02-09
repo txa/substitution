@@ -70,13 +70,13 @@ additional structure to model simply typed $\lambda$-calculus (section
 \ref{sec:simply-typed-cwfs}) and then we show that the recursive
 definition of substitution gives rise to a simply typed CwF (section
 \ref{sec:cwf-recurs-subst}). We can define the initial CwF as a
-Quotient Inductive-Inductive Type (QIIT). To simplify our development, rather 
+quotient inductive-inductive type (QIIT). To simplify our development, rather 
 than 
 using a Cubical Agda HIT,
 \footnote{Cubical Agda still lacks some essential automation,
   e.g. integrating no-confusion properties into pattern matching.}
 we just postulate the existence of this QIIT in Agda (with
-the associated rewriting rules). By initiality, there is an evaluation
+the associated $\beta$-laws as rewriting rules). By initiality, there is an evaluation
 functor from the initial CwF to the recursively defined CwF (defined
 in section \ref{sec:cwf-recurs-subst}). On the
 other hand, we can embed the recursive CwF into the initial CwF;

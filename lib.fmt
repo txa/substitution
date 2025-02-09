@@ -92,6 +92,8 @@
 %format _⇒_ = "\_\Rightarrow\_"
 %format `_ = "\texttt{\textasciigrave}\_"
 %format ` = "\texttt{\textasciigrave}"
+%format ·    = "\cdot"
+%format _·_  = "\_" · "\_"
 
 %format ⊢ = "\vdash"
 %format _⊢_ = "\_\vdash\_"
@@ -155,7 +157,7 @@
 
 %format ⁺ = "^{+}"
 %format _⁺_ = "\_^{+}\_"
-%format _⁺v_ = "^{+}\!{\mathrm{v}}"
+%format _⁺v_ = "\_" "^{+}\!{\mathrm{v}}" "\_"
 %format ⁺v = "^{+}\!{\mathrm{v}}"
 %format _⁺_, = "\_^{+}\_,"
 
