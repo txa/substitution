@@ -66,12 +66,13 @@ variable
 \end{code}
 %endif
 
-Here the predicate |isV| only holds for |V|. We could avoid this mutual
-definition by using equality |_≡_|:
+Here the predicate |isV| only holds for |V|. This particular encoding makes
+use of Agda's support for inductive-inductive datatypes (IITs), but merely a
+pair of a natural number |n| and a proof |n ≤ 1| is sufficient:
+
 \begin{spec}
-data Sort where
-  V : Sort
-  T>V : (s : Sort) → s ≡ V → Sort
+Sort : Set
+Sort = Σ ℕ (_≤ 1)
 \end{spec}
 
 We can now define |T = T>V V isV : Sort| but, even better, we can tell Agda that
@@ -80,8 +81,8 @@ this is a derived pattern
 pattern T = T>V V isV
 \end{code}
 This means we can pattern match over |Sort| just with |V| and |T|,
-but now |V| is visibly (to Agda's termination checker) structurally smaller than
-|T|.
+while ensuring |V| is visibly (to Agda's termination checker) structurally 
+smaller than |T|.
 
 We can now define terms and variables in one go (|x, y, z|):
 \begin{code}
@@ -260,6 +261,9 @@ And now we define:
 xs ^ A                 =  xs ⁺ A , zero[ _ ]
 \end{code}
 
+\subsection{Termination}
+\label{sec:termination}
+
 Unfortunately (as of Agda 2.7.0.1), we now hit a termination error.
 \begin{spec}
 Termination checking failed for the following functions:
@@ -394,7 +398,7 @@ Ultimately the details behind how termination is ensured do not matter here
 though: both approaches provide effectively the same
 interface.
 \footnote{Technically, a |Sort|-polymorphic |id| provides a direct
-way to build identity \texit{substitutions} as well as identity
+way to build identity \textit{substitutions} as well as identity
 \textit{renamings}, which are useful for implementing single substitutions 
 (|< t > = id , t|), 
 but we can easily recover this with a monomorphic |id| by extending |tm⊑| to 
