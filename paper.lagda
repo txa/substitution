@@ -22,7 +22,7 @@
 \tikzcdset{scaleedge cd/.style={every label/.append style={scale=#1}}}
 \tikzcdset{scalecell cd/.style={cells={nodes={scale=#1}}}}
 
-\bibliographystyle{plainurl}
+\bibliographystyle{./plainurl}
 
 \title{Substitution without copy and paste}
 
@@ -57,11 +57,10 @@
 
 \authorrunning{T. Altenkirch, N. Burk and P. Wadler}
 \Copyright{Thorsten Altenkirch, Nathaniel Burke and Philip Wadler}
-
-% TODO Pick ACM 2012 Classifications from https://dl.acm.org/ccs/ccs_flat.cfm 
-\ccsdesc[100]{\textcolor{red}{Replace ccsdesc macro with valid one}}
-% TODO Keywords
-\keywords{Dummy keyword}
+ 
+% TODO Maybe tweak/add more keywords
+\ccsdesc{Theory of computation~Type theory}
+\keywords{Substitution, Metatheory, Agda}
 
 \begin{document}
 \maketitle
@@ -430,8 +429,7 @@ we believe that the construction here can be useful to others.
 
 
 
-\bibliographystyle{ACM-Reference-Format}
-\bibliography{local}
+\bibliography{./local}
 
 
 \end{document}
