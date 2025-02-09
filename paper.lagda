@@ -126,7 +126,9 @@ The main setback was that the same proofs got repeated many times.
 If there is one guideline of good software engineering then it is 
 \textbf{Do not write code by copy and paste} and this applies even more so to 
 formal proofs.
-
+% Horrible hack: Remind LaTeX that "\\[<LENGTH>]" is a thing, because apparently
+% it can sometimes forget...
+\phantom{a} \\[0.0ex] \indent
 This paper is the result of the effort to refactor the proof. We think
 that the method used is interesting also for other problems. In
 particular the current construction can be seen as a warmup for the
