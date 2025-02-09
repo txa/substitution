@@ -151,7 +151,7 @@ id∘ = id∘′ ⟨⟩
 \end{code}
 
 \begin{spec}
-{-# \Keyword{INLINE} $\text{id} \circ \;$ #-}
+{-# \Keyword{INLINE} $\Varid{id} \circ \;$ #-}
 \end{spec}
 
 %if False

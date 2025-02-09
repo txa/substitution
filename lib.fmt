@@ -171,7 +171,7 @@
 %format id∘ = "\mathrm{id}\circ"
 %format id∘′ = "\mathrm{id}\!\circ^{\prime}"
 
-%format •-η = "\bullet\!-\!\eta"
+%format •-η = "\bigcdot\!-\!\eta"
 %format π₀ = "\pi_0"
 %format π₁ = "\pi_1"
 %format ▷-β₀ = "\rhd\!-\!\beta_0"
@@ -425,7 +425,8 @@
 %format ′      = "^{\prime}"
 %format ⊢′     = ⊢ ′
 %format _⊢′_   = "\_" ⊢′ "\_"
-%format ●      = "\bullet"
+%format ●      = "\bigcdot"
+%format •      = "\bigcdot"
 %format id′    = id ′
 
 %format ≤  = "\leq"

@@ -37,7 +37,7 @@ module Subst where
 
 Our main idea is to turn the distinction between
 variables and terms into a parameter. The first approximation is to
-define a type |Sort| (|q, r, s|) :
+define a type |Sort| (|q, r, s|):
 \begin{spec}
 data Sort : Set where
    V T : Sort  
@@ -50,15 +50,26 @@ Agda's termination checker only knows about the structural
 orderings. With the following definition, we
 can make |V| structurally smaller than |T>V V isV|, while maintaining that 
 |Sort| has only two elements.
+
+%if false
 \begin{code}
-data Sort : Set 
-data IsV : Sort → Set
-data Sort where
-  V : Sort
-  T>V : (s : Sort) → IsV s → Sort
-data IsV where
-  isV : IsV V
+mutual
 \end{code}
+%endif
+\noindent
+\begin{minipage}{0.45\textwidth}
+\begin{code}
+  data Sort : Set where
+    V    : Sort
+    T>V  : (s : Sort) → IsV s → Sort
+\end{code}
+\end{minipage}
+\begin{minipage}{0.45\textwidth}
+\begin{code}
+  data IsV : Sort → Set where
+    isV : IsV V
+\end{code}
+\end{minipage}
 %if False
 \begin{code}
 variable
@@ -116,27 +127,40 @@ variable
 
 To account for the non-uniform behaviour of substitution and
 composition (the result is |V| only if both inputs are |V|) we define
-a least upper bound on |Sort|:
+a least upper bound on |Sort|. We also need this order as a relation.
+
+\noindent
+\begin{minipage}{0.45\textwidth}
 \begin{code}
 _⊔_ : Sort → Sort → Sort
 V ⊔ r  =  r
 T ⊔ r  =  T
 \end{code}
-We also need this order as a relation, for inserting coercions when necessary:
+\end{minipage}
+\begin{minipage}{0.45\textwidth}
 \begin{code}
 data _⊑_ : Sort → Sort → Set where
   rfl : s ⊑ s
   v⊑t : V ⊑ T
 \end{code}
+\end{minipage}\\
 Yes, this is just boolean algebra. We need a number of laws:
+
+\noindent
+\begin{minipage}{0.45\textwidth}
 \begin{code}
 ⊑t : s ⊑ T
 v⊑ : V ⊑ s
 ⊑q⊔ : q ⊑ (q ⊔ r)
+\end{code}
+\end{minipage}
+\begin{minipage}{0.45\textwidth}
+\begin{code}
 ⊑⊔r : r ⊑ (q ⊔ r)
 ⊔⊔ : q ⊔ (r ⊔ s) ≡ (q ⊔ r) ⊔ s
 ⊔v : q ⊔ V ≡ q
 \end{code}
+\end{minipage}\\
 which are easy to prove by case analysis, e.g.
 \begin{code}
 ⊑t {V} = v⊑t
@@ -160,7 +184,6 @@ v⊑ {T} = v⊑t
 ⊔v {T} = refl
 \end{code}
 %endif
-
 To improve readability we turn the equations ($\sqcup\sqcup$, 
 $\sqcup\mathrm{v}$) into rewrite rules: by declaring
 
@@ -176,9 +199,8 @@ $\sqcup\mathrm{v}$) into rewrite rules: by declaring
 
 This introduces new definitional equalities, i.e.
 |q ⊔ (r ⊔ s) = (q ⊔ r) ⊔ s| and |q ⊔ V = q| are now used by the type
-checker.
-\footnote{Effectively, this feature allows a selective use of extensional
-  Type Theory.}
+checker\footnote{Effectively, this feature allows a selective use of 
+extensional Type Theory.}.
 The order gives rise to a functor which is witnessed by
 \begin{code}
 tm⊑ : q ⊑ s → Γ ⊢[ q ] A → Γ ⊢[ s ] A
@@ -193,24 +215,23 @@ we are ready to define substitution and renaming in one operation
 \begin{code}
 _[_] : Γ ⊢[ q ] A → Δ ⊨[ r ] Γ → Δ ⊢[ q ⊔ r ] A
 
-zero    [ xs , x ]   =  x
-(suc i _) [ xs , x ] =  i [ xs ]
-(` i)   [ xs ]       =  tm⊑  ⊑t  (i [ xs ])
-(t · u) [ xs ]       =  (t [ xs ]) · (u [ xs ])
-(ƛ t)   [ xs ]       =  ƛ (t [ xs ^ _ ]) 
+zero       [ xs , x ]  = x
+(suc i _)  [ xs , x ]  = i [ xs ]
+(` i)      [ xs ]      = tm⊑  ⊑t  (i [ xs ])
+(t · u)    [ xs ]      = (t [ xs ]) · (u [ xs ])
+(ƛ t)      [ xs ]      = ƛ (t [ xs ^ _ ]) 
 \end{code}
 We use |_⊔_| here to take care of the fact that substitution will only return a 
-variable if both inputs are variables / renamings. We also
+variable if both inputs are variables / renamings. We
 need to use |tm⊑| to take care of the two cases when substituting for
 a variable. 
 
 We can also define |id| using |_^_|:
 \begin{spec}
 id : Γ ⊨[ V ] Γ
-id {Γ = •}     =  ε
-id {Γ = Γ ▷ A} =  id ^ A
+id {Γ = •}      =  ε
+id {Γ = Γ ▷ A}  =  id ^ A
 \end{spec}
-
 %if False
 \begin{code}
 id-poly : Γ ⊨[ q ] Γ 
@@ -233,7 +254,6 @@ id = id-poly
 -- id′ {Γ = Γ ▷ A} _ = id ^ A
 \end{code}
 %endif
-
 To define |_^_|, we need parametric versions of |zero|, |suc| and
 |suc*|. |zero| is very easy:
 
@@ -242,20 +262,38 @@ zero[_] : ∀ q → Γ ▷ A ⊢[ q ] A
 zero[ V ]      =  zero
 zero[ T ]      =  ` zero
 \end{code}
-
 However, |suc| is more subtle since the case for |T| depends on its
 fold over substitutions (|_⁺_|):
+
+%if false
 \begin{code}
 _⁺_ : Γ ⊨[ q ] Δ → (A : Ty) → Γ ▷ A ⊨[ q ] Δ
+\end{code}
+%endif
 
-suc[_] : ∀ q → Γ ⊢[ q ] B → (A : Ty) 
-       → Γ ▷ A ⊢[ q ] B
-suc[ V ] i  A   =  suc i A
-suc[ T ] t  A   =  t [ id ⁺  A ]
-
+\noindent
+\begin{minipage}{0.45\textwidth}
+\begin{code}
+suc[_]  :  ∀ q → Γ ⊢[ q ] B → ∀ A 
+        →  Γ ▷ A ⊢[ q ] B
+suc[ V ] i  A  = suc i A
+suc[ T ] t  A  = t [ id ⁺  A ]
+\end{code}
+\end{minipage}
+\begin{minipage}{0.45\textwidth}
+\begin{spec}
+_⁺_  :  Γ ⊨[ q ] Δ → ∀ A 
+     →  Γ ▷ A ⊨[ q ] Δ
+ε         ⁺ A = ε
+(xs , x)  ⁺ A = xs ⁺ A , suc[ _ ] x A 
+\end{spec}
+\end{minipage}\\
+%if false
+\begin{code}
 ε ⁺ A = ε
 (xs , x) ⁺ A = xs ⁺ A , suc[ _ ] x A 
 \end{code}
+%endif
 And now we define:
 \begin{code}
 xs ^ A                 =  xs ⁺ A , zero[ _ ]
@@ -296,6 +334,7 @@ to be tracked and termination to be correctly inferred by Agda.
 We present the call graph diagramatically (inlining |_^_|), 
 in the style of \cite{keller2010hereditary}.
 
+\begin{minipage}{0.65\textwidth}
 \begin{tikzcd}[scaleedge cd=1.1, sep=large]
 & |suc[ q₄ ] t₄q₄Γ₄|
 \arrow[dd, bend left, "\substack{|r₃ < q₄|}"]
@@ -313,15 +352,9 @@ in the style of \cite{keller2010hereditary}.
 \arrow[l, "|r₃ = r₁|"]
 \arrow[in=300, out=240, loop, swap, "\substack{|r₁′ = r₁| \\ |t₁′ < t₁|}"]
 \end{tikzcd}
-
-To justify termination formally, we note that along all cycles in the graph,
-either the 
-|Sort| strictly decreases
-in size, or the size of the |Sort| is preserved and some other argument
-(the context, substitution or term) gets smaller. We can therefore
-assign decreasing measures as 
-follows:
-
+\captionof{figure}{Call graph of substitution operations}
+\end{minipage}
+\begin{minipage}{0.25\textwidth}
 \renewcommand{\arraystretch}{1.2}
 \begin{center}
 \begin{tabular}{ ||c||c||c|| }
@@ -338,6 +371,16 @@ Function & Measure \\
 \hline
 \end{tabular}
 \end{center}
+\captionof{table}{Per-function termination measures}
+\end{minipage}
+\\[2.0ex]
+
+To justify termination formally, we note that along all cycles in the graph,
+either the 
+|Sort| strictly decreases
+in size, or the size of the |Sort| is preserved and some other argument
+(the context, substitution or term) gets smaller. We can therefore
+assign decreasing measures to each of the functions.
 
 We now have a working implementation of substitution. In preparation for
 a similar termination issue we will encounter later though, we note that, 
@@ -345,15 +388,20 @@ perhaps surprisingly, adding a ``dummy argument'' to |id| of
 a completely unrelated type, such as |Bool| also satisfies Agda.
 That is, we can write
 
+\begin{minipage}{0.45\textwidth}
 \begin{spec}
 id′ : Bool → Γ ⊨[ V ] Γ
 id′ {Γ = •}      d = ε
 id′ {Γ = Γ ▷ A}  d = id′ d ^ A
-
+\end{spec}
+\end{minipage}
+\begin{minipage}{0.45\textwidth}
+\begin{spec}
 id : Γ ⊨[ V ] Γ 
 id = id′ true
-{-# INLINE id #-} 
+{-#  \Keyword{INLINE} $\Varid{id}$ #-} 
 \end{spec}
+\end{minipage}
 
 This result was a little surprising at first, but Agda's
 implementation reveals answers. It turns out that Agda considers
@@ -364,33 +412,33 @@ parameters of the caller. This enables Agda to infer |true ≤ T| in
 |id′ {Γ = Γ ▷ A}|; we do not get a strict decrease in |Sort| like before,
 but the size is at least preserved, and it turns out
 (making use of some slightly more complicated termination measures) this is
-enough:
+enough.
 
-% TODO: We could probably fit the tweaked termination measures to the right of
-% the call-graph diagram
-\begin{tikzcd}[scaleedge cd=1.1, sep=large]
-& |suc[ q₄ ] t₄q₄Γ₄|
-\arrow[dd, bend left, "\substack{|r₃ < q₄|}"]
-\arrow[ldd, bend right, swap, "\substack{|d₂ ≤ q₄| \\ |Γ₂ = Γ₄|}"]
-\arrow[rdd, bend left, "\substack{|r₁ < q₄|}"]
-\\
-\\
-|id′Γ₂ d₂| 
-\arrow[r, swap, "\substack{|q₃ ≤ d₂| \\ |Δ₃ < Γ₂|}"]
-\arrow[in=300, out=240, loop, swap, "\substack{|d₂′ = d₂| \\ |Γ₂′ < Γ₂|}"]
-& |σ₃r₃Δ₃Γ₃ ⁺ A| 
-\arrow[uu, bend left, "\substack{|q₄ = r₃| \\ |Γ₄ = Δ₃|}"]
-\arrow[in=300, out=240, loop, swap, "\substack{|r₃′ = r₃| \\ |Δ₃′ = Δ₃| \\ |σ₃′ < σ₃|}"]
-& |t₁q₁Γ₁ [ σ₁r₁Δ₁Γ₁ ]|
-\arrow[l, "|r₃ = r₁|"]
-\arrow[in=300, out=240, loop, swap, "\substack{|r₁′ = r₁| \\ |t₁′ < t₁|}"]
-\end{tikzcd}
+% Call graph diagram for the "dummy argument" approach (commented out because
+% it takes up a lot of space and I don't think it is really necessary):
+% \begin{tikzcd}[scaleedge cd=1.1, sep=large]
+% & |suc[ q₄ ] t₄q₄Γ₄|
+% \arrow[dd, bend left, "\substack{|r₃ < q₄|}"]
+% \arrow[ldd, bend right, swap, "\substack{|d₂ ≤ q₄| \\ |Γ₂ = Γ₄|}"]
+% \arrow[rdd, bend left, "\substack{|r₁ < q₄|}"]
+% \\
+% \\
+% |id′Γ₂ d₂| 
+% \arrow[r, swap, "\substack{|q₃ ≤ d₂| \\ |Δ₃ < Γ₂|}"]
+% \arrow[in=300, out=240, loop, swap, "\substack{|d₂′ = d₂| \\ |Γ₂′ < Γ₂|}"]
+% & |σ₃r₃Δ₃Γ₃ ⁺ A| 
+% \arrow[uu, bend left, "\substack{|q₄ = r₃| \\ |Γ₄ = Δ₃|}"]
+% \arrow[in=300, out=240, loop, swap, "\substack{|r₃′ = r₃| \\ |Δ₃′ = Δ₃| \\ |σ₃′ < σ₃|}"]
+% & |t₁q₁Γ₁ [ σ₁r₁Δ₁Γ₁ ]|
+% \arrow[l, "|r₃ = r₁|"]
+% \arrow[in=300, out=240, loop, swap, "\substack{|r₁′ = r₁| \\ |t₁′ < t₁|}"]
+% \end{tikzcd}
 
 % TODO: Should we link to the PR?
 % https://github.com/agda/agda/pull/7695
 This ``dummy argument'' approach perhaps is interesting because one could 
-imagine automating this process (i.e. via elaboration or
-directly inside termination checking). In fact, a
+imagine automating this process (i.e. via elaboration, or
+directly during termination checking). In fact, a
 PR featuring exactly this extension is currently open on the Agda
 GitHub repository.
 

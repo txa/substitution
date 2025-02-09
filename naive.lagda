@@ -71,7 +71,6 @@ data _⊨_ : Con → Con → Set where
   ε   : Γ ⊨ •
   _,_ : Γ ⊨ Δ → Γ ⊢ A → Γ ⊨ Δ ▷ A  
 \end{code}
-
 Now to define the categorical structure (|_∘_|, |id|) we first need to define
 substitution for terms and variables:
 %if False
@@ -83,16 +82,16 @@ _^_ : Γ ⊨ Δ → (A : Ty) → Γ ▷ A ⊨ Δ ▷ A
 \begin{minipage}{0.45\textwidth}
 \begin{code}
 _v[_] : Γ ∋ A → Δ ⊨ Γ → Δ ⊢ A
-zero    v[ ts , t ]    =  t
-(suc i _) v[ ts , t ]  =  i v[ ts ]
+zero       v[ ts , t ] = t
+(suc i _)  v[ ts , t ] = i v[ ts ]
 \end{code}
 \end{minipage}
 \begin{minipage}{0.45\textwidth}
 \begin{spec}
 _[_] : Γ ⊢ A → Δ ⊨ Γ → Δ ⊢ A
-(` i)   [ ts ]       =  i v[ ts ]
-(t · u) [ ts ]       =  (t [ ts ]) · (u [ ts ])
-(ƛ t)   [ ts ]       =  ƛ ?
+(` i)    [ ts ] = i v[ ts ]
+(t · u)  [ ts ] = (t [ ts ]) · (u [ ts ])
+(ƛ t)    [ ts ] = ƛ ?
 \end{spec}
 \end{minipage}
 
@@ -114,7 +113,6 @@ _[_] : Γ ⊢ A → Δ ⊨ Γ → Δ ⊢ A
 \begin{code}
 (ƛ t)   [ ts ]       =  ƛ (t [ ts ^ _ ])
 \end{code}
-
 However, now we have to define |_^_|. This is easy (isn't it?) but we
 need weakening on substitutions:
 \begin{code}
@@ -144,7 +142,6 @@ suc-tm : Γ ⊢ B → (A : Ty) → Γ ▷ A ⊢ B
 suc-tm : Γ ⊢ B → (A : Ty) → Γ ▷ A ⊢ B
 \end{spec}
 \end{minipage}
-
 But how can we define |suc-tm| when we only have weakening for variables? If we
 already had identity |id : Γ ⊨ Γ| and substitution we could write:
 \begin{spec}
@@ -165,7 +162,7 @@ data _⊨v_ : Con → Con → Set where
   _,_ : Γ ⊨v Δ → Γ ∋ A → Γ ⊨v Δ ▷ A
 \end{code}
 \noindent
-\raggedright
+\justifying
 \begin{minipage}{0.45\textwidth}
 \begin{code}
 _v[_]v : Γ ∋ A → Δ ⊨v Γ → Δ ∋ A
@@ -200,6 +197,7 @@ This may not seem too bad: to obtain structural termination we just have to
 duplicate a few definitions, but it gets even worse when proving the
 laws. For example, to prove associativity, we first need to prove functoriality 
 of substitution:
+
 \begin{spec}
 [∘] : t [ us ∘ vs ] ≡ t [ us ] [ vs ]
 \end{spec}

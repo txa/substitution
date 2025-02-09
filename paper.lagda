@@ -7,6 +7,8 @@
 % \citestyle{acmauthoryear}
 %\usepackage{tipa}
 %\usepackage{fontspec}
+\usepackage{graphicx}
+\usepackage{ragged2e}
 \usepackage{tikz-cd}
 \let\Bbbk\relax % to avoid conflict
 %include lhs2TeX.fmt
@@ -21,6 +23,12 @@
 
 \tikzcdset{scaleedge cd/.style={every label/.append style={scale=#1}}}
 \tikzcdset{scalecell cd/.style={cells={nodes={scale=#1}}}}
+
+% From https://tex.stackexchange.com/questions/235118/making-a-thicker-cdot-for-dot-product-that-is-thinner-than-bullet
+\makeatletter
+\newcommand*\bigcdot{\mathpalette\bigcdot@@{3.0}}
+\newcommand*\bigcdot@@[2]{\mathbin{\vcenter{\hbox{\scalebox{#2}{$\m@@th#1\cdot$}}}}}
+\makeatother
 
 \bibliographystyle{./plainurl}
 
