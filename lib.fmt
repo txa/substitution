@@ -139,10 +139,13 @@
 %format _⊢[_]_ = "\_\vdash\![\_]\_"
 %format ⊢[ = "\vdash\!["
 %format _⊢[ = "\_\vdash\!["
+%format ]_ = "]\_"
+%format _[_] = "\_[\_]"
 
 %format _⊨[_]_ = "\_\models\![\_]\_"
 %format ⊨[ = "\models\!["
 %format _⊨[ = "\_\models\!["
+%format ⊨[_] = "\models\![\_]"
 
 %format _▷_ = "\_\rhd\_"
 %format ▷ = "\rhd"

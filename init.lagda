@@ -171,46 +171,67 @@ record CwF-simple : Set₁ where
 \end{code}
 %endif
 
-We start with the category of contexts, using the same names as
+We start with the category of contexts, using the same naming scheme as
 introduced previously:
-\begin{spec}
-  field
-    Con : Set
-    _⊨_ : Con → Con → Set
 
-    id  : Γ ⊨ Γ
-    _∘_ : Δ ⊨ Θ → Γ ⊨ Δ → Γ ⊨ Θ
-    id∘ : id ∘ δ ≡ δ
-    ∘id : δ ∘ id ≡ δ
-    ∘∘  : (ξ ∘ θ) ∘ δ ≡ ξ ∘ (θ ∘ δ)  
+\begin{minipage}{0.45\textwidth}
+\begin{spec}
+  Con  : Set
+  _⊨_  : Con → Con → Set
+
+  id   : Γ ⊨ Γ
+  _∘_  : Δ ⊨ Θ → Γ ⊨ Δ → Γ ⊨ Θ
 \end{spec}
+\end{minipage}
+\begin{minipage}{0.45\textwidth}
+\begin{spec}
+  id∘  : id ∘ δ ≡ δ
+  ∘id  : δ ∘ id ≡ δ
+  ∘∘   : (ξ ∘ θ) ∘ δ ≡ ξ ∘ (θ ∘ δ)  
+\end{spec}
+\end{minipage}\\
 We introduce the set of types and associate a presheaf with each type:
+
+\begin{minipage}{0.45\textwidth}
 \begin{spec}
-    Ty   : Set           
-    _⊢_  : Con → Ty → Set         
-    _[_] : Γ ⊢ A → Δ ⊨ Γ → Δ ⊢ A
-    [id] : (t [ id ]) ≡ t
-    [∘]  : t [ θ ] [ δ ] ≡ t [ θ ∘ δ ] 
+  Ty    : Set           
+  _⊢_   : Con → Ty → Set         
+  
+  _[_]  : Γ ⊢ A → Δ ⊨ Γ → Δ ⊢ A
 \end{spec}
-The category of contexts has a terminal object (the empty context):
+\end{minipage}
+\begin{minipage}{0.45\textwidth}
 \begin{spec}
-    •   : Con
-    ε   : Γ ⊨ • 
-    •-η : δ ≡ ε  
+  [id] : (t [ id ]) ≡ t
+  [∘]  : t [ θ ] [ δ ] ≡ t [ θ ∘ δ ] 
 \end{spec}
-Context extension resembles categorical products but mixing contexts
+\end{minipage}\\
+The category of contexts has a terminal object (the empty context), and
+context extension resembles categorical products but mixing contexts
 and types:
+
+\begin{minipage}{0.5\textwidth}
 \begin{spec}
-    _▷_  : Con → Ty → Con
-    _,_  : Γ ⊨ Δ → Γ ⊢ A → Γ ⊨ (Δ ▷ A)
-    π₀   : Γ ⊨ (Δ ▷ A) → Γ ⊨ Δ
-    π₁   : Γ ⊨ (Δ ▷ A) → Γ ⊢ A
-    ▷-β₀ : π₀ (δ , t) ≡ δ
-    ▷-β₁ : π₁ (δ , t) ≡ t
-    ▷-η  : (π₀ δ , π₁ δ) ≡ δ
-    π₀∘  : π₀ (θ ∘ δ) ≡ π₀ θ ∘ δ
-    π₁∘  : π₁ (θ ∘ δ) ≡ (π₁ θ) [ δ ]  
+  •   : Con
+  ε   : Γ ⊨ •
+
+  _▷_  : Con → Ty → Con
+  _,_  : Γ ⊨ Δ → Γ ⊢ A → Γ ⊨ (Δ ▷ A)
+  π₀   : Γ ⊨ (Δ ▷ A) → Γ ⊨ Δ
+  π₁   : Γ ⊨ (Δ ▷ A) → Γ ⊢ A
+\end{spec} 
+\end{minipage}
+\begin{minipage}{0.45\textwidth}
+\begin{spec}
+  •-η : δ ≡ ε
+  
+  ▷-β₀ : π₀ (δ , t) ≡ δ
+  ▷-β₁ : π₁ (δ , t) ≡ t
+  ▷-η  : (π₀ δ , π₁ δ) ≡ δ
+  π₀∘  : π₀ (θ ∘ δ) ≡ π₀ θ ∘ δ
+  π₁∘  : π₁ (θ ∘ δ) ≡ (π₁ θ) [ δ ]  
 \end{spec}
+\end{minipage}\\
 We can define the morphism part of the context extension functor as
 before:
 \begin{spec}
@@ -220,15 +241,21 @@ before:
 We need to add the specific components for simply typed
 $\lambda$-calculus; we add the type constructors, the term
 constructors and the corresponding naturality laws:
+
+\begin{minipage}{0.45\textwidth}
 \begin{spec}
-  field
-    o    : Ty
-    _⇒_  : Ty → Ty → Ty
-    _·_  : Γ ⊢ A ⇒ B → Γ ⊢ A → Γ ⊢ B
-    ƛ_   : Γ ▷ A ⊢ B → Γ ⊢ A ⇒ B  
-    ·[]  : (t · u) [ δ ] ≡ (t [ δ ]) · (u [ δ ])
-    ƛ[]  : (ƛ t) [ δ ] ≡ ƛ (t [ δ ^ _ ])  
+  o    : Ty
+  _⇒_  : Ty → Ty → Ty
+  _·_  : Γ ⊢ A ⇒ B → Γ ⊢ A → Γ ⊢ B
 \end{spec}
+\end{minipage}
+\begin{minipage}{0.45\textwidth}
+\begin{spec}
+  ƛ_   : Γ ▷ A ⊢ B → Γ ⊢ A ⇒ B  
+  ·[]  : (t · u) [ δ ] ≡ (t [ δ ]) · (u [ δ ])
+  ƛ[]  : (ƛ t) [ δ ] ≡ ƛ (t [ δ ^ _ ])  
+\end{spec}
+\end{minipage}
 
 \subsection{The CwF of recursive substitutions}
 \label{sec:cwf-recurs-subst}
@@ -240,7 +267,7 @@ the specified CwF laws, specifically that |CwF-simple| can be instantiated with
 ``normalisation'' direction of our initial CwF |≃| recursive sub syntax 
 isomorphism.
 
-Most of the work to prove these laws was already done in
+Most of the work to prove these laws was already done in section
 \ref{sec:proving-laws} but there are a couple tricky details with fitting
 into the exact structure the |CwF-simple| record requires.
 
@@ -248,44 +275,39 @@ into the exact structure the |CwF-simple| record requires.
 \begin{code}
 open import subst
 open import laws
+module CwF = CwF-simple
 \end{code}
 %endif
-
-\begin{code}
-module CwF = CwF-simple
-
-\end{code}
-\begin{spec}
-is-cwf : CwF-simple
-is-cwf .CwF.Con = Con
-\end{spec}
 
 We need to decide which type family to interpret substitutions into. 
 In our first attempt, we tried to pair renamings/substitutions with their sorts 
 to stay polymorphic:
 
+\begin{minipage}{0.45\textwidth}
 \begin{spec}
-record _⊨_ (Δ : Con) (Γ : Con) : Set where
-  field
-    sort : Sort
-    tms  : Δ ⊨[ sort ] Γ
-
-is-cwf .CwF._⊨_ = _⊨_
-is-cwf .CwF.id  = record {sort = V; tms = id}
+_⊨_ : Con → Con → Set
+Δ ⊨ Γ = Σ Sort (Δ ⊨[_] Γ)
 \end{spec}
+\end{minipage}
+\begin{minipage}{0.45\textwidth}
+\begin{spec}
+is-cwf .CwF._⊨_  = _⊨_
+is-cwf .CwF.id   = V , id
+\end{spec}
+\end{minipage}
 
 Unfortunately, this approach quickly breaks. The CwF laws force us to provide a 
 unique morphism to the terminal context (i.e. a unique weakening from the empty 
 context).
 
 \begin{spec}
-is-cwf .CwF.• = •
-is-cwf .CwF.ε = record {sort = ?; tms = ε}
-is-cwf .CwF.•-η {δ = record {sort = q; tms = ε}} = ?
+is-cwf .CwF.•                = •
+is-cwf .CwF.ε                = ? , ε
+is-cwf .CwF.•-η {δ = q , ε}  = ?
 \end{spec}
 
 Our |_⊨_| record is simply too flexible here. It allows two distinct 
-implementations: |record {sort = V; tms = ε}| and |record {sort = T; tms = ε}|. 
+implementations: |V , ε| and |T , ε|. 
 We are stuck!
 
 Therefore, we instead fix the sort to |T|.
@@ -310,21 +332,25 @@ interleaved mutual
   ⊑⁺ : tm*⊑ ⊑t xs ⁺ A ≡ tm*⊑ v⊑t (xs ⁺ A)
   ⊑^ : tm*⊑ v⊑t xs ^ A ≡ tm*⊑ v⊑t (xs ^ A)
 
+  is-cwf : CwF-simple
+  is-cwf .CwF.Con = Con
 \end{code}
 %endif
 
+\begin{minipage}{0.45\textwidth}
 \begin{code}
-  is-cwf : CwF-simple
-  is-cwf .CwF.Con = Con
-  is-cwf .CwF._⊨_ = _⊨[ T ]_
-
-  is-cwf .CwF.•           = •
-  is-cwf .CwF.ε           = ε
-  is-cwf .CwF.•-η {δ = ε} = refl 
-
-  is-cwf .CwF._∘_ = _∘_
-  is-cwf .CwF.∘∘  = sym ∘∘
+  is-cwf .CwF._⊨_  = _⊨[ T ]_
+  is-cwf .CwF.•    = •
+  is-cwf .CwF.ε    = ε
 \end{code}
+\end{minipage}
+\begin{minipage}{0.45\textwidth}
+\begin{code}
+  is-cwf .CwF.•-η {δ = ε}  = refl 
+  is-cwf .CwF._∘_          = _∘_
+  is-cwf .CwF.∘∘           = sym ∘∘
+\end{code}
+\end{minipage}
 
 The lack of flexibility over sorts when constructing substitutions does, 
 however, make identity a little trickier. 
@@ -332,10 +358,8 @@ however, make identity a little trickier.
 We need the equivalent substitution |Γ ⊨[ T ] Γ|.
 
 We first extend |tm⊑| to renamings/substitutions with a fold: 
-|tm*⊑ : q ⊑ s → Γ ⊨[ q ] Δ → Γ ⊨[ s ] Δ|.
-
-And prove various lemmas about how |tm*⊑| coercions can be lifted outside of
-our substitution operators:
+|tm*⊑ : q ⊑ s → Γ ⊨[ q ] Δ → Γ ⊨[ s ] Δ|, and nd prove various lemmas about how 
+|tm*⊑| coercions can be lifted outside of our substitution operators:
 
 \begin{minipage}{0.35\textwidth}
 \begin{spec}
@@ -354,7 +378,7 @@ our substitution operators:
 
 Most of these are proofs come out easily by induction on terms and 
 substitutions so we skip over them.
-Perhaps worth noting though is that |⊑⁺| entails folding over substitutions
+Perhaps worth noting though is that |⊑⁺| requires folding over substitutions
 using one new law, relating our two
 ways of weakening variables.
 
@@ -431,14 +455,21 @@ identity substitution to a variable |i| produces the distinct term |` i|).
 \end{code}
 %endif
 
+\begin{minipage}{0.45\textwidth}
 \begin{code}
-  is-cwf .CwF._⊢_           = _⊢[ T ]_
-  is-cwf .CwF._[_]          = _[_]
-  is-cwf .CwF.[id] {t = t}  =
-                       t [ tm*⊑ v⊑t id ]
-    ≡⟨ t[⊑] {t = t} ⟩  t [ id ]
-    ≡⟨ [id] ⟩          t ∎
+  is-cwf .CwF._⊢_   = _⊢[ T ]_
+
+  is-cwf .CwF._[_]  = _[_]
 \end{code}
+\end{minipage}
+\begin{minipage}{0.45\textwidth}
+\begin{code}
+  is-cwf .CwF.[id] {t = t}  =                   
+    t [ tm*⊑ v⊑t id ]  ≡⟨ t[⊑] {t = t} ⟩  
+    t [ id ]           ≡⟨ [id] ⟩          
+    t                  ∎
+\end{code}
+\end{minipage}
 
 %if False
 \begin{code}
@@ -488,7 +519,8 @@ differing implementations of |_^_|.
 \end{code}
 
 We have shown our recursive substitution syntax satisfies the CwF laws, but we
-want to go a step further and show initiality: that our syntax is isomorphic to
+want to go a step further and show initiality: that our syntax is
+isomorphic to
 the initial CwF.
 
 An important first step is to actually define the initial CwF (and its
@@ -499,7 +531,7 @@ We also reuse our existing datatypes for contexts and types for convenience
 (note terms do not occur inside types in STLC).
 
 To state the dependent equations between outputs of the eliminator, we need
-dependent identity types. We can define this simply by matching on the identity
+dependent identity types. We can define these simply by matching on the identity
 between the LHS and RHS types.
 
 %if False
@@ -516,11 +548,13 @@ private variable
 \begin{code}
 _≡[_]≡_ : ∀ {A B : Set ℓ} → A → A ≡ B → B → Set ℓ
 x ≡[ refl ]≡ y = x ≡ y
-
 \end{code}
 
 To avoid name clashes between our existing syntax and the initial CwF 
-constructors, we annotate every |ICwF| constructor with |ᴵ|.
+constructors, we annotate every |ICwF| constructor with |ᴵ|. e.g.
+|_⊢ᴵ_ : Con → Ty → Set|, |idᴵ  : Γ ⊨ᴵ Γ| etc. Note we reuse the definitions
+of contexts and types as in STLC there are no non-trivial equations on these
+components.
 
 %if False
 \begin{code}
@@ -532,17 +566,6 @@ infixl  6  _·ᴵ_
 infix   8  _[_]ᴵ
 \end{code}
 %endif
-
-\begin{spec}
-postulate
-  _⊢ᴵ_ : Con → Ty → Set
-  _⊨ᴵ_ : Con → Con → Set
-  
-  idᴵ  : Γ ⊨ᴵ Γ
-  _∘ᴵ_ : Δ ⊨ᴵ Γ → Θ ⊨ᴵ Δ → Θ ⊨ᴵ Γ
-  id∘ᴵ : idᴵ ∘ᴵ δᴵ ≡ δᴵ
-  -- ...
-\end{spec}
 
 %if False
 \begin{code}
@@ -599,9 +622,27 @@ sucᴵ x A = x [ π₀ᴵ idᴵ ]ᴵ
 
 % TODO: Is this the correct paper to cite? i.e. was this the first paper to use
 % use this convention or was it taken from somewhere else?
-We state the eliminator for the initial CwF in terms of |Motive| and |Methods| 
-records as in \cite{altenkirch2016tt_in_tt}.
+We state the eliminator for the initial CwF in terms of |Motive : Set₁| and 
+|Methods : Motive → Set₁| records as in \cite{altenkirch2016tt_in_tt}.
 
+\begin{code}
+module _ {𝕄} (𝕞 : Methods 𝕄) where
+\end{code}
+
+\begin{minipage}{0.35\textwidth}
+\begin{code}
+  elim-con  : ∀ Γ → Conᴹ Γ
+  elim-ty   : ∀ A → Tyᴹ  A
+\end{code}
+\end{minipage}
+\begin{minipage}{0.45\textwidth}
+\begin{code}
+  elim-cwf   : ∀ tᴵ → Tmᴹ (elim-con Γ) (elim-ty A) tᴵ
+  elim-cwf*  : ∀ δᴵ → Tmsᴹ (elim-con Δ) (elim-con Γ) δᴵ
+\end{code}
+\end{minipage}
+
+%if False
 \begin{code}
 record Motive : Set₁ where
   field
@@ -610,17 +651,7 @@ record Motive : Set₁ where
     Tmᴹ  : Conᴹ Γ → Tyᴹ A → Γ ⊢ᴵ A → Set
     Tmsᴹ : Conᴹ Δ → Conᴹ Γ → Δ ⊨ᴵ Γ → Set
 \end{code}
-
-\begin{spec}
-record Methods (𝕄 : Motive) : Set₁ where
-  field
-    idᴹ  : Tmsᴹ Γᴹ Γᴹ idᴵ 
-    _∘ᴹ_ : Tmsᴹ Δᴹ Γᴹ σᴵ → Tmsᴹ θᴹ Δᴹ δᴵ 
-          → Tmsᴹ θᴹ Γᴹ (σᴵ ∘ᴵ δᴵ)
-    
-    id∘ᴹ : idᴹ ∘ᴹ δᴹ ≡[ cong (Tmsᴹ Δᴹ Γᴹ) id∘ᴵ ]≡ δᴹ
-    -- ...
-\end{spec}
+%endif
 
 %if False
 \begin{code}
@@ -697,6 +728,7 @@ module _ (𝕄 : Motive) where
 \end{code}
 %endif
 
+%if False
 \begin{code}
 module Eliminator {𝕄} (𝕞 : Methods 𝕄) where
   open Motive 𝕄
@@ -720,6 +752,7 @@ module Eliminator {𝕄} (𝕞 : Methods 𝕄) where
                   ≡ elim-cwf* σᴵ ∘ᴹ elim-cwf* δᴵ
     -- ...
 \end{code}
+%endif
 
 %if False
 \begin{code}
@@ -747,22 +780,17 @@ open Eliminator public
 \end{code}
 %endif
 
-\begin{spec}
-{-# \Keyword{REWRITE} elim-cwf$\mathrm{*}$-id$\beta$ #-}
-{-# \Keyword{REWRITE} elim-cwf$\mathrm{*}$-$\circ\beta$ #-}
--- ...
-\end{spec}
-
 Normalisation from the initial CwF into substitution normal forms now only
 needs a way to connect our notion of ``being a CwF'' with our initial CwF's 
 eliminator: specifically, that any set of type families satisfying the CwF laws
 gives rise to a |Motive| and associated set of |Methods|. To achieve this,
 we define |cwf-to-motive : CwF-simple → Motive| and 
-|cwf-to-methods : CwF-simple → Methods| to project out the relevant fields,
+|cwf-to-methods : CwF-simple → Methods|, which simply project out the relevant 
+fields,
 and then implement e.g. |rec-cwf = elim-cwf  cwf-to-methods|.
 
 The one extra ingredient we need to make this work out neatly is to introduce
-a new reduction for |cong|: |cong (λ _ → x) p ≡ refl|\footnote{
+a new reduction for |cong|, |cong (λ _ → x) p ≡ refl|\footnote{
 This definitional identity also holds natively in Cubical.}, via an Agda rewrite
 rule.
 %if False
