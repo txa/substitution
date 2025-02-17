@@ -331,45 +331,46 @@ however, make identity a little trickier.
 |id| doesn't fit |CwF.id| directly as it produces a renaming |Γ ⊨[ V ] Γ|. 
 We need the equivalent substitution |Γ ⊨[ T ] Γ|.
 
-We first extend |tm⊑| to sequences of variables/terms:
-\begin{spec}
-  tm*⊑ : q ⊑ s → Γ ⊨[ q ] Δ → Γ ⊨[ s ] Δ
-  tm*⊑ q⊑s ε = ε
-  tm*⊑ q⊑s (σ , x) = tm*⊑ q⊑s σ , tm⊑ q⊑s x
-\end{spec}
+We first extend |tm⊑| to renamings/substitutions with a fold: 
+|tm*⊑ : q ⊑ s → Γ ⊨[ q ] Δ → Γ ⊨[ s ] Δ|.
 
 And prove various lemmas about how |tm*⊑| coercions can be lifted outside of
 our substitution operators:
 
+\begin{minipage}{0.35\textwidth}
 \begin{spec}
-  ⊑∘   : tm*⊑ v⊑t xs ∘ ys ≡ xs ∘ ys
-  ∘⊑   : xs ∘ tm*⊑ v⊑t ys ≡ xs ∘ ys
-  v[⊑] : i [ tm*⊑ v⊑t ys ] ≡ tm⊑ v⊑t i [ ys ]
-  t[⊑] : t [ tm*⊑ v⊑t ys ] ≡ t [ ys ]
-  ⊑⁺   : tm*⊑ ⊑t xs ⁺ A ≡ tm*⊑ v⊑t (xs ⁺ A)
-  ⊑^   : tm*⊑ v⊑t xs ^ A ≡ tm*⊑ v⊑t (xs ^ A)
+  ⊑∘   : tm*⊑ v⊑t xs ∘ ys   ≡ xs ∘ ys
+  ∘⊑   : xs ∘ tm*⊑ v⊑t ys   ≡ xs ∘ ys
+  t[⊑] : t [ tm*⊑ v⊑t ys ]  ≡ t [ ys ]
 \end{spec}
+\end{minipage}
+\begin{minipage}{0.6\textwidth}
+\begin{spec}
+  ⊑⁺   : tm*⊑ ⊑t xs ⁺ A     ≡ tm*⊑ v⊑t (xs ⁺ A)
+  ⊑^   : tm*⊑ v⊑t xs ^ A    ≡ tm*⊑ v⊑t (xs ^ A)
+  v[⊑] : i [ tm*⊑ v⊑t ys ]  ≡ tm⊑ v⊑t i [ ys ]
+\end{spec}
+\end{minipage}
 
 Most of these are proofs come out easily by induction on terms and 
 substitutions so we skip over them.
-Perhaps worth noting though is that |⊑⁺| requires one new law relating our two
+Perhaps worth noting though is that |⊑⁺| entails folding over substitutions
+using one new law, relating our two
 ways of weakening variables.
 
 \begin{code}
   suc[id⁺] : i [ id ⁺ A ] ≡ suc i A
   suc[id⁺] {i = i} {A = A} =
-    i [ id ⁺ A ]
-    ≡⟨ ⁺-nat[]v {i = i} ⟩ 
-    suc (i [ id ]) A
-    ≡⟨ cong (λ j → suc j A) [id] ⟩
+    i [ id ⁺ A ]      ≡⟨ ⁺-nat[]v {i = i} ⟩ 
+    suc (i [ id ]) A  ≡⟨ cong (λ j → suc j A) [id] ⟩
     suc i A ∎
-
-  ⊑⁺ {xs = ε}      = refl
-  ⊑⁺ {xs = xs , x} = cong₂ _,_ ⊑⁺ (cong (`_) suc[id⁺])
 \end{code}
 
 %if False
 \begin{code}
+  ⊑⁺ {xs = ε}      = refl
+  ⊑⁺ {xs = xs , x} = cong₂ _,_ ⊑⁺ (cong (`_) suc[id⁺])
+  
   ⊑∘ {xs = ε} = refl
   ⊑∘ {xs = xs , x} = cong₂ _,_ ⊑∘ refl
 
@@ -393,52 +394,63 @@ ways of weakening variables.
 %endif
 
 We can now build an identity substitution by applying this coercion to the 
-identity renaming.
-
+identity renaming: |is-cwf .CwF.id = tm*⊑ v⊑t id|.
+%if False
 \begin{code}
   is-cwf .CwF.id = tm*⊑ v⊑t id
 \end{code}
-
-The left and right identity CwF laws now take the form |tm*⊑ v⊑t id ∘ δ ≡ δ|
+%endif
+The left and right identity CwF laws take the form |tm*⊑ v⊑t id ∘ δ ≡ δ|
 and |δ ∘ tm*⊑ v⊑t id ≡ δ|. This is where we can take full advantage of the 
 |tm*⊑| machinery; these lemmas let us reuse our existing |id∘|/|∘id| proofs!
 
+\begin{minipage}{0.45\textwidth}
 \begin{code}
   is-cwf .CwF.id∘ {δ = δ} = 
-    tm*⊑ v⊑t id ∘ δ
-    ≡⟨ ⊑∘ ⟩
-    id ∘ δ
-    ≡⟨ id∘ ⟩
-    δ ∎
-  is-cwf .CwF.∘id {δ = δ} =
-    δ ∘ tm*⊑ v⊑t id
-    ≡⟨ ∘⊑ ⟩
-    δ ∘ id
-    ≡⟨ ∘id ⟩
+    tm*⊑ v⊑t id ∘ δ  ≡⟨ ⊑∘ ⟩   
+    id ∘ δ           ≡⟨ id∘ ⟩  
     δ ∎
 \end{code}
+\end{minipage}
+\begin{minipage}{0.45\textwidth}
+\begin{code}
+  is-cwf .CwF.∘id {δ = δ} =
+    δ ∘ tm*⊑ v⊑t id  ≡⟨ ∘⊑ ⟩   
+    δ ∘ id           ≡⟨ ∘id ⟩  
+    δ ∎
+\end{code}
+\end{minipage}
 
 Similarly to substitutions, we must fix the sort of our terms to |T| 
 (in this case, so we can prove the identity law - note that applying the 
 identity substitution to a variable |i| produces the distinct term |` i|).
 
+%if False
 \begin{code}
   is-cwf .CwF.Ty           = Ty
-  is-cwf .CwF._⊢_          = _⊢[ T ]_
-  is-cwf .CwF._[_]         = _[_]
-  is-cwf .CwF.[∘] {t = t}  = sym ([∘] {x = t})
-  is-cwf .CwF.[id] {t = t} =
-    t [ tm*⊑ v⊑t id ]
-    ≡⟨ t[⊑] {t = t} ⟩
-    t [ id ]
-    ≡⟨ [id] ⟩
-    t ∎
+\end{code}
+%endif
+
+\begin{code}
+  is-cwf .CwF._⊢_           = _⊢[ T ]_
+  is-cwf .CwF._[_]          = _[_]
+  is-cwf .CwF.[id] {t = t}  =
+                       t [ tm*⊑ v⊑t id ]
+    ≡⟨ t[⊑] {t = t} ⟩  t [ id ]
+    ≡⟨ [id] ⟩          t ∎
 \end{code}
 
-Context extension and the associated laws are easy. We define projections 
-|π₀ (δ , t) = δ| and |π₁ (δ , t) = t| standalone as these will be useful in the 
-next section also.
+%if False
+\begin{code}
+  is-cwf .CwF.[∘] {t = t}  = sym ([∘] {x = t})
+\end{code}
+%endif
 
+We now define projections |π₀ (δ , t) = δ| and |π₁ (δ , t) = t| and
+|▷-β₀|, |▷-β₁|, |▷-η|, |π₀∘| and |π₁∘| all hold by definition (though the
+latter three only after matching on the guaranteed-non-empty substitution). 
+
+%if False
 \begin{code}
   is-cwf .CwF._▷_ = _▷_
   is-cwf .CwF._,_ = _,_
@@ -450,25 +462,28 @@ next section also.
   is-cwf .CwF.π₀∘ {θ = xs , x} = refl
   is-cwf .CwF.π₁∘ {θ = xs , x} = refl
 \end{code}
+%endif
 
 Finally, we can deal with the cases specific to simply typed $\lambda$-calculus.
-Only the $\beta$-rule for substitutions applied to lambdas is non-trivial due to 
+|·[]| holds by definition, but the $\beta$-rule for substitutions applied to
+lambdas requires a bit of equational reasoning due to 
 differing implementations of |_^_|.
 
+%if False
 \begin{code}
   is-cwf .CwF.o = o
   is-cwf .CwF._⇒_ = _⇒_
   is-cwf .CwF._·_ = _·_
   is-cwf .CwF.ƛ_ = ƛ_
   is-cwf .CwF.·[] = refl
-  is-cwf .CwF.ƛ[] {A = A} {t = x} {δ = ys} =
-    ƛ x [ ys ^ A ]
-    ≡⟨ cong (λ ρ → ƛ x [ ρ ^ A ]) (sym ∘id) ⟩
-    ƛ x [ (ys ∘ id) ^ A ]
-    ≡⟨ cong (λ ρ → ƛ x [ ρ , ` zero ]) (sym ⁺-nat∘) ⟩ 
-    ƛ x [ ys ∘ id ⁺ A , ` zero ]
-    ≡⟨ cong (λ ρ → ƛ x [ ρ , ` zero ]) 
-            (sym (∘⊑ {ys = id ⁺ _})) ⟩
+\end{code}
+%endif
+
+\begin{code}
+  is-cwf .CwF.ƛ[] {A = A} {t = x} {δ = ys} =           
+    ƛ x [ ys ^ A ]                ≡⟨ cong (λ ρ → ƛ x [ ρ ^ A ]) (sym ∘id) ⟩         
+    ƛ x [ (ys ∘ id) ^ A ]         ≡⟨ cong (λ ρ → ƛ x [ ρ , ` zero ]) (sym ⁺-nat∘) ⟩  
+    ƛ x [ ys ∘ id ⁺ A , ` zero ]  ≡⟨ cong (λ ρ → ƛ x [ ρ , ` zero ]) (sym (∘⊑ {ys = id ⁺ _})) ⟩
     ƛ x [ ys ∘ tm*⊑ v⊑t (id ⁺ A) , ` zero ] ∎
 \end{code}
 
@@ -499,8 +514,7 @@ private variable
 %endif
 
 \begin{code}
-_≡[_]≡_ : ∀ {A B : Set ℓ} → A → A ≡ B → B 
-        → Set ℓ
+_≡[_]≡_ : ∀ {A B : Set ℓ} → A → A ≡ B → B → Set ℓ
 x ≡[ refl ]≡ y = x ≡ y
 
 \end{code}
@@ -742,23 +756,15 @@ open Eliminator public
 Normalisation from the initial CwF into substitution normal forms now only
 needs a way to connect our notion of ``being a CwF'' with our initial CwF's 
 eliminator: specifically, that any set of type families satisfying the CwF laws
-gives rise to a |Motive| and associated set of |Methods|.
+gives rise to a |Motive| and associated set of |Methods|. To achieve this,
+we define |cwf-to-motive : CwF-simple → Motive| and 
+|cwf-to-methods : CwF-simple → Methods| to project out the relevant fields,
+and then implement e.g. |rec-cwf = elim-cwf  cwf-to-methods|.
 
 The one extra ingredient we need to make this work out neatly is to introduce
-a new reduction for |cong|:
-\footnote{This definitional identity also holds natively in Cubical.}
-
-% To save space, we can always use this shorter (not valid Agda) signature
-% for "cong-const"
-% cong-const : cong (λ _ → x) p ≡ refl
-\begin{spec}
-cong-const : ∀ {x : A} {y z : B} {p : y ≡ z}
-           → cong (λ _ → x) p ≡ refl
-cong-const {p = refl} = refl
-
-{-# \Keyword{REWRITE} cong-const #-}
-\end{spec}
-
+a new reduction for |cong|: |cong (λ _ → x) p ≡ refl|\footnote{
+This definitional identity also holds natively in Cubical.}, via an Agda rewrite
+rule.
 %if False
 \begin{code}
 cong-const : ∀ {A : Set ℓ₁} {B : Set ℓ₂} {x : A} 
@@ -769,10 +775,10 @@ cong-const {p = refl} = refl
 {-# REWRITE cong-const #-}
 \end{code}
 %endif
-
 This enables the no-longer-dependent |_≡[_]≡_|s to collapse to |_≡_|s 
 automatically.
 
+%if False
 \begin{code}
 module Recursor (cwf : CwF-simple) where
   cwf-to-motive : Motive
@@ -793,6 +799,7 @@ module Recursor (cwf : CwF-simple) where
   cwf-to-methods .id∘ᴹ  = cwf .CwF.id∘
   -- ...
 \end{code}
+%endif
 
 %if False
 \begin{code}
@@ -839,8 +846,10 @@ norm = rec-cwf is-cwf
 
 Of course, normalisation shouldn't change the type of a term, or the context it
 is in, so we might hope for a simpler signature |Γ ⊢ᴵ A → Γ ⊢[ T ] A| and, 
-conveniently, rewrite rules can get us there!
+conveniently, rewrite rules (|rec-con is-cwf Γ ≡ Γ|, |rec-ty is-cwf A ≡ A|) 
+can get us there!
 
+%if False
 \begin{code}
 Con≡ : rec-con is-cwf Γ ≡ Γ
 Ty≡  : rec-ty is-cwf A ≡ A
@@ -851,37 +860,48 @@ Con≡ {Γ = Γ ▷ A} = cong₂ _▷_ Con≡ Ty≡
 Ty≡ {A = o} = refl
 Ty≡ {A = A ⇒ B} = cong₂ _⇒_ Ty≡ Ty≡
 \end{code}
-\begin{spec}
-{-# \Keyword{REWRITE} $\mathrm{Con}\!\equiv \; \mathrm{Ty}\!\equiv$ #-} 
-\end{spec}
+%endif
+
 %if False
 \begin{code}
 {-# REWRITE Con≡ Ty≡ #-}
 \end{code}
 %endif
+\begin{minipage}{0.45\textwidth}
 \begin{code}
 norm : Γ ⊢ᴵ A → Γ ⊢[ T ] A
 norm = rec-cwf is-cwf 
-
+\end{code}
+\end{minipage}
+\begin{minipage}{0.45\textwidth}
+\begin{code}
 norm* : Δ ⊨ᴵ Γ → Δ ⊨[ T ] Γ
 norm* = rec-cwf* is-cwf
 \end{code}
+\end{minipage}
 
 The inverse operation to inject our syntax back into the initial CwF is easily
-implemented by recursing on our substitution normal forms.
+implemented by recursion on substitution normal forms.
 
+\begin{minipage}{0.45\textwidth}
 \begin{code}
-⌜_⌝ : Γ ⊢[ q ] A → Γ ⊢ᴵ A
-⌜ zero ⌝    = zeroᴵ
-⌜ suc i B ⌝ = sucᴵ ⌜ i ⌝ B
-⌜ ` i ⌝     = ⌜ i ⌝
+⌜_⌝   : Γ ⊢[ q ] A → Γ ⊢ᴵ A
+⌜_⌝*  : Δ ⊨[ q ] Γ → Δ ⊨ᴵ Γ
+
+⌜ zero ⌝     = zeroᴵ
+⌜ suc i B ⌝  = sucᴵ ⌜ i ⌝ B
+⌜ ` i ⌝      = ⌜ i ⌝
+\end{code}
+\end{minipage}
+\begin{minipage}{0.45\textwidth}
+\begin{code}
 ⌜ t · u ⌝   = ⌜ t ⌝ ·ᴵ ⌜ u ⌝
 ⌜ ƛ t ⌝     = ƛᴵ ⌜ t ⌝
 
-⌜_⌝* : Δ ⊨[ q ] Γ → Δ ⊨ᴵ Γ
-⌜ ε ⌝*     = εᴵ
-⌜ δ , x ⌝* = ⌜ δ ⌝* ,ᴵ ⌜ x ⌝
+⌜ ε ⌝*      = εᴵ
+⌜ δ , x ⌝*  = ⌜ δ ⌝* ,ᴵ ⌜ x ⌝
 \end{code}
+\end{minipage}
 
 \subsection{Proving initiality}
 \label{sec:proving-initiality}
@@ -903,19 +923,15 @@ details worth mentioning:
 
 \begin{code}
 stab : norm ⌜ x ⌝ ≡ tm⊑ ⊑t x
-stab {x = zero} = refl
-stab {x = suc i B} =
-  norm ⌜ i ⌝ [ tm*⊑ v⊑t (id ⁺ B) ]
-  ≡⟨ t[⊑] {t = norm ⌜ i ⌝} ⟩
-  norm ⌜ i ⌝ [ id ⁺ B ]
-  ≡⟨ cong (λ j → suc[ _ ] j B) (stab {x = i}) ⟩
-  ` i [ id ⁺ B ]
-  ≡⟨ cong `_ suc[id⁺] ⟩
+stab {x = zero}     = refl
+stab {x = suc i B}  =
+  norm ⌜ i ⌝ [ tm*⊑ v⊑t (id ⁺ B) ]  ≡⟨ t[⊑] {t = norm ⌜ i ⌝} ⟩
+  norm ⌜ i ⌝ [ id ⁺ B ]             ≡⟨ cong (λ j → suc[ _ ] j B) (stab {x = i}) ⟩
+  ` i [ id ⁺ B ]                    ≡⟨ cong `_ suc[id⁺] ⟩
   ` suc i B ∎
-stab {x = ` i} = stab {x = i}
-stab {x = t · u} = 
-  cong₂ _·_ (stab {x = t}) (stab {x = u})
-stab {x = ƛ t} = cong ƛ_ (stab {x = t})
+stab {x = ` i}      = stab {x = i}
+stab {x = t · u}    = cong₂ _·_ (stab {x = t}) (stab {x = u})
+stab {x = ƛ t}      = cong ƛ_ (stab {x = t})
 \end{code}
 
 To prove completeness, we must instead induct on the initial CwF itself, which
@@ -932,14 +948,16 @@ compl-𝕄 .Tmsᴹ _ _ δᴵ = ⌜ norm* δᴵ ⌝* ≡ δᴵ
 To show these identities, we need to prove that our various recursively defined
 syntax operations are preserved by |⌜_⌝|.
 
-Preservation of |zero[_]| reduces to reflexivity after splitting on the
-sort.
+Preservation of |zero[_]|, |⌜zero⌝ : ⌜ zero[ q ] ⌝ ≡ zeroᴵ| reduces to
+reflexivity after splitting on the sort.
 
+%if False
 \begin{code}
 ⌜zero⌝ : ⌜ zero[_] {Γ = Γ} {A = A} q ⌝ ≡ zeroᴵ
 ⌜zero⌝ {q = V} = refl
 ⌜zero⌝ {q = T} = refl
 \end{code}
+%endif
 
 Preservation of each of the projections out of sequences of terms 
 (e.g. |⌜ π₀ δ ⌝* ≡ π₀ᴵ ⌜ δ ⌝*|) reduce to the 
@@ -975,16 +993,22 @@ implementing |⌜id⌝| to keep Agda's termination checker happy.
 \end{code}
 %endif
 
+\begin{minipage}{0.45\textwidth}
 \begin{spec}
 ⌜[]⌝  : ⌜ x [ ys ] ⌝ ≡ ⌜ x ⌝ [ ⌜ ys ⌝* ]ᴵ
 ⌜^⌝   : ⌜ xs ^ A ⌝* ≡ ⌜ xs ⌝* ^ᴵ A
 ⌜⁺⌝   : ⌜ xs ⁺ A ⌝* ≡ ⌜ xs ⌝* ∘ᴵ wkᴵ
 ⌜id⌝  : ⌜ id {Γ = Γ} ⌝* ≡ idᴵ
+\end{spec}
+\end{minipage}
+\begin{minipage}{0.45\textwidth}
+\begin{spec}
 ⌜suc⌝ : ⌜ suc[ q ] x B ⌝ ≡ ⌜ x ⌝ [ wkᴵ ]ᴵ
 
 ⌜id⌝′ : Sort → ⌜ id {Γ = Γ} ⌝* ≡ idᴵ
 ⌜id⌝ = ⌜id⌝′ V
 \end{spec}
+\end{minipage}
 
 % {-# \Keyword{INLINE} $\ulcorner\mathrm{id}\urcorner\;$ #-}
 %if False
@@ -993,39 +1017,33 @@ implementing |⌜id⌝| to keep Agda's termination checker happy.
 \end{code}
 %endif
 
-To complete these proofs, we also need $\beta$-laws about our initial CwF
+To complete these proofs, we also need $\beta$-laws for our initial CwF
 substitutions, so we derive these now.
 
+\begin{minipage}{0.4\textwidth}
+\noindent
 \begin{code}
 zero[]ᴵ : zeroᴵ [ δᴵ ,ᴵ tᴵ ]ᴵ ≡ tᴵ
-zero[]ᴵ {δᴵ = δᴵ} {tᴵ = tᴵ} =
-  zeroᴵ [ δᴵ ,ᴵ tᴵ ]ᴵ
-  ≡⟨ sym π₁∘ᴵ ⟩
-  π₁ᴵ (idᴵ ∘ᴵ (δᴵ ,ᴵ tᴵ))
-  ≡⟨ cong π₁ᴵ id∘ᴵ ⟩
-  π₁ᴵ (δᴵ ,ᴵ tᴵ)
-  ≡⟨ ▷-β₁ᴵ ⟩
-  tᴵ ∎
+zero[]ᴵ {δᴵ = δᴵ} {tᴵ = tᴵ} =  
+  zeroᴵ [ δᴵ ,ᴵ tᴵ ]ᴵ      ≡⟨ sym π₁∘ᴵ ⟩                
+  π₁ᴵ (idᴵ ∘ᴵ (δᴵ ,ᴵ tᴵ))  ≡⟨ cong π₁ᴵ id∘ᴵ ⟩ 
+  π₁ᴵ (δᴵ ,ᴵ tᴵ)           ≡⟨ ▷-β₁ᴵ ⟩ 
+  tᴵ                       ∎
 \end{code}
-
-% \begin{spec}
-% suc[]ᴵ : sucᴵ tᴵ B [ δᴵ ,ᴵ uᴵ ]ᴵ ≡ tᴵ [ δᴵ ]ᴵ
-% suc[]ᴵ {tᴵ = tᴵ} {B = B} {δᴵ = δᴵ} {uᴵ = uᴵ} = 
-%   -- ...
-
-% ,[]ᴵ : (δᴵ ,ᴵ tᴵ) ∘ᴵ σᴵ ≡ (δᴵ ∘ᴵ σᴵ) ,ᴵ (tᴵ [ σᴵ ]ᴵ)
-% ,[]ᴵ {δᴵ = δᴵ} {tᴵ = tᴵ} {σᴵ = σᴵ} = 
-%   -- ...
-% \end{spec}
-
+\end{minipage}
+\begin{minipage}{0.55\textwidth}
+\noindent
 \begin{spec}
 suc[]ᴵ : sucᴵ tᴵ B [ δᴵ ,ᴵ uᴵ ]ᴵ ≡ tᴵ [ δᴵ ]ᴵ
-suc[]ᴵ = -- ...
-
-,[]ᴵ : (δᴵ ,ᴵ tᴵ) ∘ᴵ σᴵ ≡ (δᴵ ∘ᴵ σᴵ) ,ᴵ (tᴵ [ σᴵ ]ᴵ)
-,[]ᴵ = -- ...
+suc[]ᴵ = ...
 \end{spec}
 
+\noindent
+\begin{spec}
+,∘ᴵ : (δᴵ ,ᴵ tᴵ) ∘ᴵ σᴵ ≡ (δᴵ ∘ᴵ σᴵ) ,ᴵ (tᴵ [ σᴵ ]ᴵ)
+,∘ᴵ = ...
+\end{spec}
+\end{minipage}
 
 %if False
 \begin{code}
@@ -1041,8 +1059,8 @@ suc[]ᴵ {tᴵ = tᴵ} {B = B} {δᴵ = δᴵ} {uᴵ = uᴵ} =
   ≡⟨ cong (tᴵ [_]ᴵ) ▷-β₀ᴵ ⟩
   tᴵ [ δᴵ ]ᴵ ∎ 
 
-,[]ᴵ : (δᴵ ,ᴵ tᴵ) ∘ᴵ σᴵ ≡ (δᴵ ∘ᴵ σᴵ) ,ᴵ (tᴵ [ σᴵ ]ᴵ)
-,[]ᴵ {δᴵ = δᴵ} {tᴵ = tᴵ} {σᴵ = σᴵ} =
+,∘ᴵ : (δᴵ ,ᴵ tᴵ) ∘ᴵ σᴵ ≡ (δᴵ ∘ᴵ σᴵ) ,ᴵ (tᴵ [ σᴵ ]ᴵ)
+,∘ᴵ {δᴵ = δᴵ} {tᴵ = tᴵ} {σᴵ = σᴵ} =
   (δᴵ ,ᴵ tᴵ) ∘ᴵ σᴵ
   ≡⟨ sym (▷-ηᴵ {δᴵ = (δᴵ ,ᴵ tᴵ) ∘ᴵ σᴵ}) ⟩
   π₀ᴵ ((δᴵ ,ᴵ tᴵ) ∘ᴵ σᴵ) ,ᴵ π₁ᴵ ((δᴵ ,ᴵ tᴵ) ∘ᴵ σᴵ)
@@ -1058,15 +1076,13 @@ suc[]ᴵ {tᴵ = tᴵ} {B = B} {δᴵ = δᴵ} {uᴵ = uᴵ} =
 %endif
 
 We also need a couple lemmas about how |⌜_⌝| treats terms of different sorts
-identically. 
-
+identically: |⌜⊑⌝ : ∀ {x : Γ ⊢[ q ] A} → ⌜ tm⊑ ⊑t x ⌝ ≡ ⌜ x ⌝| and
+|⌜⊑⌝* : ⌜ tm*⊑ ⊑t xs ⌝* ≡ ⌜ xs ⌝*|.
+%if False
 \begin{code}
 ⌜⊑⌝ : ∀ {x : Γ ⊢[ q ] A} → ⌜ tm⊑ ⊑t x ⌝ ≡ ⌜ x ⌝
 ⌜⊑⌝* : ⌜ tm*⊑ ⊑t xs ⌝* ≡ ⌜ xs ⌝*
-\end{code}
 
-%if False
-\begin{code}
 ⌜⊑⌝ {q = V} = refl
 ⌜⊑⌝ {q = T} = refl
 
@@ -1111,17 +1127,23 @@ cases to cover, so for brevity we elide the proofs of |⌜[]⌝| and |⌜suc⌝|
 \end{code}
 %endif
 
+\begin{minipage}{0.6\textwidth}
 \begin{code}
 ⌜^⌝ {q = q} = cong₂ _,ᴵ_ ⌜⁺⌝ (⌜zero⌝ {q = q})
+\end{code}
 
+\begin{code}
 ⌜⁺⌝ {xs = ε} = sym •-ηᴵ
 ⌜⁺⌝ {xs = xs , x} {A = A} = 
   ⌜ xs ⁺ A ⌝* ,ᴵ ⌜ suc[ _ ] x A ⌝
   ≡⟨ cong₂ _,ᴵ_ ⌜⁺⌝ (⌜suc⌝ {x = x}) ⟩
   (⌜ xs ⌝* ∘ᴵ wkᴵ) ,ᴵ (⌜ x ⌝ [ wkᴵ ]ᴵ)
-  ≡⟨ sym ,[]ᴵ ⟩
+  ≡⟨ sym ,∘ᴵ ⟩
   (⌜ xs ⌝* ,ᴵ ⌜ x ⌝) ∘ᴵ wkᴵ ∎
-
+\end{code}
+\end{minipage}
+\begin{minipage}{0.35\textwidth}
+\begin{code}
 ⌜id⌝′ {Γ = •} _ = sym •-ηᴵ
 ⌜id⌝′ {Γ = Γ ▷ A} _ = 
   ⌜ id ⁺ A ⌝* ,ᴵ zeroᴵ
@@ -1134,6 +1156,8 @@ cases to cover, so for brevity we elide the proofs of |⌜[]⌝| and |⌜suc⌝|
   ≡⟨ ▷-ηᴵ ⟩
   idᴵ ∎
 \end{code}
+\end{minipage}
+
 %if False
 \begin{code}
 ⌜suc⌝ {q = V} = refl
@@ -1161,7 +1185,7 @@ We also prove preservation of substitution composition
   ⌜ xs ∘ ys ⌝* ,ᴵ ⌜ x [ ys ] ⌝
   ≡⟨ cong₂ _,ᴵ_ ⌜∘⌝ (⌜[]⌝ {x = x}) ⟩
   (⌜ xs ⌝* ∘ᴵ ⌜ ys ⌝*) ,ᴵ (⌜ x ⌝ [ ⌜ ys ⌝* ]ᴵ)
-  ≡⟨ sym ,[]ᴵ ⟩
+  ≡⟨ sym ,∘ᴵ ⟩
   (⌜ xs ⌝* ,ᴵ ⌜ x ⌝) ∘ᴵ ⌜ ys ⌝* ∎
 \end{code}
 %endif
@@ -1174,25 +1198,28 @@ preservation lemmas and inductive hypotheses.
 duip : ∀ {A B : Set ℓ} {x y : A} {z w : B} {p q} {r : (x ≡ y) ≡ (z ≡ w)}
      → p ≡[ r ]≡ q
 duip {p = refl} {q = refl} {r = refl} = refl
+
+compl-𝕞 : Methods compl-𝕄
 \end{code}
 %endif
 
+\begin{minipage}{0.35\textwidth}
+\noindent
 \begin{code}
-compl-𝕞 : Methods compl-𝕄
 compl-𝕞 .idᴹ = 
-  ⌜ tm*⊑ v⊑t id ⌝*
-  ≡⟨ ⌜⊑⌝* ⟩
-  ⌜ id ⌝*
-  ≡⟨ ⌜id⌝ ⟩
+  ⌜ tm*⊑ v⊑t id ⌝*  ≡⟨ ⌜⊑⌝* ⟩
+  ⌜ id ⌝*           ≡⟨ ⌜id⌝ ⟩
   idᴵ ∎
-compl-𝕞 ._∘ᴹ_ {σᴵ = σᴵ} {δᴵ = δᴵ} σᴹ δᴹ = 
-  ⌜ norm* σᴵ ∘ norm* δᴵ ⌝*
-  ≡⟨ ⌜∘⌝ ⟩
-  ⌜ norm* σᴵ ⌝* ∘ᴵ ⌜ norm* δᴵ ⌝*
-  ≡⟨ cong₂ _∘ᴵ_ σᴹ δᴹ ⟩
-  σᴵ ∘ᴵ δᴵ ∎
--- ...
 \end{code}
+\end{minipage}
+\begin{minipage}{0.6\textwidth}
+\begin{code}
+compl-𝕞 ._∘ᴹ_ {σᴵ = σᴵ} {δᴵ = δᴵ} σᴹ δᴹ = 
+  ⌜ norm* σᴵ ∘ norm* δᴵ ⌝*        ≡⟨ ⌜∘⌝ ⟩
+  ⌜ norm* σᴵ ⌝* ∘ᴵ ⌜ norm* δᴵ ⌝*  ≡⟨ cong₂ _∘ᴵ_ σᴹ δᴹ ⟩
+  σᴵ ∘ᴵ δᴵ ∎
+\end{code}
+\end{minipage}
 
 %if False
 \begin{code}
@@ -1239,21 +1266,18 @@ the sledgehammer of set truncation (which prevents eliminating the initial
 CwF into any non-set).
 
 As we are working in vanilla Agda, we'll take a simpler approach, and rely on 
-UIP (|duip : ∀ {x y z w r} {p : x ≡ y} {q : z ≡ w} → p ≡[ r ]≡ q|).
-\footnote{Note that proving this form of (dependent) UIP relies 
+UIP (
+|duip : ∀ {x y z w r} {p : x ≡ y} {q : z ≡ w} → p ≡[ r ]≡ q|\footnote{
+Note that proving this form of (dependent) UIP relies 
 on type constructor injectivity (specifically, injectivity of |_≡_|). 
 We could use a weaker version taking an additional proof of |x ≡ z|, 
 but this would be clunkier to use; Agda has no hope of inferring such a
-proof by unification.}
-
-\begin{code}
-compl-𝕞 .id∘ᴹ  = duip
-compl-𝕞 .∘idᴹ  = duip
--- ...
-\end{code}
+proof by unification.}), enabling e.g. |compl-𝕞 .id∘ᴹ  = duip|
 
 %if False
 \begin{code}
+compl-𝕞 .id∘ᴹ  = duip
+compl-𝕞 .∘idᴹ  = duip
 compl-𝕞 .∘∘ᴹ   = duip
 compl-𝕞 .[id]ᴹ = duip
 compl-𝕞 .[∘]ᴹ  = duip

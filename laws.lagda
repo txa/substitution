@@ -101,7 +101,13 @@ functor law for substitution. This is the main lemma for
 associativity. 
 
 Let's state the functor law but postpone the proof until the next section:
-|[∘] : x [ xs ∘ ys ] ≡ x [ xs ] [ ys ]|. This implicitly relies on the
+|[∘] : x [ xs ∘ ys ] ≡ x [ xs ] [ ys ]|. 
+%if False
+\begin{code}
+[∘] : x [ xs ∘ ys ] ≡ x [ xs ] [ ys ]
+\end{code}
+%endif
+This implicitly relies on the
 definitional  equality\footnote{We rely on Agda's 
 rewrite rules here.
 Alternatively we would have to insert a transport using |subst|.}
