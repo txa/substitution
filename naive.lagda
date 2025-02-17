@@ -98,10 +98,7 @@ _[_] : Γ ⊢ A → Δ ⊨ Γ → Δ ⊢ A
 As usual, we encounter a problem with the case for binders |ƛ_|. We are given a
 substitution |ts : Δ ⊨ Γ| but the body |t| lives in the extended context
 |t : Γ , A ⊢ B|. We need to exploit the fact that context extension
-|_▷_| is functorial:
-\begin{spec}
-_^_ : Γ ⊨ Δ → (A : Ty) → Γ ▷ A ⊨ Δ ▷ A
-\end{spec}
+|_▷_| is functorial: |_^_ : Γ ⊨ Δ → (A : Ty) → Γ ▷ A ⊨ Δ ▷ A|.
 Using |_^_| we can complete |_[_]|
 %if false
 \begin{code}
@@ -114,16 +111,17 @@ _[_] : Γ ⊢ A → Δ ⊨ Γ → Δ ⊢ A
 (ƛ t)   [ ts ]       =  ƛ (t [ ts ^ _ ])
 \end{code}
 However, now we have to define |_^_|. This is easy (isn't it?) but we
-need weakening on substitutions:
+need weakening on substitutions: |_⁺_ : Γ ⊨ Δ → (A : Ty) → Γ ▷ A ⊨ Δ|:
+%if False
 \begin{code}
 _⁺_ : Γ ⊨ Δ → (A : Ty) → Γ ▷ A ⊨ Δ
 \end{code}
-And now we can define |_^_|:
+%endif
 \begin{code}
 ts ^ A = ts ⁺ A , ` zero 
 \end{code}
-but we need to define |_⁺_|, which is nothing but a fold of weakening
-of terms
+Now we need to define |_⁺_|, which is nothing but a fold of weakening
+of terms:
 
 %if false
 \begin{code}
@@ -141,12 +139,10 @@ suc-tm : Γ ⊢ B → (A : Ty) → Γ ▷ A ⊢ B
 \begin{spec}
 suc-tm : Γ ⊢ B → (A : Ty) → Γ ▷ A ⊢ B
 \end{spec}
-\end{minipage}
+\end{minipage}\\
 But how can we define |suc-tm| when we only have weakening for variables? If we
 already had identity |id : Γ ⊨ Γ| and substitution we could write:
-\begin{spec}
-suc-tm t A = t [ id ⁺ A ] 
-\end{spec}
+|suc-tm t A = t [ id ⁺ A ] |, 
 but this is certainly not structurally recursive (and hence rejected
 by Agda's termination checker).
 
@@ -196,11 +192,7 @@ suc-tm t A       = t [ idv ⁺v A ]v
 This may not seem too bad: to obtain structural termination we just have to
 duplicate a few definitions, but it gets even worse when proving the
 laws. For example, to prove associativity, we first need to prove functoriality 
-of substitution:
-
-\begin{spec}
-[∘] : t [ us ∘ vs ] ≡ t [ us ] [ vs ]
-\end{spec}
+of substitution: |[∘] : t [ us ∘ vs ] ≡ t [ us ] [ vs ]|.
 Since |t, us, vs| can be variables/renamings or terms/substitutions,
 there are in principle eight combinations (though it turns out that four is 
 enough). 

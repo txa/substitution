@@ -161,15 +161,17 @@
 %format ⁺v = "^{+}\!{\mathrm{v}}"
 %format _⁺_, = "\_^{+}\_,"
 
+%format _,_  = "\_" , "\_"
+
 %format ^∘ = "\uparrow\!\circ"
 %format ⁺∘ = "{}^+\!\circ"
-%format ⁺-nat∘ = "{}^+\!-\mathrm{nat}\!\circ"
+%format ⁺-nat∘ = "{}^+\!-" nat "\!\circ"
 
 %format ∘∘ = "\circ\!\circ"
 %format [∘] = "[\circ]"
-%format ∘id = "\circ\!\mathrm{id}"
-%format id∘ = "\mathrm{id}\circ"
-%format id∘′ = "\mathrm{id}\!\circ^{\prime}"
+%format ∘id = "\circ\!" id
+%format id∘ = id "\circ"
+%format id∘′ = id "\circ^{\prime}"
 
 %format •-η = "\bigcdot\!-\!\eta"
 %format π₀ = "\pi_0"

@@ -78,13 +78,9 @@ variable
 %endif
 
 Here the predicate |isV| only holds for |V|. This particular encoding makes
-use of Agda's support for inductive-inductive datatypes (IITs), but merely a
-pair of a natural number |n| and a proof |n ≤ 1| is sufficient:
-
-\begin{spec}
-Sort : Set
-Sort = Σ ℕ (_≤ 1)
-\end{spec}
+use of Agda's support for inductive-inductive datatypes (IITs), but a
+pair of a natural number |n| and a proof |n ≤ 1| would also work, i.e.
+|Sort = Σ ℕ (_≤ 1)|.
 
 We can now define |T = T>V V isV : Sort| but, even better, we can tell Agda that
 this is a derived pattern
@@ -185,11 +181,10 @@ v⊑ {T} = v⊑t
 \end{code}
 %endif
 To improve readability we turn the equations ($\sqcup\sqcup$, 
-$\sqcup\mathrm{v}$) into rewrite rules: by declaring
-
-\begin{spec}
-{-# \Keyword{REWRITE} $\sqcup\!\sqcup \; \sqcup\mathrm{v} \;$ #-}
-\end{spec}
+$\sqcup\mathrm{v}$) into rewrite rules.
+% \begin{spec}
+% {-# \Keyword{REWRITE} $\sqcup\!\sqcup \; \sqcup\mathrm{v} \;$ #-}
+% \end{spec}
 
 %if False
 \begin{code}
@@ -207,11 +202,14 @@ tm⊑ : q ⊑ s → Γ ⊢[ q ] A → Γ ⊢[ s ] A
 tm⊑ rfl x = x
 tm⊑ v⊑t i = ` i
 \end{code}
-Using a parametric version of |_^_|
+By making functoriality of context extension parameteric, 
+|_^_ : Γ ⊨[ q ] Δ → ∀ A → Γ ▷ A ⊨[ q ] Δ ▷ A|, we are ready to define 
+substitution and renaming in one operation:
+%if False
 \begin{code}
-_^_ : Γ ⊨[ q ] Δ → ∀ A → Γ ▷ A ⊨[ q ] Δ ▷ A   
+_^_ : Γ ⊨[ q ] Δ → ∀ A → Γ ▷ A ⊨[ q ] Δ ▷ A
 \end{code}
-we are ready to define substitution and renaming in one operation
+%endif
 \begin{code}
 _[_] : Γ ⊢[ q ] A → Δ ⊨[ r ] Γ → Δ ⊢[ q ⊔ r ] A
 
@@ -254,7 +252,7 @@ id = id-poly
 -- id′ {Γ = Γ ▷ A} _ = id ^ A
 \end{code}
 %endif
-To define |_^_|, we need parametric versions of |zero|, |suc| and
+To implement |_^_|, we need parametric versions of |zero|, |suc| and
 |suc*|. |zero| is very easy:
 
 \begin{code}
@@ -288,21 +286,28 @@ _⁺_  :  Γ ⊨[ q ] Δ → ∀ A
 (xs , x)  ⁺ A = xs ⁺ A , suc[ _ ] x A 
 \end{spec}
 \end{minipage}\\
-%if false
+%if False
 \begin{code}
 ε ⁺ A = ε
 (xs , x) ⁺ A = xs ⁺ A , suc[ _ ] x A 
 \end{code}
 %endif
-And now we define:
+And now we define: |xs ^ A =  xs ⁺ A , zero[ _ ]|.
+%if False
 \begin{code}
 xs ^ A                 =  xs ⁺ A , zero[ _ ]
 \end{code}
+%endif
 
 \subsection{Termination}
 \label{sec:termination}
 
-Unfortunately (as of Agda 2.7.0.1), we now hit a termination error.
+Unfortunately (as of Agda 2.7.0.1\footnote{
+One of the authors to this paper has submitted a PR 
+(\href{https://github.com/agda/agda/pull/7695}{\#7695}) to Agda that 
+extends the termination checking algorithm such that these definitions
+are accepted directly.
+}), we now hit a termination error.
 \begin{spec}
 Termination checking failed for the following functions:
   _^_, _[_], id, _⁺_, suc[_]
@@ -331,7 +336,7 @@ adds new rows/columns (corresponding to the |Sort| argument) to the call
 matrices
 involving |id|, enabling the decrease
 to be tracked and termination to be correctly inferred by Agda.
-We present the call graph diagramatically (inlining |_^_|), 
+We present this call graph diagramatically (inlining |_^_|), 
 in the style of \cite{keller2010hereditary}.
 
 \begin{minipage}{0.65\textwidth}
@@ -379,40 +384,49 @@ To justify termination formally, we note that along all cycles in the graph,
 either the 
 |Sort| strictly decreases
 in size, or the size of the |Sort| is preserved and some other argument
-(the context, substitution or term) gets smaller. We can therefore
-assign decreasing measures to each of the functions.
+(the context, substitution or term) gets smaller. Following this, we can
+assign lexicographically-decreasing measures to each of the functions.
 
-We now have a working implementation of substitution. In preparation for
-a similar termination issue we will encounter later though, we note that, 
-perhaps surprisingly, adding a ``dummy argument'' to |id| of
-a completely unrelated type, such as |Bool| also satisfies Agda.
-That is, we can write
+In practice, we will generally require identity renamings, rather than
+substitutions, 
+and so we shall continue
+as if the original |id| definition worked (recovering |V|-only |id| from the
+|Sort|-polymorphic one is easy after all: we merely need to instantiate the
+|Sort| argument with |V|).
 
-\begin{minipage}{0.45\textwidth}
-\begin{spec}
-id′ : Bool → Γ ⊨[ V ] Γ
-id′ {Γ = •}      d = ε
-id′ {Γ = Γ ▷ A}  d = id′ d ^ A
-\end{spec}
-\end{minipage}
-\begin{minipage}{0.45\textwidth}
-\begin{spec}
-id : Γ ⊨[ V ] Γ 
-id = id′ true
-{-#  \Keyword{INLINE} $\Varid{id}$ #-} 
-\end{spec}
-\end{minipage}
+% Dummy argument explanation (unnecessary)
 
-This result was a little surprising at first, but Agda's
-implementation reveals answers. It turns out that Agda considers
-``base constructors'' (data constructors
-taking with arguments) to be structurally smaller-than-or-equal-to all
-parameters of the caller. This enables Agda to infer |true ≤ T| in 
-|suc[ T ] t A| and |V ≤ true| in
-|id′ {Γ = Γ ▷ A}|; we do not get a strict decrease in |Sort| like before,
-but the size is at least preserved, and it turns out
-(making use of some slightly more complicated termination measures) this is
-enough.
+% We now have a working implementation of substitution. In preparation for
+% a similar termination issue we will encounter later though, we note that, 
+% perhaps surprisingly, adding a ``dummy argument'' to |id| of
+% a completely unrelated type, such as |Bool| also satisfies Agda.
+% That is, we can write
+% 
+% \begin{minipage}{0.45\textwidth}
+% \begin{spec}
+% id′ : Bool → Γ ⊨[ V ] Γ
+% id′ {Γ = •}      d = ε
+% id′ {Γ = Γ ▷ A}  d = id′ d ^ A
+% \end{spec}
+% \end{minipage}
+% \begin{minipage}{0.45\textwidth}
+% \begin{spec}
+% id : Γ ⊨[ V ] Γ 
+% id = id′ true
+% {-#  \Keyword{INLINE} $\Varid{id}$ #-} 
+% \end{spec}
+% \end{minipage}
+% 
+% This result was a little surprising at first, but Agda's
+% implementation reveals answers. It turns out that Agda considers
+% ``base constructors'' (data constructors
+% taking with arguments) to be structurally smaller-than-or-equal-to all
+% parameters of the caller. This enables Agda to infer |true ≤ T| in 
+% |suc[ T ] t A| and |V ≤ true| in
+% |id′ {Γ = Γ ▷ A}|; we do not get a strict decrease in |Sort| like before,
+% but the size is at least preserved, and it turns out
+% (making use of some slightly more complicated termination measures) this is
+% enough.
 
 % Call graph diagram for the "dummy argument" approach (commented out because
 % it takes up a lot of space and I don't think it is really necessary):
@@ -436,23 +450,23 @@ enough.
 
 % TODO: Should we link to the PR?
 % https://github.com/agda/agda/pull/7695
-This ``dummy argument'' approach perhaps is interesting because one could 
-imagine automating this process (i.e. via elaboration, or
-directly during termination checking). In fact, a
-PR featuring exactly this extension is currently open on the Agda
-GitHub repository.
+% This ``dummy argument'' approach perhaps is interesting because one could 
+% imagine automating this process (i.e. via elaboration, or
+% directly during termination checking). In fact, a
+% PR featuring exactly this extension is currently open on the Agda
+% GitHub repository.
 
-Ultimately the details behind how termination is ensured do not matter here 
-though: both approaches provide effectively the same
-interface.
-\footnote{Technically, a |Sort|-polymorphic |id| provides a direct
-way to build identity \textit{substitutions} as well as identity
-\textit{renamings}, which are useful for implementing single substitutions 
-(|< t > = id , t|), 
-but we can easily recover this with a monomorphic |id| by extending |tm⊑| to 
-lists of terms (see \ref{sec::cwf-recurs-subst}). For the rest of the paper, 
-we will use |id : Γ ⊨[ V ] Γ| without assumptions about how it is 
-implemented.}
+% Ultimately the details behind how termination is ensured do not matter here 
+% though: both approaches provide effectively the same
+% interface.
+% \footnote{Technically, a |Sort|-polymorphic |id| provides a direct
+% way to build identity \textit{substitutions} as well as identity
+% \textit{renamings}, which are useful for implementing single substitutions 
+% (|< t > = id , t|), 
+% but we can easily recover this with a monomorphic |id| by extending |tm⊑| to 
+% lists of terms (see \ref{sec::cwf-recurs-subst}). For the rest of the paper, 
+% we will use |id : Γ ⊨[ V ] Γ| without assumptions about how it is 
+% implemented.}
 
 Finally, we define composition by folding substitution:
 \begin{code}

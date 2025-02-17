@@ -984,11 +984,9 @@ implementing |⌜id⌝| to keep Agda's termination checker happy.
 
 ⌜id⌝′ : Sort → ⌜ id {Γ = Γ} ⌝* ≡ idᴵ
 ⌜id⌝ = ⌜id⌝′ V
-
-{-# \Keyword{INLINE} $\ulcorner\mathrm{id}\urcorner\;$ #-}
 \end{spec}
 
-
+% {-# \Keyword{INLINE} $\ulcorner\mathrm{id}\urcorner\;$ #-}
 %if False
 \begin{code}
 {-# INLINE ⌜id⌝ #-}

@@ -27,10 +27,13 @@ Let's get the easy case out of the way: the right-identity law
 (|xs ∘ id ≡ xs|). It is easy because it doesn't depend on any other
 categorical equations.
 
-The main lemma is the identity law for the substitution functor:
+The main lemma is the identity law for the substitution functor 
+|[id] : x [ id ] ≡ x|.
+%if False
 \begin{code}
 [id] : x [ id ] ≡ x
 \end{code}
+%endif
 To prove the successor case, we need naturality of |suc[ q ]| applied to a 
 variable, which can be shown by simple induction over said variable:
 \footnote{We are using the naming conventions introduced in sections
@@ -43,31 +46,37 @@ variable, which can be shown by simple induction over said variable:
 ⁺-nat[]v {i = zero}     {xs = xs , x} = refl
 ⁺-nat[]v {i = suc j A}  {xs = xs , x} = ⁺-nat[]v {i = j}
 \end{code}
-
 The identity law is now easily provable by structural induction:
 
+\begin{minipage}{0.45\textwidth}
 \begin{code}
-[id] {x = zero} = refl
-[id] {x = suc i A} = 
+[id] {x = zero}     = refl
+[id] {x = suc i A}  = 
    i [ id ⁺ A ] 
    ≡⟨ ⁺-nat[]v {i = i} ⟩
    suc (i [ id ]) A
    ≡⟨ cong (λ j → suc j A) ([id] {x = i}) ⟩      
    suc i A ∎
-[id] {x = ` i} =
+\end{code}
+\end{minipage}
+\begin{minipage}{0.45\textwidth}
+\begin{code}
+[id] {x = ` i}    =
    cong `_ ([id] {x = i})
-[id] {x = t · u} =
+[id] {x = t · u}  =
    cong₂ _·_ ([id] {x = t}) ([id] {x = u})
-[id] {x = ƛ t} =
+[id] {x = ƛ t}    =
    cong ƛ_ ([id] {x = t})
 \end{code}
+\end{minipage}
+
 Note that the |ƛ_| case is easy here: we need the law to hold for
 |t :  Γ , A ⊢[ T ] B|, but this is still covered by the inductive hypothesis 
 because |id {Γ = Γ , A}  =  id ^ A|.
 
 Note also that is the first time we use Agda's syntax for equational derivations.
 This is just syntactic sugar for constructing an equational
-derivation using transitivity and reflexivity, exploiting Agda's
+derivation using transitivity, exploiting Agda's
 flexible syntax. Here |e ≡⟨ p ⟩ e'| means that |p| is a proof of
 |e ≡ e'|. Later we will also use the special case |e ≡⟨⟩ e'| which
 means that |e| and |e'| are definitionally equal (this corresponds to
@@ -80,9 +89,8 @@ and a version for binary functions
 The category law now is a fold of the functor law:
 \begin{code}
 ∘id : xs ∘ id ≡ xs
-∘id {xs = ε}         = refl
-∘id {xs = xs , x}  =
-   cong₂ _,_ (∘id {xs = xs}) ([id] {x = x})
+∘id {xs = ε}       = refl
+∘id {xs = xs , x}  = cong₂ _,_ (∘id {xs = xs}) ([id] {x = x})
 \end{code}
 
 \subsection{The left identity law}
@@ -92,33 +100,21 @@ We need to prove the left identity law mutually with the second
 functor law for substitution. This is the main lemma for
 associativity. 
 
-Let's state the functor law but postpone the proof until the next section
-
-\begin{code}
-[∘] : x [ xs ∘ ys ] ≡ x [ xs ] [ ys ]
-\end{code}
-This actually uses the definitional equality
-\footnote{We rely on Agda's rewrite here.
+Let's state the functor law but postpone the proof until the next section:
+|[∘] : x [ xs ∘ ys ] ≡ x [ xs ] [ ys ]|. This implicitly relies on the
+definitional  equality\footnote{We rely on Agda's 
+rewrite rules here.
 Alternatively we would have to insert a transport using |subst|.}
-\begin{spec}
-⊔⊔ : q ⊔ (r ⊔ s) = (q ⊔ r) ⊔ s
-\end{spec}
-because the left hand side has the type
-\begin{spec}
-Δ ⊢[  q ⊔ (r ⊔ s) ] A
-\end{spec}
-while the right hand side has type
-\begin{spec}
-Δ ⊢[ (q ⊔ r) ⊔ s ] A.
-\end{spec}
+|⊔⊔ : q ⊔ (r ⊔ s) = (q ⊔ r) ⊔ s| because the left hand side has the type
+|Δ ⊢[  q ⊔ (r ⊔ s) ] A| while the right hand side has type
+|Δ ⊢[ (q ⊔ r) ⊔ s ] A|.
 
-Of course, we must also state the left-identity law:
-
+Of course, we must also state the left-identity law |id∘ : id ∘ xs ≡ xs|. 
+%if False
 \begin{code}
-id∘ : {xs : Γ ⊨[ r ] Δ}
-  → id ∘ xs ≡ xs
+id∘ : id ∘ xs ≡ xs
 \end{code}
-
+%endif
 Similarly to |id|, Agda will not accept a direct implementation of |id∘| as 
 structurally recursive. Unfortunately, adapting the law to deal with a
 |Sort|-polymorphic |id| complicates matters: when |xs| is a renaming 
@@ -127,79 +123,53 @@ composed with an identity substition (i.e. at sort |T|), its sort must be lifted
 on
 the RHS (e.g. by extending the |tm⊑| functor to lists of terms) to
 obey |_⊔_|. 
+
 Accounting for this lifting is certainly do-able, but in keeping with the
 single-responsibility principle of software design, we argue it is neater
 to consider only |V|-sorted |id| here and worry about equations involving
-|Sort|-coercions later (in \ref{sec::cwf-recurs-subst}).
-
-We therefore use the dummy argument trick, declaring a version of |id∘| 
-which takes an unused argument, and 
-implementing our desired left-identity law by instantiating with a 
-suitable base constructor.
-\footnote{Alternatively, we could extend sort coercions, |tm⊑|, to 
-renamings/substitutions. The proofs end up a bit clunkier this way 
-(requiring explicit insertion and removal of these extra coercions).}
-
-\begin{code}
-data Dummy : Set where
-   ⟨⟩ : Dummy
-
-id∘′ : Dummy → {xs : Γ ⊨[ r ] Δ}
-  → id ∘ xs ≡ xs
-
-id∘ = id∘′ ⟨⟩
-\end{code}
-
-\begin{spec}
-{-# \Keyword{INLINE} $\Varid{id} \circ \;$ #-}
-\end{spec}
+|Sort|-coercions later (in \ref{sec:cwf-recurs-subst}).
+Therefore, we instead add a ``dummy'' |Sort| argument
+(i.e. |id∘′ : Sort → id ∘ xs ≡ xs|) to track the size
+decrease (such that we can eventually just use |id∘ = id∘′ V|).
+\footnote{Perhaps surprisingly, this ``dummy'' argument does not even need to
+be of type |Sort| to satisfy Agda here. More discussion on this trick 
+can be found at 
+\href{https://github.com/agda/agda/issues/7693}{\#7693}, but in summary:
+\begin{itemize} 
+   \item Agda considers all base constructors (constructors with no parameters) 
+   to be of minimal size structurally, so their presence can track size
+   preservation of other base-constructor arguments across function calls.
+   \item It turns out that
+   a strict decrease in |Sort| is not necessary everywhere for termination: 
+   the context also gets structurally smaller.
+\end{itemize}
+}
 
 %if False
 \begin{code}
+id∘′ : Sort → id ∘ xs ≡ xs
+id∘ = id∘′ V
 {-# INLINE id∘ #-}
 \end{code}
 %endif
+To prove |id∘′|, we need the $\beta$-law for |_⁺_|: 
+|⁺∘ : xs ⁺ A  ∘ (ys , x) ≡ xs ∘ ys|, which can be shown with a fold over a
+corresponding property for |suc[_]|:
+|suc[] : (suc[ q ] x _) [ ys , y ] ≡ x [ ys ] |.
 
-To prove it, we need the $\beta$-laws for |zero[_]| and |_⁺_|:
-\begin{code}
-zero[] : zero[ q ] [ xs , x ] ≡ tm⊑ (⊑⊔r {q = q}) x 
-⁺∘ : xs ⁺ A  ∘ (ys , x) ≡ xs ∘ ys
-\end{code}
-As before we state the laws but prove them later.
-Now |id∘| can be shown easily:
-\begin{code}
-id∘′ _ {xs = ε} = refl
-id∘′ _ {xs = xs , x} = cong₂ _,_
-   (id ⁺ _ ∘ (xs , x)
-     ≡⟨ ⁺∘ {xs = id} ⟩
-   id ∘ xs 
-     ≡⟨ id∘ ⟩
-   xs ∎)
-   refl
-\end{code}
-
-Now we show the $\beta$-laws. |zero[]| is just a simple case analysis over the sort
 %if False
 \begin{code}
-zero[] {q = V} = refl
-zero[] {q = T} = refl
+⁺∘ : xs ⁺ A ∘ (ys , x) ≡ xs ∘ ys
+suc[] : (suc[ q ] x _) [ ys , y ] ≡ x [ ys ] 
 \end{code}
 %endif
-while |⁺∘| relies on a corresponding property for substitutions:
-\begin{code}
-suc[] : {ys : Γ ⊨[ r ] Δ}
-    → (suc[ q ] x _) [ ys , y ] ≡ x [ ys ] 
-\end{code}
 
-The case for |q = V| is just definitional:
+\noindent
+\begin{minipage}{0.4\textwidth}
 \begin{code}
-suc[] {q = V} = refl
-\end{code}
-% It is simpler now - does it still count as "surprisingly complicated"?
-while |q = T| is surprisingly complicated and in particular relies on the 
-functor law |[∘]|.
-\begin{code}
-suc[] {q = T} {x = x} {y = y} {ys = ys} =
+suc[] {q = V}                            = 
+   refl
+suc[] {q = T} {x = x} {ys = ys} {y = y}  =
   (suc[ T ] x _) [ ys , y ]
   ≡⟨⟩
   x [ id ⁺ _ ] [ ys , y ]
@@ -210,13 +180,34 @@ suc[] {q = T} {x = x} {y = y} {ys = ys} =
   ≡⟨ cong (λ ρ → x [ ρ ]) id∘ ⟩
   x [ ys ]  ∎
 \end{code}
-Now the $\beta$-law |⁺∘| is just a simple fold. You may note that
-|⁺∘| relies on itself indirectly via |suc[]|. Termination is justified here by 
-the sort decreasing.
+\end{minipage}
+\hfill
+\begin{minipage}{0.5\textwidth}
+\begin{code}
+⁺∘ {xs = ε}       = 
+   refl
+⁺∘ {xs = xs , x}  = 
+   cong₂ _,_ (⁺∘ {xs = xs}) (suc[] {x = x})
+
+id∘′ {xs = ε}       _ = refl
+id∘′ {xs = xs , x}  _ = cong₂ _,_
+   (id ⁺ _ ∘ (xs , x)
+     ≡⟨ ⁺∘ {xs = id} ⟩
+   id ∘ xs 
+     ≡⟨ id∘ ⟩
+   xs ∎)
+   refl
+\end{code}
+\end{minipage}
+
+One may note that
+|⁺∘| relies on itself indirectly via |suc[]|. Like with the substitution
+operations, termination is justified here by 
+the |Sort| decreasing.
 %if False
 \begin{code}
-⁺∘ {xs = ε} = refl
-⁺∘ {xs = xs , x} = cong₂ _,_ (⁺∘ {xs = xs}) (suc[] {x = x})
+-- ⁺∘ {xs = ε} = refl
+-- ⁺∘ {xs = xs , x} = cong₂ _,_ (⁺∘ {xs = xs}) (suc[] {x = x})
 \end{code}
 %endif
 
@@ -226,15 +217,17 @@ We finally get to the proof of the second functor law
 (|[∘] : x [ xs ∘ ys ] ≡ x [ xs ] [ ys ]|), the main lemma for
 associativity. The main obstacle is that for the |ƛ_| case; we need the
 second functor law for context extension:
+|^∘ : (xs ∘ ys) ^ A ≡ (xs ^ A) ∘ (ys ^ A)|.
+%if False
 \begin{code}
 ^∘ :  {xs : Γ ⊨[ r ] Θ}{ys : Δ ⊨[ s ] Γ}{A : Ty}
       → (xs ∘ ys) ^ A ≡ (xs ^ A) ∘ (ys ^ A)
 \end{code}
+%endif
+
 To verify the variable case we also need that |tm⊑| commutes with substitution,
-which is easy to prove by case analysis
-\begin{spec}
-tm[] : tm⊑ ⊑t (x [ xs ]) ≡ (tm⊑ ⊑t x) [ xs ]
-\end{spec}
+|tm[] : tm⊑ ⊑t (x [ xs ]) ≡ (tm⊑ ⊑t x) [ xs ]|,
+which is easy to prove by case analysis.
 %if False
 \begin{code}
 tm[] : {x : Θ ⊢[ q ] A}{xs : Γ ⊨[ r ] Θ}
@@ -243,7 +236,10 @@ tm[] {q = V} = refl
 tm[] {q = T} = refl
 \end{code}
 %endif
+
 We are now ready to prove |[∘]| by structural induction:
+
+\begin{minipage}{0.5\textwidth}
 \begin{code}
 [∘] {x = zero} {xs = xs , x} = refl
 [∘] {x = suc i _} {xs = xs , x} = [∘] {x = i}
@@ -253,6 +249,10 @@ We are now ready to prove |[∘]| by structural induction:
    tm⊑ ⊑t (x [ xs ] [ ys ])
     ≡⟨ tm[] {x = x [ xs ]} ⟩        
    (tm⊑ ⊑t (x [ xs ])) [ ys ] ∎
+\end{code}
+\end{minipage}
+\begin{minipage}{0.45\textwidth}
+\begin{code}
 [∘] {x = t · u} =
    cong₂ _·_ ([∘] {x = t}) ([∘] {x = u})
 [∘] {x = ƛ t}{xs = xs}{ys = ys} =
@@ -263,35 +263,46 @@ We are now ready to prove |[∘]| by structural induction:
      ≡⟨ [∘] {x = t} ⟩           
      (t [ xs ^ _ ]) [ ys ^ _ ] ∎)
 \end{code}
-From here we prove associativity by a fold:
+\end{minipage}
+
+Associativity |∘∘ : xs ∘ (ys ∘ zs) ≡ (xs ∘ ys) ∘ zs| can be proven merely by a 
+fold of |[∘]| over substitutions.
+%if False
 \begin{code}
 ∘∘ : xs ∘ (ys ∘ zs) ≡ (xs ∘ ys) ∘ zs
 ∘∘ {xs = ε} = refl
 ∘∘ {xs = xs , x} =
    cong₂ _,_ (∘∘ {xs = xs}) ([∘] {x = x})
 \end{code}
+%endif
 
 However, we are not done yet. We still need to prove
 the second functor law for |_^_| (|^∘|). It turns out that this depends on
-the naturality of weakening:
+the naturality of weakening |⁺-nat∘ : xs ∘ (ys ⁺ A) ≡ (xs ∘ ys) ⁺ A|,
+%if False
 \begin{code}
-⁺-nat∘ : xs ∘ (ys ⁺ A) ≡ (xs ∘ ys) ⁺ A  
+⁺-nat∘ : xs ∘ (ys ⁺ A) ≡ (xs ∘ ys) ⁺ A
 \end{code}
-which unsurprisingly has to be shown by establishing a corresponding
-property for substitutions:
+%endif
+which unsurprisingly must be shown by establishing a corresponding
+property for substitutions: |⁺-nat[] : x [ xs ⁺ A ] ≡ suc[ _ ] (x [ xs ]) A|.
+%if False
 \begin{code}
-⁺-nat[] : {x : Γ  ⊢[ q ] B}{xs : Δ ⊨[ r ] Γ}
-     → x [ xs ⁺ A ] ≡ suc[ _ ] (x [ xs ]) A
+⁺-nat[] : ∀ {x : Γ ⊢[ q ] B} {xs : Δ ⊨[ r ] Γ} 
+        → x [ xs ⁺ A ] ≡ suc[ _ ] (x [ xs ]) A
 \end{code}
+%endif
 The case |q = V| is just the naturality for variables which we have
-already proven:
+already proven (|⁺-nat[]v|).
+%if False
 \begin{code}
 ⁺-nat[] {q = V}{x = i} = ⁺-nat[]v {i = i}
 \end{code}
+%endif
 The case for |q = T| is more interesting and relies again on |[∘]| and
 |∘id|:
 \begin{code}
-⁺-nat[] {q = T} {A = A} {x = x} {xs} = 
+⁺-nat[] {q = T} {A = A} {x = x} {xs = xs} = 
    x [ xs ⁺ A ]
    ≡⟨ cong (λ zs → x [ zs ⁺ A ]) (sym ∘id) ⟩
    x [ (xs ∘ id) ⁺ A ]     
@@ -313,8 +324,20 @@ tm⊑zero v⊑t = refl
 \end{code}
 %endif
 
-Finally we have all the ingredients to prove the second functor law |^∘|:
-\footnote{Actually we also need that zero commutes with |tm⊑|: that is for any
+It also turns out we need the $\beta$-law for |zero[_]|: 
+|zero[]  : zero[ q ] [ xs , x ] ≡ tm⊑ (⊑⊔r {q = q}) x|, which holds
+definitionally in the case for either |Sort|.
+
+%if False
+\begin{code}
+zero[]  : zero[ q ] [ xs , x ] ≡ tm⊑ (⊑⊔r {q = q}) x 
+zero[] {q = V} = refl
+zero[] {q = T} = refl
+\end{code}
+%endif 
+
+Finally, we have all the ingredients to prove the second functor law |^∘|:
+\footnote{Actually, we also need that zero commutes with |tm⊑|: that is for any
 |q⊑r : q ⊑ r| we have that |tm⊑zero q⊑r : zero[ r ] ≡ tm⊑ q⊑r zero[ q ]|.}
 \begin{code}
 ^∘ {r = r}{s = s}{xs = xs}{ys = ys} {A = A} = 
