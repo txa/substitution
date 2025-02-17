@@ -1,9 +1,14 @@
-\documentclass[sigplan,10pt,natbib]{acmart}
+\documentclass[a4paper,UKenglish,cleveref, autoref, thm-restate]{lipics-v2021}
+% \documentclass[sigplan,10pt,natbib]{acmart}
 %\documentclass[sigplan,10pt,natbib,anonymous,review]{acmart}
-\settopmatter{printfolios=true,printccs=false,printacmref=false}
-\citestyle{acmauthoryear}
+
+
+% \settopmatter{printfolios=true,printccs=false,printacmref=false}
+% \citestyle{acmauthoryear}
 %\usepackage{tipa}
 %\usepackage{fontspec}
+\usepackage{graphicx}
+\usepackage{ragged2e}
 \usepackage{tikz-cd}
 \let\Bbbk\relax % to avoid conflict
 %include lhs2TeX.fmt
@@ -19,31 +24,54 @@
 \tikzcdset{scaleedge cd/.style={every label/.append style={scale=#1}}}
 \tikzcdset{scalecell cd/.style={cells={nodes={scale=#1}}}}
 
+% From https://tex.stackexchange.com/questions/235118/making-a-thicker-cdot-for-dot-product-that-is-thinner-than-bullet
+\makeatletter
+\newcommand*\bigcdot{\mathpalette\bigcdot@@{3.0}}
+\newcommand*\bigcdot@@[2]{\mathbin{\vcenter{\hbox{\scalebox{#2}{$\m@@th#1\cdot$}}}}}
+\makeatother
+
+\bibliographystyle{./plainurl}
+
 \title{Substitution without copy and paste}
 
-\author{Thorsten Altenkirch}
-\affiliation{%
-  \institution{University of Nottingham}
-  \city{Nottingham}
-  \country{United Kingdom}
-  }
-\email{thorsten.altenkirch@@nottingham.ac.uk}
+% \author{Thorsten Altenkirch}
+% \affiliation{%
+%   \institution{University of Nottingham}
+%   \city{Nottingham}
+%   \country{United Kingdom}
+%   }
+% \email{thorsten.altenkirch@@nottingham.ac.uk}
+% 
+% \author{Nathaniel Burke}
+% \affiliation{
+%   \institution{Imperial College London}
+%   \city{London}
+%   \country{United Kingdom}
+%   }
+% \email{nathaniel.burke21@@imperial.ac.uk}
+% 
+% \author{Philip Wadler}
+% \affiliation{
+%   \institution{University of Edinburgh}
+%   \city{Edinburgh}
+%   \country{United Kingdom}
+%   }
+% \email{wadler@@inf.ed.ac.uk}
 
-\author{Nathaniel Burke}
-\affiliation{
-  \institution{Imperial College London}
-  \city{London}
-  \country{United Kingdom}
-  }
-\email{nathaniel.burke21@@imperial.ac.uk}
+%TODO Add ORCIDs?
+\author{Thorsten Altenkirch}{University of Nottingham, Nottingham, United Kingdom}{thorsten.altenkirch@@nottingham.ac.uk}{}{}
+\author{Nathaniel Burke}{Imperial College London, London, United Kingdom}{nathaniel.burke21@@imperial.ac.uk}{}{}
+\author{Philip Wadler}{University of Edinburgh, Edinburgh, United Kingdom}{wadler@@inf.ed.ac.uk}{}{}
 
-\author{Philip Wadler}
-\affiliation{
-  \institution{University of Edinburgh}
-  \city{Edinburgh}
-  \country{United Kingdom}
-  }
-\email{wadler@@inf.ed.ac.uk}
+\authorrunning{T. Altenkirch, N. Burke and P. Wadler}
+\Copyright{Thorsten Altenkirch, Nathaniel Burke and Philip Wadler}
+ 
+% TODO Maybe tweak/add more keywords
+\ccsdesc{Theory of computation~Type theory}
+\keywords{Substitution, Metatheory, Agda}
+
+\begin{document}
+\maketitle
 
 \begin{abstract}
 When defining substitution recursively for a language with binders
@@ -58,9 +86,6 @@ substitution gives rise to a simply typed category with families (CwF)
 and indeed that it is isomorphic to the initial simply typed CwF.
 \end{abstract}
 
-\begin{document}
-\maketitle
-
 \section{Introduction}
 \label{sec:introduction}
 
@@ -69,12 +94,12 @@ and indeed that it is isomorphic to the initial simply typed CwF.
 \begin{quote}
 Some half dozen persons have written technically on combinatory logic,
 and most of these, including ourselves, have published something
-erroneous. \citet{curry1958combinatory}
+erroneous. \cite{curry1958combinatory}
 \end{quote}
 
 % It is notoriously difficult to define substitution correctly
 % in the presence of binding operators. A pleasing solution is
-% suggested by \citet{debruijn1972lambda}, which not only
+% suggested by \cite{debruijn1972lambda}, which not only
 % introduces his eponymous indices but also the notion of
 % simultaneous substitution. However, to make the recursive
 % definition well-founded there is a necessary
@@ -90,7 +115,7 @@ erroneous. \citet{curry1958combinatory}
 % the left, and again on the right); and this leads to
 % fundamental properties that require four proofs, closely
 % related by cut and paste. There are techniques for factoring
-% these definitions and proofs, for instance as suggested by \citet{allais2017type},
+% these definitions and proofs, for instance as suggested by \cite{allais2017type},
 % but these are far from elementary.
 
 % [PHIL: End alternative introduction. Having written it, I think
@@ -99,16 +124,18 @@ erroneous. \citet{curry1958combinatory}
 
 The first author was writing lecture notes for an introduction to
 category theory for functional programmers. A nice example of a
-category is the category of simply typed $\lambda$-terms and
+category is that of simply typed $\lambda$-terms and
 substitutions; hence it seemed a good idea to give the definition and
 ask the students to prove the category laws. When writing the answer,
 they realised that it is not as easy as they thought, and to make sure that
 there were no mistakes, they started to formalize the problem in Agda.
 The main setback was that the same proofs got repeated many times. 
-If there is one guideline of good software engineering then it is 
-\textbf{Do not write code by copy and paste} and this applies even more so to 
+If there is one guideline of good software engineering then it is to
+\textbf{not write code by copy and paste} and this applies even more so to 
 formal proofs.
-
+% Horrible hack: Remind LaTeX that "\\[<LENGTH>]" is a thing, because apparently
+% it can sometimes forget...
+\phantom{a} \\[0.0ex] \indent
 This paper is the result of the effort to refactor the proof. We think
 that the method used is interesting also for other problems. In
 particular the current construction can be seen as a warmup for the
@@ -124,12 +151,20 @@ that you have to differentiate between renamings (|Δ ⊨v Γ|) where
 variables are substituted only for variables (|Γ ∋ A|) and proper substitutions 
 (|Δ ⊨ Γ|) where variables are replaced with terms (|Γ ⊢ A|). This results in 
 having to define several similar operations
+
+\begin{minipage}{0.45\textwidth}
 \begin{spec}
-  _v[_]v  : Γ ∋ A   → Δ ⊨v Γ  → Δ ∋ A
-  _v[_]   : Γ ∋ A   → Δ ⊨ Γ   → Δ ⊢ A
-  _[_]v   : Γ ⊢ A   → Δ ⊨v Γ  → Δ ⊢ A
-  _[_]    :  Γ ⊢ A  → Δ ⊨ Γ   → Δ ⊢ A
+  _v[_]v  : Γ ∋ A  → Δ ⊨v Γ  → Δ ∋ A
+  _v[_]   : Γ ∋ A  → Δ ⊨ Γ   → Δ ⊢ A
 \end{spec}
+\end{minipage}
+\begin{minipage}{0.45\textwidth}
+\begin{spec}
+  _[_]v   : Γ ⊢ A  → Δ ⊨v Γ  → Δ ⊢ A
+  _[_]    : Γ ⊢ A  → Δ ⊨ Γ   → Δ ⊢ A
+\end{spec}
+\end{minipage}
+
 And indeed the operations on terms depend on the operations on
 variables. This duplication gets worse when we prove properties
 of substitution, such as the functor law:
@@ -140,7 +175,7 @@ Since all components |x|, |xs|, |ys| can be either variables/renamings
 or terms/substitutions, we seemingly need to prove eight possibilities (with
 the repetition extending also to the intermediary lemmas). 
 Our solution is to introduce a type of sorts with |V : Sort| for
-variables/renamings and |T : Sort| for terms substitutions, leading
+variables/renamings and |T : Sort| for terms/substitutions, leading
 to a single substitution operation
 \begin{spec}
 _[_] : Γ ⊢[ q ] A → Δ ⊨[ r ] Γ → Δ ⊢[ q ⊔ r ] A  
@@ -179,7 +214,7 @@ substitutions are the \emph{substitution normal forms}.
 \subsection{Related work}
 \label{sec:related-work}
 
-\citet{de_bruijn_lambda_1972} introduces his eponymous indices and
+\cite{de_bruijn_lambda_1972} introduces his eponymous indices and
 also the notion of simultaneous substitution. We are here using a
 typed version of de Bruijn indices, e.g. see \cite{alti:csl99} where
 the problem of showing termination of a simple definition of
@@ -317,8 +352,7 @@ support
 for lexicographic termination\footnote{In fact, specifying termination
 measures manually has some advantages: we no longer need to use a
 complicated |Sort| datatype to make the ordering on constructors
-obvious: computing
-sizes with |if b then 1 else 0| is sufficient.}.
+explicit.}.
  Of course, doing the analysis to work out which
 termination measures were appropriate took some time, and one could imagine
 an expanded Lean tactic being able to infer termination
@@ -340,13 +374,13 @@ One reviewer asked about another alternative: since we are merging |_∋_| and
 why not go further and merge them entirely? Instead of a separate type for
 variables, one could have a term corresponding to de Bruijn index zero
 (written |●| below) and an explicit weakening operator on terms (written |_↑|).
-\begin{code}
+\begin{spec}
 data _⊢′_ : Con → Ty → Set where
   ●    : Γ ▷ A ⊢′ A
   _↑   : Γ ⊢′ B → Γ ▷ A ⊢′ B
   _·_  : Γ ⊢ A ⇒ B → Γ ⊢ A → Γ ⊢ B
   ƛ_   : Γ ▷ A ⊢ B → Γ ⊢ A ⇒ B  
-\end{code}
+\end{spec}
 This has the unfortunate property that there is now more than one way to
 write terms that used to be identical. For instance, the terms
 |● ↑ ↑ · ● ↑ · ●| and |(● ↑ · ●) ↑ · ●| are equivalent, where |● ↑ ↑|
@@ -365,8 +399,8 @@ This paper can also be seen as a preparation for the harder problem to
 implement recursive substitution for dependent types. This is harder,
 because here the typing of the constructors actually depends on the
 substitution laws. While such a M\"unchhausian \cite{altenkirch2023munchhausen} 
-construction
-\footnote{The reference is to Baron Münchhausen, who allegedly pulled himself 
+construction\footnote{The reference is to Baron Münchhausen, who allegedly 
+pulled himself 
 out of a swamp by his own hair.
 % PLW: deleted the following as redundant
 % We call definitions in type theory whose typing depends on equations about 
@@ -410,8 +444,7 @@ we believe that the construction here can be useful to others.
 
 
 
-\bibliographystyle{ACM-Reference-Format}
-\bibliography{local}
+\bibliography{./local}
 
 
 \end{document}

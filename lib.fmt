@@ -92,6 +92,8 @@
 %format _⇒_ = "\_\Rightarrow\_"
 %format `_ = "\texttt{\textasciigrave}\_"
 %format ` = "\texttt{\textasciigrave}"
+%format ·    = "\cdot"
+%format _·_  = "\_" · "\_"
 
 %format ⊢ = "\vdash"
 %format _⊢_ = "\_\vdash\_"
@@ -137,10 +139,13 @@
 %format _⊢[_]_ = "\_\vdash\![\_]\_"
 %format ⊢[ = "\vdash\!["
 %format _⊢[ = "\_\vdash\!["
+%format ]_ = "]\_"
+%format _[_] = "\_[\_]"
 
 %format _⊨[_]_ = "\_\models\![\_]\_"
 %format ⊨[ = "\models\!["
 %format _⊨[ = "\_\models\!["
+%format ⊨[_] = "\models\![\_]"
 
 %format _▷_ = "\_\rhd\_"
 %format ▷ = "\rhd"
@@ -155,21 +160,24 @@
 
 %format ⁺ = "^{+}"
 %format _⁺_ = "\_^{+}\_"
-%format _⁺v_ = "^{+}\!{\mathrm{v}}"
+%format _⁺v_ = "\_" "^{+}\!{\mathrm{v}}" "\_"
 %format ⁺v = "^{+}\!{\mathrm{v}}"
 %format _⁺_, = "\_^{+}\_,"
 
+%format _,_  = "\_" , "\_"
+
 %format ^∘ = "\uparrow\!\circ"
 %format ⁺∘ = "{}^+\!\circ"
-%format ⁺-nat∘ = "{}^+\!-\mathrm{nat}\!\circ"
+%format ⁺-nat∘ = "{}^+\!-" nat "\circ"
+%format ,∘     = , "\circ"
 
 %format ∘∘ = "\circ\!\circ"
 %format [∘] = "[\circ]"
-%format ∘id = "\circ\!\mathrm{id}"
-%format id∘ = "\mathrm{id}\circ"
-%format id∘′ = "\mathrm{id}\!\circ^{\prime}"
+%format ∘id = "\circ" id
+%format id∘ = id "\circ"
+%format id∘′ = id "\circ^{\prime}"
 
-%format •-η = "\bullet\!-\!\eta"
+%format •-η = "\bigcdot\!-\!\eta"
 %format π₀ = "\pi_0"
 %format π₁ = "\pi_1"
 %format ▷-β₀ = "\rhd\!-\!\beta_0"
@@ -183,36 +191,36 @@
 %format ⊔ = "\sqcup"
 %format _⊔_ = "\_\sqcup\_"
 %format ⊔⊔ = "\sqcup\!\sqcup"
-%format ⊔v = "\sqcup\!\mathrm{v}"
+%format ⊔v = "\sqcup\!" v
 
 %format ⊑ = "\sqsubseteq"
 %format _⊑_ = "\_\sqsubseteq\_"
-%format v⊑t = "\mathrm{v}\!\sqsubseteq\!\mathrm{t}"
-%format ⊑t = "\sqsubseteq\!\mathrm{t}"
-%format v⊑ = "\mathrm{v}\!\sqsubseteq"
-%format tm⊑ = "\mathrm{tm}\!\sqsubseteq"
-%format q⊑r = "\mathrm{q}\!\sqsubseteq\!\mathrm{r}"
-%format tm⊑zero = "\mathrm{tm}\!\sqsubseteq\!\mathrm{zero}"
+%format v⊑t = v "\!\sqsubseteq\!" t
+%format ⊑t = "\sqsubseteq\!" t
+%format v⊑ = v "\!\sqsubseteq"
+%format tm⊑ = tm "\!\sqsubseteq"
+%format q⊑r = q "\!\sqsubseteq\!" r
+%format tm⊑zero = tm "\!\sqsubseteq\!" zero
 
 %format ⊑q⊔ = "\sqsubseteq\!\mathrm{q}\!\sqcup"
-%format ⊑⊔r = "\sqsubseteq\!\sqcup\mathrm{r}"
+%format ⊑⊔r = "\sqsubseteq\!\sqcup" r
 
-%format tm*⊑ = "\mathrm{tm*}\!\sqsubseteq"
-%format q⊑s = "\mathrm{q}\!\sqsubseteq\!\mathrm{s}"
+%format tm*⊑ = tm "\mathrm{*}\!\sqsubseteq"
+%format q⊑s = q "\!\sqsubseteq\!" s
 
 %format ⊑∘ = "\sqsubseteq\!\circ"
 %format ∘⊑ = "\circ\!\sqsubseteq"
-%format v[⊑] = "\mathrm{v}[\sqsubseteq]"
-%format t[⊑] = "\mathrm{t}[\sqsubseteq]"
+%format v[⊑] = v "[\sqsubseteq]"
+%format t[⊑] = t "[\sqsubseteq]"
 %format ⊑⁺ = "\sqsubseteq^{+}"
 %format ⊑^ = "\sqsubseteq\uparrow"
 
 %format ⁺-nat[]v = "^{+}" -nat[]v
 %format ⁺-nat[] = "^{+}" -nat[]
 
-%format cong₂ = "\mathrm{cong}_{2}"
+%format cong₂ = cong "_{2}"
 
-%format suc[id⁺] = "\mathrm{suc}[\mathrm{id}^{+}]"
+%format suc[id⁺] = suc "[" id "^{+}" "]"
 
 %format 𝕄 = "\mathbb{M}"
 %format 𝕞 = "\textbf{m}"
@@ -324,6 +332,7 @@
 %format zero[]ᴵ = zero[] ᴵ
 %format suc[]ᴵ  = suc[]  ᴵ
 %format ,[]ᴵ    = ,[]    ᴵ
+%format ,∘ᴵ     = ,∘     ᴵ
 %format [_]ᴵ    = [_]    ᴵ
 %format _,ᴵ     = _,     ᴵ
 %format ,ᴵ_     = ,_     ᴵ
@@ -423,7 +432,8 @@
 %format ′      = "^{\prime}"
 %format ⊢′     = ⊢ ′
 %format _⊢′_   = "\_" ⊢′ "\_"
-%format ●      = "\bullet"
+%format ●      = "\bigcdot"
+%format •      = "\bigcdot"
 %format id′    = id ′
 
 %format ≤  = "\leq"
