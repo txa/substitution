@@ -19,6 +19,7 @@ can verify the laws of a simply typed category with families
 they can be specialised to simple types \cite{castellan2021categories}. We 
 summarize the definition of a simply typed CwF as follows:
 
+\vspace{-1ex}
 \begin{itemize}
 \item A category of contexts (|Con|) and substitutions (|_⊨_|),
 \item A set of types |Ty|,
@@ -29,6 +30,7 @@ summarize the definition of a simply typed CwF as follows:
   |(Γ ⊨ Δ) × (Γ ⊢ A|).
 \end{itemize}
 
+\vspace{-1ex}
 I.e. a simply typed CwF is just a CwF where the presheaf of types is constant.
 We will give the precise definition in the next section, hence it
 isn't necessary to be familiar with the categorical terminology to follow the 
@@ -510,8 +512,9 @@ We also reuse our existing datatypes for contexts and types for convenience
 (note terms do not occur inside types in STLC).
 
 To state the dependent equations between outputs of the eliminator, we need
-dependent identity types. We can define these simply by matching on the identity
-between the LHS and RHS types.
+dependent identity types |_≡[_]≡_ : ∀ {A B : Set ℓ} → A → A ≡ B → B → Set ℓ|. 
+We can define these simply by matching on the identity
+between the LHS and RHS types |x ≡[ refl ]≡ y = x ≡ y|.
 
 %if False
 \begin{code}
@@ -524,10 +527,12 @@ private variable
 \end{code}
 %endif
 
+%if False
 \begin{code}
 _≡[_]≡_ : ∀ {A B : Set ℓ} → A → A ≡ B → B → Set ℓ
 x ≡[ refl ]≡ y = x ≡ y
 \end{code}
+%endif
 
 To avoid name clashes between our existing syntax and the initial CwF 
 constructors, we annotate every |ICwF| constructor with |ᴵ|. e.g.
