@@ -608,7 +608,7 @@ We state the eliminator for the initial CwF in terms of |Motive : Set₁| and
 module _ {𝕄} (𝕞 : Methods 𝕄) where
 \end{spec}
 
-\vspace{-3ex}
+\vspace{-1ex}
 \begin{minipage}{0.35\textwidth}
 \begin{spec}
   elim-con  : ∀ Γ → Conᴹ Γ
