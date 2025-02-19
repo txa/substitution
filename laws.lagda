@@ -173,16 +173,13 @@ suc[] : (suc[ q ] x _) [ ys , y ] ≡ x [ ys ]
 \noindent
 \begin{minipage}{0.4\textwidth}
 \begin{code}
-suc[] {q = V}                            = 
-   refl
+suc[] {q = V} = refl
 suc[] {q = T} {x = x} {ys = ys} {y = y}  =
-  (suc[ T ] x _) [ ys , y ]
-  ≡⟨⟩
-  x [ id ⁺ _ ] [ ys , y ]
-  ≡⟨ sym ([∘] {x = x}) ⟩
-  x [ (id ⁺ _) ∘ (ys , y) ]
+  (suc[ T ] x _) [ ys , y ]  ≡⟨⟩
+  x [ id ⁺ _ ] [ ys , y ]    ≡⟨ sym ([∘] {x = x}) ⟩
+  x [ (id ⁺ _) ∘ (ys , y) ]  
   ≡⟨ cong (λ ρ → x [ ρ ]) ⁺∘  ⟩
-  x [ id ∘ ys  ]
+  x [ id ∘ ys  ]             
   ≡⟨ cong (λ ρ → x [ ρ ]) id∘ ⟩
   x [ ys ]  ∎
 \end{code}
@@ -190,18 +187,15 @@ suc[] {q = T} {x = x} {ys = ys} {y = y}  =
 \hfill
 \begin{minipage}{0.5\textwidth}
 \begin{code}
-⁺∘ {xs = ε}       = 
-   refl
+⁺∘ {xs = ε}       = refl
 ⁺∘ {xs = xs , x}  = 
    cong₂ _,_ (⁺∘ {xs = xs}) (suc[] {x = x})
 
 id∘′ {xs = ε}       _ = refl
 id∘′ {xs = xs , x}  _ = cong₂ _,_
-   (id ⁺ _ ∘ (xs , x)
-     ≡⟨ ⁺∘ {xs = id} ⟩
-   id ∘ xs 
-     ≡⟨ id∘ ⟩
-   xs ∎)
+   (id ⁺ _ ∘ (xs , x)  ≡⟨ ⁺∘ {xs = id} ⟩
+   id ∘ xs             ≡⟨ id∘ ⟩
+   xs                  ∎)
    refl
 \end{code}
 \end{minipage}
@@ -309,13 +303,10 @@ The case for |q = T| is more interesting and relies again on |[∘]| and
 |∘id|:
 \begin{code}
 ⁺-nat[] {q = T} {A = A} {x = x} {xs = xs} = 
-   x [ xs ⁺ A ]
-   ≡⟨ cong (λ zs → x [ zs ⁺ A ]) (sym ∘id) ⟩
-   x [ (xs ∘ id) ⁺ A ]     
-   ≡⟨ cong (λ zs → x [ zs ]) (sym (⁺-nat∘ {xs = xs})) ⟩
-   x [ xs ∘ (id ⁺ A) ]   
-   ≡⟨ [∘] {x = x} ⟩
-   x [ xs ] [ id ⁺ A ] ∎
+   x [ xs ⁺ A ]         ≡⟨ cong (λ zs → x [ zs ⁺ A ]) (sym ∘id) ⟩
+   x [ (xs ∘ id) ⁺ A ]  ≡⟨ cong (λ zs → x [ zs ]) (sym (⁺-nat∘ {xs = xs})) ⟩
+   x [ xs ∘ (id ⁺ A) ]  ≡⟨ [∘] {x = x} ⟩
+   x [ xs ] [ id ⁺ A ]  ∎
 \end{code}
 
 %if False
@@ -330,8 +321,8 @@ tm⊑zero v⊑t = refl
 \end{code}
 %endif
 
-It also turns out we need the $\beta$-law for |zero[_]|: 
-|zero[]  : zero[ q ] [ xs , x ] ≡ tm⊑ (⊑⊔r {q = q}) x|, which holds
+It also turns out we need |zero[]  : zero[ q ] [ xs , x ] ≡ tm⊑ (⊑⊔r {q = q}) x|
+, the $\beta$-law for |zero[_]|, which holds
 definitionally in the case for either |Sort|.
 
 %if False
@@ -347,18 +338,13 @@ Finally, we have all the ingredients to prove the second functor law |^∘|:
 |q⊑r : q ⊑ r| we have that |tm⊑zero q⊑r : zero[ r ] ≡ tm⊑ q⊑r zero[ q ]|.}
 \begin{code}
 ^∘ {r = r}{s = s}{xs = xs}{ys = ys} {A = A} = 
-    (xs ∘ ys) ^ A
-    ≡⟨⟩
-    (xs ∘ ys) ⁺ A , zero[ r ⊔ s ]    
-    ≡⟨ cong₂ _,_ (sym (⁺-nat∘ {xs = xs})) refl ⟩
-    xs ∘ (ys ⁺ A) , zero[ r ⊔ s ]
-    ≡⟨ cong₂ _,_ refl (tm⊑zero (⊑⊔r {r = s}{q = r})) ⟩        
-    xs ∘ (ys ⁺ A) , tm⊑ (⊑⊔r {q = r}) zero[ s ]
-    ≡⟨ cong₂ _,_
-         (sym (⁺∘ {xs = xs}))
-         (sym (zero[] {q = r}{x = zero[ s ]}))  ⟩    
-    (xs ⁺ A) ∘  (ys ^ A) , zero[ r ] [ ys ^ A ]
-    ≡⟨⟩  
-    (xs ^ A) ∘ (ys ^ A) ∎
+    (xs ∘ ys) ^ A                                ≡⟨⟩
+    (xs ∘ ys) ⁺ A , zero[ r ⊔ s ]                ≡⟨ cong₂ _,_ (sym (⁺-nat∘ {xs = xs})) refl ⟩
+    xs ∘ (ys ⁺ A) , zero[ r ⊔ s ]                
+      ≡⟨ cong₂ _,_ refl (tm⊑zero (⊑⊔r {r = s}{q = r})) ⟩        
+    xs ∘ (ys ⁺ A) , tm⊑ (⊑⊔r {q = r}) zero[ s ]  
+      ≡⟨ cong₂ _,_ (sym (⁺∘ {xs = xs})) (sym (zero[] {q = r}{x = zero[ s ]}))  ⟩    
+    (xs ⁺ A) ∘  (ys ^ A) , zero[ r ] [ ys ^ A ]  ≡⟨⟩  
+    (xs ^ A) ∘ (ys ^ A)                          ∎
 \end{code}
  

@@ -93,10 +93,8 @@ completeness and stability in the language of normalisation functions.
 \subsection{Simply Typed CwFs}
 \label{sec:simply-typed-cwfs}
 
-We define a record to capture simply typed CWFs:
-\begin{code}
-record CwF-simple : Set₁ where
-\end{code}
+We define a record to capture simply typed CWFs: 
+|record CwF-simple : Set₁|.
 
 %if False
 \begin{code}
@@ -173,8 +171,8 @@ record CwF-simple : Set₁ where
 \end{code}
 %endif
 
-We start with the category of contexts, using the same naming scheme as
-introduced previously:
+For the contents, we begin with the category of contexts, using the 
+same naming conventions as introduced previously:
 
 \begin{minipage}{0.45\textwidth}
 \begin{spec}
@@ -244,7 +242,8 @@ We need to add the specific components for simply typed
 $\lambda$-calculus; we add the type constructors, the term
 constructors and the corresponding naturality laws:
 
-\begin{minipage}{0.45\textwidth}
+\noindent
+\begin{minipage}{0.5\textwidth}
 \begin{spec}
   o    : Ty
   _⇒_  : Ty → Ty → Ty
@@ -318,6 +317,7 @@ interleaved mutual
 \end{code}
 %endif
 
+\noindent
 \begin{minipage}{0.45\textwidth}
 \begin{code}
   is-cwf .CwF._⊨_  = _⊨[ T ]_
@@ -429,20 +429,14 @@ and |δ ∘ tm*⊑ v⊑t id ≡ δ|. This is where we can take full advantage of
 Similarly to substitutions, we must fix the sort of our terms to |T| 
 (in this case, so we can prove the identity law - note that applying the 
 identity substitution to a variable |i| produces the distinct term |` i|).
-
 %if False
 \begin{code}
   is-cwf .CwF.Ty           = Ty
+  is-cwf .CwF._⊢_   = _⊢[ T ]_
+  is-cwf .CwF._[_]  = _[_]
 \end{code}
 %endif
 
-\begin{minipage}{0.45\textwidth}
-\begin{code}
-  is-cwf .CwF._⊢_   = _⊢[ T ]_
-
-  is-cwf .CwF._[_]  = _[_]
-\end{code}
-\end{minipage}
 \begin{minipage}{0.45\textwidth}
 \begin{code}
   is-cwf .CwF.[id] {t = t}  =                   
@@ -450,6 +444,13 @@ identity substitution to a variable |i| produces the distinct term |` i|).
     t [ id ]           ≡⟨ [id] ⟩          
     t                  ∎
 \end{code}
+\end{minipage}
+\begin{minipage}{0.45\textwidth}
+\begin{spec}
+  is-cwf .CwF._⊢_   = _⊢[ T ]_
+
+  is-cwf .CwF._[_]  = _[_]
+\end{spec}
 \end{minipage}
 
 %if False
@@ -952,11 +953,20 @@ means there are many more cases. We start with the motive:
 
 \begin{code}
 compl-𝕄 : Motive
-compl-𝕄 .Conᴹ _ = ⊤
-compl-𝕄 .Tyᴹ  _ = ⊤
-compl-𝕄 .Tmᴹ _ _ tᴵ = ⌜ norm tᴵ ⌝ ≡ tᴵ
-compl-𝕄 .Tmsᴹ _ _ δᴵ = ⌜ norm* δᴵ ⌝* ≡ δᴵ
 \end{code}
+
+\begin{minipage}{0.45\textwidth}
+\begin{code}
+compl-𝕄 .Tmᴹ _ _ tᴵ   = ⌜ norm tᴵ ⌝ ≡ tᴵ
+compl-𝕄 .Tmsᴹ _ _ δᴵ  = ⌜ norm* δᴵ ⌝* ≡ δᴵ
+\end{code}
+\end{minipage}
+\begin{minipage}{0.45\textwidth}
+\begin{code}
+compl-𝕄 .Conᴹ _  = ⊤
+compl-𝕄 .Tyᴹ  _  = ⊤
+\end{code}
+\end{minipage}
 
 To show these identities, we need to prove that our various recursively defined
 syntax operations are preserved by |⌜_⌝|.
@@ -1104,7 +1114,7 @@ identically: |⌜⊑⌝ : ∀ {x : Γ ⊢[ q ] A} → ⌜ tm⊑ ⊑t x ⌝ ≡ �
 \end{code}
 %endif
 
-We can now (finally) proceed with the proofs. There are quite a few
+We can now proceed with the preservation proofs. There are quite a few
 cases to cover, so for brevity we elide the proofs of |⌜[]⌝| and |⌜suc⌝|.
 
 %if False
@@ -1140,10 +1150,12 @@ cases to cover, so for brevity we elide the proofs of |⌜[]⌝| and |⌜suc⌝|
 \end{code}
 %endif
 
+\noindent
 \begin{minipage}{0.6\textwidth}
 \begin{code}
 ⌜^⌝ {q = q} = cong₂ _,ᴵ_ ⌜⁺⌝ (⌜zero⌝ {q = q})
 \end{code}
+\\
 
 \begin{code}
 ⌜⁺⌝ {xs = ε} = sym •-ηᴵ
@@ -1188,7 +1200,7 @@ cases to cover, so for brevity we elide the proofs of |⌜[]⌝| and |⌜suc⌝|
 %endif
 
 We also prove preservation of substitution composition 
-|⌜∘⌝ : ⌜ xs ∘ ys ⌝* ≡ ⌜ xs ⌝* ∘ᴵ ⌜ ys ⌝*| in similar fashion.
+|⌜∘⌝ : ⌜ xs ∘ ys ⌝* ≡ ⌜ xs ⌝* ∘ᴵ ⌜ ys ⌝*| in similar fashion, folding |⌜[]⌝|.
 
 %if False
 \begin{code}
@@ -1204,7 +1216,7 @@ We also prove preservation of substitution composition
 %endif
 
 The main cases of |Methods compl-𝕄| can now be proved by just applying the 
-preservation lemmas and inductive hypotheses.
+preservation lemmas and inductive hypotheses, e.g:
 
 %if False
 \begin{code}
@@ -1216,8 +1228,8 @@ compl-𝕞 : Methods compl-𝕄
 \end{code}
 %endif
 
-\begin{minipage}{0.35\textwidth}
 \noindent
+\begin{minipage}{0.35\textwidth}
 \begin{code}
 compl-𝕞 .idᴹ = 
   ⌜ tm*⊑ v⊑t id ⌝*  ≡⟨ ⌜⊑⌝* ⟩
@@ -1305,6 +1317,7 @@ compl-𝕞 .ƛ[]ᴹ  = duip
 \end{code}
 %endif
 
+\noindent
 And completeness is just one call to the eliminator away.
 
 \begin{code}

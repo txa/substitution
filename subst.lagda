@@ -83,10 +83,14 @@ pair of a natural number |n| and a proof |n ≤ 1| would also work, i.e.
 |Sort = Σ ℕ (_≤ 1)|.
 
 We can now define |T = T>V V isV : Sort| but, even better, we can tell Agda that
-this is a derived pattern
+this is a derived pattern with |pattern T = T>V V isV|.
+
+%if False
 \begin{code}
 pattern T = T>V V isV
 \end{code}
+%endif
+
 This means we can pattern match over |Sort| just with |V| and |T|,
 while ensuring |V| is visibly (to Agda's termination checker) structurally 
 smaller than |T|.
@@ -210,15 +214,23 @@ substitution and renaming in one operation:
 _^_ : Γ ⊨[ q ] Δ → ∀ A → Γ ▷ A ⊨[ q ] Δ ▷ A
 \end{code}
 %endif
+
+\noindent
+\begin{minipage}{0.62\textwidth}
 \begin{code}
 _[_] : Γ ⊢[ q ] A → Δ ⊨[ r ] Γ → Δ ⊢[ q ⊔ r ] A
-
 zero       [ xs , x ]  = x
 (suc i _)  [ xs , x ]  = i [ xs ]
+\end{code}
+\end{minipage}
+\begin{minipage}{0.3\textwidth}
+\begin{code}
 (` i)      [ xs ]      = tm⊑  ⊑t  (i [ xs ])
 (t · u)    [ xs ]      = (t [ xs ]) · (u [ xs ])
 (ƛ t)      [ xs ]      = ƛ (t [ xs ^ _ ]) 
 \end{code}
+\end{minipage}
+
 We use |_⊔_| here to take care of the fact that substitution will only return a 
 variable if both inputs are variables / renamings. We
 need to use |tm⊑| to take care of the two cases when substituting for
@@ -308,10 +320,13 @@ One of the authors to this paper has submitted a PR
 extends the termination checking algorithm such that these definitions
 are accepted directly.
 }), we now hit a termination error.
+
+%if False
 \begin{spec}
 Termination checking failed for the following functions:
   _^_, _[_], id, _⁺_, suc[_]
 \end{spec}
+%endif
 
 The cause turns out to be |id|. Termination here hinges on weakening for terms
 (|suc[ T ] t A|) building
@@ -377,6 +392,7 @@ Function & Measure \\
 \end{tabular}
 \end{center}
 \captionof{table}{Per-function termination measures}
+\label{table:termination}
 \end{minipage}
 \\[2.0ex]
 
@@ -385,7 +401,8 @@ either the
 |Sort| strictly decreases
 in size, or the size of the |Sort| is preserved and some other argument
 (the context, substitution or term) gets smaller. Following this, we can
-assign lexicographically-decreasing measures to each of the functions.
+assign lexicographically-decreasing measures to each of the functions
+(\textsf{Table \ref{table:termination}}).
 
 In practice, we will generally require identity renamings, rather than
 substitutions, 
