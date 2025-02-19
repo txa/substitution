@@ -279,36 +279,15 @@ module CwF = CwF-simple
 \end{code}
 %endif
 
-We need to decide which type family to interpret substitutions into. 
+Our first non-trivial decision is which type family to interpret substitutions 
+into. 
 In our first attempt, we tried to pair renamings/substitutions with their sorts 
-to stay polymorphic:
-
-\begin{minipage}{0.45\textwidth}
-\begin{spec}
-_⊨_ : Con → Con → Set
-Δ ⊨ Γ = Σ Sort (Δ ⊨[_] Γ)
-\end{spec}
-\end{minipage}
-\begin{minipage}{0.45\textwidth}
-\begin{spec}
-is-cwf .CwF._⊨_  = _⊨_
-is-cwf .CwF.id   = V , id
-\end{spec}
-\end{minipage}
-
-Unfortunately, this approach quickly breaks. The CwF laws force us to provide a 
+to stay polymorphic: |is-cwf .CwF._⊨_ = Σ Sort (Δ ⊨[_] Γ)|.
+Unfortunately, this approach quickly breaks. The |•-η| CwF law forces us to 
+provide a 
 unique morphism to the terminal context (i.e. a unique weakening from the empty 
-context).
-
-\begin{spec}
-is-cwf .CwF.•                = •
-is-cwf .CwF.ε                = ? , ε
-is-cwf .CwF.•-η {δ = q , ε}  = ?
-\end{spec}
-
-Our |_⊨_| record is simply too flexible here. It allows two distinct 
-implementations: |V , ε| and |T , ε|. 
-We are stuck!
+context); |Σ Sort (Δ ⊨[_] Γ)| is simply too flexible here, allowing
+both |V , ε| and |T , ε|.
 
 Therefore, we instead fix the sort to |T|.
 
@@ -626,9 +605,18 @@ We state the eliminator for the initial CwF in terms of |Motive : Set₁| and
 |Methods : Motive → Set₁| records as in \cite{altenkirch2016tt_in_tt}.
 
 \begin{code}
+<<<<<<< HEAD
 module _ {𝕄} (𝕞 : Methods 𝕄) where
 \end{code}
 
+=======
+<<<<<<< Updated upstream
+=======
+module _ {𝕄} (𝕞 : Methods 𝕄) where
+\end{code}
+
+\vspace{-3ex}
+>>>>>>> f92b59e (Shorten)
 \begin{minipage}{0.35\textwidth}
 \begin{code}
   elim-con  : ∀ Γ → Conᴹ Γ
@@ -644,6 +632,10 @@ module _ {𝕄} (𝕞 : Methods 𝕄) where
 
 %if False
 \begin{code}
+<<<<<<< HEAD
+=======
+>>>>>>> Stashed changes
+>>>>>>> f92b59e (Shorten)
 record Motive : Set₁ where
   field
     Conᴹ : Con → Set
