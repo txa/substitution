@@ -222,6 +222,7 @@
 
 %format cong₂ = cong "_{2}"
 
+%format suc[     = suc "["
 %format suc[id⁺] = suc "[" id "^{+}" "]"
 
 %format 𝕄 = "\mathbb{M}"

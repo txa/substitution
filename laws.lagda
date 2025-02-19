@@ -52,11 +52,10 @@ The identity law is now easily provable by structural induction:
 \begin{code}
 [id] {x = zero}     = refl
 [id] {x = suc i A}  = 
-   i [ id ⁺ A ] 
-   ≡⟨ ⁺-nat[]v {i = i} ⟩
+   i [ id ⁺ A ]  ≡⟨ ⁺-nat[]v {i = i} ⟩
    suc (i [ id ]) A
    ≡⟨ cong (λ j → suc j A) ([id] {x = i}) ⟩      
-   suc i A ∎
+   suc i A       ∎
 \end{code}
 \end{minipage}
 \begin{minipage}{0.45\textwidth}
@@ -86,12 +85,16 @@ We also make heavy use of congruence |cong f : a ≡ b → f a ≡ f b|
 and a version for binary functions
 |cong₂ g : a ≡ b → c ≡ d → g a c ≡ g b d|.
 
-The category law now is a fold of the functor law:
+The category law |∘id : xs ∘ id ≡ xs| is now simply a fold of the functor law
+(|[id]|).
+
+%if False
 \begin{code}
 ∘id : xs ∘ id ≡ xs
 ∘id {xs = ε}       = refl
 ∘id {xs = xs , x}  = cong₂ _,_ (∘id {xs = xs}) ([id] {x = x})
 \end{code}
+%endif
 
 \subsection{The left identity law}
 \label{sec:right-ident}
@@ -145,7 +148,7 @@ can be found at
    \item Agda considers all base constructors (constructors with no parameters) 
    to be of minimal size structurally, so their presence can track size
    preservation of other base-constructor arguments across function calls.
-   \item It turns out that
+   \item \vspace{-0.75ex} It turns out that
    a strict decrease in |Sort| is not necessary everywhere for termination: 
    the context also gets structurally smaller.
 \end{itemize}
@@ -158,9 +161,9 @@ id∘ = id∘′ V
 {-# INLINE id∘ #-}
 \end{code}
 %endif
-To prove |id∘′|, we need the $\beta$-law for |_⁺_|: 
+To prove |id∘′|, we need the $\beta$-law for |_⁺_|,
 |⁺∘ : xs ⁺ A  ∘ (ys , x) ≡ xs ∘ ys|, which can be shown with a fold over a
-corresponding property for |suc[_]|:
+corresponding property for |suc[_]|,
 |suc[] : (suc[ q ] x _) [ ys , y ] ≡ x [ ys ] |.
 
 %if False
@@ -239,11 +242,13 @@ tm[] {q = T} = refl
 
 We are now ready to prove |[∘]| by structural induction:
 
-\begin{minipage}{0.5\textwidth}
+\noindent
+\begin{minipage}{0.55\textwidth}
 \begin{code}
-[∘] {x = zero} {xs = xs , x} = refl
-[∘] {x = suc i _} {xs = xs , x} = [∘] {x = i}
-[∘] {x = ` x}{xs = xs}{ys = ys} = 
+[∘] {x = zero}     {xs = xs , x}       = refl
+[∘] {x = suc i _}  {xs = xs , x}       = 
+   [∘] {x = i}
+[∘] {x = ` x}      {xs = xs}{ys = ys}  = 
    tm⊑ ⊑t (x [ xs ∘ ys ])
     ≡⟨ cong (tm⊑ ⊑t) ([∘] {x = x}) ⟩
    tm⊑ ⊑t (x [ xs ] [ ys ])
@@ -251,11 +256,11 @@ We are now ready to prove |[∘]| by structural induction:
    (tm⊑ ⊑t (x [ xs ])) [ ys ] ∎
 \end{code}
 \end{minipage}
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}{0.35\textwidth}
 \begin{code}
-[∘] {x = t · u} =
+[∘] {x = t · u}                  =
    cong₂ _·_ ([∘] {x = t}) ([∘] {x = u})
-[∘] {x = ƛ t}{xs = xs}{ys = ys} =
+[∘] {x = ƛ t}{xs = xs}{ys = ys}  =
    cong ƛ_ (
      t [ (xs ∘ ys) ^ _ ]
      ≡⟨ cong (λ zs → t [ zs ]) ^∘  ⟩
@@ -333,6 +338,7 @@ zero[] {q = T} = refl
 \end{code}
 %endif 
 
+\noindent
 Finally, we have all the ingredients to prove the second functor law |^∘|:
 \footnote{Actually, we also need that zero commutes with |tm⊑|: that is for any
 |q⊑r : q ⊑ r| we have that |tm⊑zero q⊑r : zero[ r ] ≡ tm⊑ q⊑r zero[ q ]|.}

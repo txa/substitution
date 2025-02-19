@@ -485,9 +485,13 @@ as if the original |id| definition worked (recovering |V|-only |id| from the
 % we will use |id : Γ ⊨[ V ] Γ| without assumptions about how it is 
 % implemented.}
 
-Finally, we define composition by folding substitution:
+Finally, we define composition, |_∘_ : Γ ⊨[ q ] Θ → Δ ⊨[ r ] Γ → Δ ⊨[ q ⊔ r ] Θ|
+by folding substitution.
+
+%if False
 \begin{code}
 _∘_ : Γ ⊨[ q ] Θ → Δ ⊨[ r ] Γ → Δ ⊨[ q ⊔ r ] Θ
 ε ∘ ys         = ε
 (xs , x) ∘ ys  = (xs ∘ ys) , x [ ys ]
 \end{code}
+%endif
