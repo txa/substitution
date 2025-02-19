@@ -98,6 +98,7 @@ We define a record to capture simply typed CWFs:
 
 %if False
 \begin{code}
+record CwF-simple : Set₁ where
   infix   3  _⊢_
   infix   3  _⊨_
   infixl  4  _▷_
@@ -1150,16 +1151,15 @@ cases to cover, so for brevity we elide the proofs of |⌜[]⌝| and |⌜suc⌝|
 \end{code}
 %endif
 
-\noindent
-\begin{minipage}{0.6\textwidth}
 \begin{code}
 ⌜^⌝ {q = q} = cong₂ _,ᴵ_ ⌜⁺⌝ (⌜zero⌝ {q = q})
 \end{code}
-\\
 
+\noindent
+\begin{minipage}{0.5\textwidth}
 \begin{code}
-⌜⁺⌝ {xs = ε} = sym •-ηᴵ
-⌜⁺⌝ {xs = xs , x} {A = A} = 
+⌜⁺⌝ {xs = ε}               = sym •-ηᴵ
+⌜⁺⌝ {xs = xs , x} {A = A}  = 
   ⌜ xs ⁺ A ⌝* ,ᴵ ⌜ suc[ _ ] x A ⌝
   ≡⟨ cong₂ _,ᴵ_ ⌜⁺⌝ (⌜suc⌝ {x = x}) ⟩
   (⌜ xs ⌝* ∘ᴵ wkᴵ) ,ᴵ (⌜ x ⌝ [ wkᴵ ]ᴵ)
@@ -1167,19 +1167,15 @@ cases to cover, so for brevity we elide the proofs of |⌜[]⌝| and |⌜suc⌝|
   (⌜ xs ⌝* ,ᴵ ⌜ x ⌝) ∘ᴵ wkᴵ ∎
 \end{code}
 \end{minipage}
-\begin{minipage}{0.35\textwidth}
+\begin{minipage}{0.45\textwidth}
 \begin{code}
-⌜id⌝′ {Γ = •} _ = sym •-ηᴵ
-⌜id⌝′ {Γ = Γ ▷ A} _ = 
-  ⌜ id ⁺ A ⌝* ,ᴵ zeroᴵ
-  ≡⟨ cong (_,ᴵ zeroᴵ) ⌜⁺⌝ ⟩
-  ⌜ id ⌝* ^ᴵ A
-  ≡⟨ cong (_^ᴵ A) ⌜id⌝ ⟩
-  idᴵ ^ᴵ A
-  ≡⟨ cong (_,ᴵ zeroᴵ) id∘ᴵ ⟩
-  wkᴵ ,ᴵ zeroᴵ
-  ≡⟨ ▷-ηᴵ ⟩
-  idᴵ ∎
+⌜id⌝′ {Γ = •}      _ = sym •-ηᴵ
+⌜id⌝′ {Γ = Γ ▷ A}  _ = 
+  ⌜ id ⁺ A ⌝* ,ᴵ zeroᴵ  ≡⟨ cong (_,ᴵ zeroᴵ) ⌜⁺⌝ ⟩
+  ⌜ id ⌝* ^ᴵ A          ≡⟨ cong (_^ᴵ A) ⌜id⌝ ⟩
+  idᴵ ^ᴵ A              ≡⟨ cong (_,ᴵ zeroᴵ) id∘ᴵ ⟩
+  wkᴵ ,ᴵ zeroᴵ          ≡⟨ ▷-ηᴵ ⟩
+  idᴵ                   ∎
 \end{code}
 \end{minipage}
 
