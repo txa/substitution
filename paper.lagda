@@ -71,6 +71,10 @@
 \keywords{Substitution, Metatheory, Agda}
 
 \begin{document}
+
+\AtBeginEnvironment{hscode}{\setlength{\parskip}{0pt} \vspace{-2ex}}
+\AtEndEnvironment{hscode}{\vspace{-2ex}}
+
 \maketitle
 
 \begin{abstract}
