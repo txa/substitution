@@ -147,6 +147,15 @@
 %format _⊨[ = "\_\models\!["
 %format ⊨[_] = "\models\![\_]"
 
+%format v[ = v "["
+%format _v[_] = "\_" v[ "\_" "]"
+
+
+%format zero[ = zero "["
+%format zero[_] = zero[ "\_" "]"
+%format suc[     = suc "["
+%format suc[_] = suc[ "\_" "]"
+
 %format _▷_ = "\_\rhd\_"
 %format ▷ = "\rhd"
 
@@ -222,7 +231,6 @@
 
 %format cong₂ = cong "_{2}"
 
-%format suc[     = suc "["
 %format suc[id⁺] = suc "[" id "^{+}" "]"
 
 %format 𝕄 = "\mathbb{M}"

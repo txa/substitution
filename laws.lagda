@@ -16,7 +16,7 @@ open import subst public
 \label{sec:proving-laws}
 
 We now present a formal proof of the categorical laws, proving each
-lemma only once while only using structural induction. Indeed the
+lemma only once while only using structural induction. Indeed 
 termination isn't completely trivial but is still inferred by the termination
 checker.
 
@@ -142,7 +142,7 @@ Therefore, we instead add a ``dummy'' |Sort| argument
 decrease (such that we can eventually just use |id∘ = id∘′ V|).
 \footnote{Perhaps surprisingly, this ``dummy'' argument does not even need to
 be of type |Sort| to satisfy Agda here. More discussion on this trick 
-can be found at 
+can be found at Agda issue
 \href{https://github.com/agda/agda/issues/7693}{\#7693}, but in summary:
 \begin{itemize} 
    \item Agda considers all base constructors (constructors with no parameters) 
@@ -150,7 +150,7 @@ can be found at
    preservation of other base-constructor arguments across function calls.
    \item \vspace{-0.75ex} It turns out that
    a strict decrease in |Sort| is not necessary everywhere for termination: 
-   the context also gets structurally smaller.
+   the context also gets structurally smaller in the call to |_⁺_| from |id|.
 \end{itemize}
 }
 

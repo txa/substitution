@@ -68,8 +68,8 @@ actual binding site).
 We also define substitutions as sequences of terms:
 \begin{code}
 data _⊨_ : Con → Con → Set where
-  ε   : Γ ⊨ •
-  _,_ : Γ ⊨ Δ → Γ ⊢ A → Γ ⊨ Δ ▷ A  
+  ε    : Γ ⊨ •
+  _,_  : Γ ⊨ Δ → Γ ⊢ A → Γ ⊨ Δ ▷ A  
 \end{code}
 Now to define the categorical structure (|_∘_|, |id|) we first need to define
 substitution for terms and variables:

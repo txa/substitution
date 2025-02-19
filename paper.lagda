@@ -171,10 +171,7 @@ having to define several similar operations
 
 And indeed the operations on terms depend on the operations on
 variables. This duplication gets worse when we prove properties
-of substitution, such as the functor law:
-\begin{spec}
- x [ xs ∘ ys ] ≡ x [ xs ] [ ys ]
-\end{spec}
+of substitution, such as the functor law, |x [ xs ∘ ys ] ≡ x [ xs ] [ ys ]|.
 Since all components |x|, |xs|, |ys| can be either variables/renamings
 or terms/substitutions, we seemingly need to prove eight possibilities (with
 the repetition extending also to the intermediary lemmas). 

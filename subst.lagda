@@ -42,12 +42,12 @@ define a type |Sort| (|q, r, s|):
 data Sort : Set where
    V T : Sort  
  \end{spec}
-but this is not exactly what we want because we want Agda to know that
+but this is not exactly what we want; ideally, Agda should know that
 the sort of variables |V| is \emph{smaller} than the sort of terms
 |T| (following intuition that variable weakening is trivial, but to 
 weaken a term we must construct a renaming). 
 Agda's termination checker only knows about the structural
-orderings. With the following definition, we
+orderings, but with the following definition, we
 can make |V| structurally smaller than |T>V V isV|, while maintaining that 
 |Sort| has only two elements.
 
@@ -112,8 +112,8 @@ parametrize all definitions and theorems explicitly. As a first step,
 we can generalize renamings and substitutions (|xs, ys, zs|):
 \begin{code}
 data _⊨[_]_ : Con → Sort → Con → Set where
-  ε   : Γ ⊨[ q ] •
-  _,_ : Γ ⊨[ q ] Δ → Γ ⊢[ q ] A → Γ ⊨[ q ] Δ ▷ A  
+  ε    : Γ ⊨[ q ] •
+  _,_  : Γ ⊨[ q ] Δ → Γ ⊢[ q ] A → Γ ⊨[ q ] Δ ▷ A  
 \end{code}
 %if False
 \begin{code}
@@ -161,11 +161,8 @@ v⊑ : V ⊑ s
 ⊔v : q ⊔ V ≡ q
 \end{code}
 \end{minipage}\\
-which are easy to prove by case analysis, e.g.
-\begin{code}
-⊑t {V} = v⊑t
-⊑t {T} = rfl
-\end{code}
+which are easy to prove by case analysis, e.g. |⊑t {V} = v⊑t| and 
+|⊑t {T} = rfl|.
 %if False
 \begin{code}
 v⊑ {V} = rfl
@@ -201,11 +198,9 @@ This introduces new definitional equalities, i.e.
 checker\footnote{Effectively, this feature allows a selective use of 
 extensional Type Theory.}.
 The order gives rise to a functor which is witnessed by
-\begin{code}
-tm⊑ : q ⊑ s → Γ ⊢[ q ] A → Γ ⊢[ s ] A
-tm⊑ rfl x = x
-tm⊑ v⊑t i = ` i
-\end{code}
+|tm⊑ : q ⊑ s → Γ ⊢[ q ] A → Γ ⊢[ s ] A|, where |tm⊑ rfl x  = x| and
+|tm⊑ v⊑t  i = ` i|
+
 By making functoriality of context extension parameteric, 
 |_^_ : Γ ⊨[ q ] Δ → ∀ A → Γ ▷ A ⊨[ q ] Δ ▷ A|, we are ready to define 
 substitution and renaming in one operation:
@@ -236,12 +231,24 @@ variable if both inputs are variables / renamings. We
 need to use |tm⊑| to take care of the two cases when substituting for
 a variable. 
 
-We can also define |id| using |_^_|:
+We can also implement |id| using |_^_| (by folding contexts), but to define 
+|_^_| itself, we need parametric versions of |zero| and |suc|. |zero| is easy:
+
+\begin{minipage}{0.45\textwidth}
 \begin{spec}
 id : Γ ⊨[ V ] Γ
 id {Γ = •}      =  ε
 id {Γ = Γ ▷ A}  =  id ^ A
 \end{spec}
+\end{minipage}
+\begin{minipage}{0.45\textwidth}
+\begin{code}
+zero[_] : ∀ q → Γ ▷ A ⊢[ q ] A
+zero[ V ]      =  zero
+zero[ T ]      =  ` zero
+\end{code}
+\end{minipage}
+
 %if False
 \begin{code}
 id-poly : Γ ⊨[ q ] Γ 
@@ -264,14 +271,7 @@ id = id-poly
 -- id′ {Γ = Γ ▷ A} _ = id ^ A
 \end{code}
 %endif
-To implement |_^_|, we need parametric versions of |zero|, |suc| and
-|suc*|. |zero| is very easy:
 
-\begin{code}
-zero[_] : ∀ q → Γ ▷ A ⊢[ q ] A
-zero[ V ]      =  zero
-zero[ T ]      =  ` zero
-\end{code}
 However, |suc| is more subtle since the case for |T| depends on its
 fold over substitutions (|_⁺_|):
 
@@ -304,7 +304,7 @@ _⁺_  :  Γ ⊨[ q ] Δ → ∀ A
 (xs , x) ⁺ A = xs ⁺ A , suc[ _ ] x A 
 \end{code}
 %endif
-And now we define: |xs ^ A =  xs ⁺ A , zero[ _ ]|.
+And now we can define |xs ^ A =  xs ⁺ A , zero[ _ ]|.
 %if False
 \begin{code}
 xs ^ A                 =  xs ⁺ A , zero[ _ ]
@@ -332,7 +332,7 @@ The cause turns out to be |id|. Termination here hinges on weakening for terms
 (|suc[ T ] t A|) building
 and applying a renaming (i.e. a sequence of variables, for which weakening is
 trivial) rather than a full substutution. Note that if |id| produced
-|Tms[ T ] Γ Γ|s, or if we implemented 
+`|Γ ⊨[ T ] Γ|'s, or if we implemented 
 weakening for variables (|suc[ V ] i A|) with |i [ id ⁺ A ]|, our operations
 would still be
 type-correct, but would genuinely loop, so perhaps Agda is right to be
@@ -351,11 +351,11 @@ adds new rows/columns (corresponding to the |Sort| argument) to the call
 matrices
 involving |id|, enabling the decrease
 to be tracked and termination to be correctly inferred by Agda.
-We present this call graph diagramatically (inlining |_^_|), 
+We present the call graph diagramatically (inlining |_^_|), 
 in the style of \cite{keller2010hereditary}.
 
-\begin{minipage}{0.65\textwidth}
-\begin{tikzcd}[scaleedge cd=1.1, sep=large]
+\begin{minipage}{0.6\textwidth}
+\begin{tikzcd}[scaleedge cd=1.1, sep=normal]
 & |suc[ q₄ ] t₄q₄Γ₄|
 \arrow[dd, bend left, "\substack{|r₃ < q₄|}"]
 \arrow[ldd, bend right, swap, "\substack{|r₂ < q₄|}"]
@@ -374,7 +374,7 @@ in the style of \cite{keller2010hereditary}.
 \end{tikzcd}
 \captionof{figure}{Call graph of substitution operations}
 \end{minipage}
-\begin{minipage}{0.25\textwidth}
+\begin{minipage}{0.3\textwidth}
 \renewcommand{\arraystretch}{1.2}
 \begin{center}
 \begin{tabular}{ ||c||c||c|| }

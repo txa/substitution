@@ -38,7 +38,7 @@ rest of the paper.
 
 We can add further constructors like function types |_⇒_|. These usually
 come with a natural isomorphisms, giving rise to $\beta$ and $\eta$ laws,
-but since we are only interested in substitutions, we don't assume this. 
+but since we are only interested in substitutions, we don't assume these. 
 Instead we add the term formers for application
 (|_·_|) and lambda-abstraction |ƛ| as natural transformations.
 
