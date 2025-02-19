@@ -2,6 +2,15 @@
 % \documentclass[sigplan,10pt,natbib]{acmart}
 %\documentclass[sigplan,10pt,natbib,anonymous,review]{acmart}
 
+\setlength{\abovedisplayskip}{2pt}
+\setlength{\belowdisplayskip}{2pt}
+\setlength{\abovedisplayshortskip}{2pt}
+\setlength{\belowdisplayshortskip}{2pt}
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd{\hscode}{\par}{\vspace{-15pt}\par}{}{}
+\makeatother
+
 
 % \settopmatter{printfolios=true,printccs=false,printacmref=false}
 % \citestyle{acmauthoryear}
@@ -14,6 +23,8 @@
 %include lhs2TeX.fmt
 %include agda.fmt
 %include lib.fmt
+
+\renewcommand{\hscodestyle}{\setlength{\baselineskip}{0.3\baselineskip}}
 
 %include is-full.lagda
 
@@ -373,7 +384,7 @@ One reviewer asked about another alternative: since we are merging |_∋_| and
 |_⊢_|
 why not go further and merge them entirely? Instead of a separate type for
 variables, one could have a term corresponding to de Bruijn index zero
-(written |● : ●    : Γ ▷ A ⊢′ A| and an explicit weakening operator on
+(written |●  : Γ ▷ A ⊢′ A| and an explicit weakening operator on
 terms (written
 |_↑ : Γ ⊢′ B → Γ ▷ A ⊢′ B|).
 % \begin{spec}
