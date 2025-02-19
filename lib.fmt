@@ -151,6 +151,8 @@
 %format ▷ = "\rhd"
 
 %format ^ = "\uparrow"
+%format _^ = "\_" ^
+%format ^_ = ^ "\_"
 %format _^_ = "\_\uparrow\_"
 
 %format ^v = "\uparrow\!{\mathrm{v}}"
