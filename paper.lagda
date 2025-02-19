@@ -2,6 +2,15 @@
 % \documentclass[sigplan,10pt,natbib]{acmart}
 %\documentclass[sigplan,10pt,natbib,anonymous,review]{acmart}
 
+\setlength{\abovedisplayskip}{2pt}
+\setlength{\belowdisplayskip}{2pt}
+\setlength{\abovedisplayshortskip}{2pt}
+\setlength{\belowdisplayshortskip}{2pt}
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd{\hscode}{\par}{\vspace{-15pt}\par}{}{}
+\makeatother
+
 
 % \settopmatter{printfolios=true,printccs=false,printacmref=false}
 % \citestyle{acmauthoryear}
@@ -14,6 +23,8 @@
 %include lhs2TeX.fmt
 %include agda.fmt
 %include lib.fmt
+
+\renewcommand{\hscodestyle}{\setlength{\baselineskip}{0.3\baselineskip}}
 
 %include is-full.lagda
 
@@ -305,28 +316,28 @@ avoid name clashes, e.g. preliminary definitions from section
 \label{sec:concl-furth-work}
 
 The subject of the paper is a problem which everybody (including
-ourselves) would have thought to be trivial. As it turns out, it isn't, and 
-we spent quite some time going down alleys that didn't work. 
-With hindsight, the main idea seems rather
-obvious: introduce sorts as a datatype with the structure of a boolean
-algebra. To implement the solution in Agda, we managed to
-convince the termination checker that |V| is structurally smaller than
-|T| and so left the actual work determining and verifying the termination 
-ordering to Agda. This greatly simplifies the formal development. 
+ourselves) would have thought to be trivial.
+% As it turns out, it isn't, and 
+% we spent quite some time going down alleys that didn't work. 
+% With hindsight, the main idea seems rather
+% obvious: introduce sorts as a datatype with the structure of a boolean
+% algebra. To implement the solution in Agda, we managed to
+% convince the termination checker that |V| is structurally smaller than
+% |T| and so left the actual work determining and verifying the termination 
+% ordering to Agda. This greatly simplifies the formal development. 
 
-We could, however, simplify our development slightly further if we were able to 
-instrument the termination checker, for example with an ordering on 
-constructors (i.e. removing the need for the |T>V| encoding). 
-We also ran into issues with Agda only examining direct arguments to function
-calls for identifying termination order. The solutions to these problems were
-all quite mechanical, which perhaps implies there is room for Agda's termination
-checking to be extended.
-Finally, it would be nice if the termination checker
-provided independently-checkable evidence that its non-trivial reasoning is 
-sound (being able to print termination matrices with |-v term:5| is a
-useful feature, but is not quite as convincing as actually elaborating 
-to well-founded induction like e.g. Lean).
-
+% We could, however, simplify our development slightly further if we were able to 
+% instrument the termination checker, for example with an ordering on 
+% constructors (i.e. removing the need for the |T>V| encoding). 
+% We also ran into issues with Agda only examining direct arguments to function
+% calls for identifying termination order. The solutions to these problems were
+% all quite mechanical, which perhaps implies there is room for Agda's termination
+% checking to be extended.
+% Finally, it would be nice if the termination checker
+% provided independently-checkable evidence that its non-trivial reasoning is 
+% sound (being able to print termination matrices with |-v term:5| is a
+% useful feature, but is not quite as convincing as actually elaborating 
+% to well-founded induction like e.g. Lean).
 It is perhaps worth mentioning that the convenience of our solution
 heavily relies on Agda's built-in 
 support for lexicographic termination \cite{alti:jfp02}. 
@@ -336,68 +347,72 @@ single argument and the latter has only raw elimination principles as
 primitive. Luckily, both of these proof assistants layer on additional
 commands/tactics to support more natural use of non-primitive induction.
 
-For example, Lean features a pair of tactics |termination_by| and 
-|decreasing_by| for specifying per-function termination measures and
-proving that these measures strictly decrease, similarly to our
-approach to justifying termination in \ref{sec:termination}. 
-The slight extra complication is
-that Lean requires the provided measures to strictly decrease along 
-every
-mutual function call as opposed to over every cycle in the call graph.
-In the case of our substitution operations, adapting for this is not to onerous,
-requiring e.g. replacing the measures for |id| and |_⁺_| from
-|(r₂ , Γ₂)| and |(r₃ , σ₃)| to |(r₂ , Γ₂ , 0)| and |(r₃ , 0 , σ₃)|, ensuring
-a strict decrease when calling |_⁺_| in |id {Γ = Γ ▷ A}|.
+% For example, Lean features a pair of tactics |termination_by| and 
+% |decreasing_by| for specifying per-function termination measures and
+% proving that these measures strictly decrease, similarly to our
+% approach to justifying termination in \ref{sec:termination}. 
+% The slight extra complication is
+% that Lean requires the provided measures to strictly decrease along 
+% every
+% mutual function call as opposed to over every cycle in the call graph.
+% In the case of our substitution operations, adapting for this is not to onerous,
+% requiring e.g. replacing the measures for |id| and |_⁺_| from
+% |(r₂ , Γ₂)| and |(r₃ , σ₃)| to |(r₂ , Γ₂ , 0)| and |(r₃ , 0 , σ₃)|, ensuring
+% a strict decrease when calling |_⁺_| in |id {Γ = Γ ▷ A}|.
 
-Conveniently, after specifying the correct measures, Lean is able to
-automatically solve the |decreasing_by| proof obligations, and so our
-approach to defining substitution remains concise even without quite-as-robust 
-support
-for lexicographic termination\footnote{In fact, specifying termination
-measures manually has some advantages: we no longer need to use a
-complicated |Sort| datatype to make the ordering on constructors
-explicit.}.
- Of course, doing the analysis to work out which
-termination measures were appropriate took some time, and one could imagine
-an expanded Lean tactic being able to infer termination
-with no assistance, using a similar algorithm to Agda.
+% Conveniently, after specifying the correct measures, Lean is able to
+% automatically solve the |decreasing_by| proof obligations, and so our
+% approach to defining substitution remains concise even without quite-as-robust 
+% support
+% for lexicographic termination\footnote{In fact, specifying termination
+% measures manually has some advantages: we no longer need to use a
+% complicated |Sort| datatype to make the ordering on constructors
+% explicit.}.
+%  Of course, doing the analysis to work out which
+% termination measures were appropriate took some time, and one could imagine
+% an expanded Lean tactic being able to infer termination
+% with no assistance, using a similar algorithm to Agda.
 
-We could avoid a recursive definition of substitution altogether and
-only work with the initial simply typed CwF as a QIIT. 
-However, this is
-unsatisfactory for two reasons: first of all, we would like to relate
-the quotiented view of $\lambda$-terms to the their definitional
-presentation, and, 
-second, when proving properties of $\lambda$-terms it is preferable to do so
-by induction over terms rather than use quotients (i.e. no need to consider
-cases for non-canonical elements or prove that equations are preserved).
+% We could avoid a recursive definition of substitution altogether and
+% only work with the initial simply typed CwF as a QIIT. 
+% However, this is
+% unsatisfactory for two reasons: first of all, we would like to relate
+% the quotiented view of $\lambda$-terms to the their definitional
+% presentation, and, 
+% second, when proving properties of $\lambda$-terms it is preferable to do so
+% by induction over terms rather than use quotients (i.e. no need to consider
+% cases for non-canonical elements or prove that equations are preserved).
 
 % PLW: added following
 One reviewer asked about another alternative: since we are merging |_∋_| and
 |_⊢_|
 why not go further and merge them entirely? Instead of a separate type for
 variables, one could have a term corresponding to de Bruijn index zero
-(written |●| below) and an explicit weakening operator on terms (written |_↑|).
-\begin{spec}
-data _⊢′_ : Con → Ty → Set where
-  ●    : Γ ▷ A ⊢′ A
-  _↑   : Γ ⊢′ B → Γ ▷ A ⊢′ B
-  _·_  : Γ ⊢ A ⇒ B → Γ ⊢ A → Γ ⊢ B
-  ƛ_   : Γ ▷ A ⊢ B → Γ ⊢ A ⇒ B  
-\end{spec}
+(written |●  : Γ ▷ A ⊢′ A| and an explicit weakening operator on
+terms (written
+|_↑ : Γ ⊢′ B → Γ ▷ A ⊢′ B|).
+% \begin{spec}
+% data _⊢′_ : Con → Ty → Set where
+%   ●    : Γ ▷ A ⊢′ A
+%   _↑   : Γ ⊢′ B → Γ ▷ A ⊢′ B
+%   _·_  : Γ ⊢ A ⇒ B → Γ ⊢ A → Γ ⊢ B
+%   ƛ_   : Γ ▷ A ⊢ B → Γ ⊢ A ⇒ B  
+% \end{spec}
 This has the unfortunate property that there is now more than one way to
 write terms that used to be identical. For instance, the terms
 |● ↑ ↑ · ● ↑ · ●| and |(● ↑ · ●) ↑ · ●| are equivalent, where |● ↑ ↑|
 corresponds to the variable with de Bruijn index two. A development
-along these lines is explored in \cite{wadler_explicit_2024}. It
-leads to a compact development, but one where the
-natural normal form appears to be to push weakening to the outside
-(such as in \cite{mcbride2018everybody}),
-so that the second of the two terms above is considered normal rather
-than the first. 
-It may be a useful alternative, but we think it is
-also interesting to pursue the development given here, where
-terms retain their familiar normal form.
+along these lines is explored in \cite{wadler_explicit_2024}.
+
+% It
+% leads to a compact development, but one where the
+% natural normal form appears to be to push weakening to the outside
+% (such as in \cite{mcbride2018everybody}),
+% so that the second of the two terms above is considered normal rather
+% than the first. 
+% It may be a useful alternative, but we think it is
+% also interesting to pursue the development given here, where
+% terms retain their familiar normal form.
 
 This paper can also be seen as a preparation for the harder problem to
 implement recursive substitution for dependent types. This is harder,
