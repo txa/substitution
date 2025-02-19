@@ -165,6 +165,9 @@ which are easy to prove by case analysis, e.g. |⊑t {V} = v⊑t| and
 |⊑t {T} = rfl|.
 %if False
 \begin{code}
+⊑t {V} = v⊑t
+⊑t {T} = rfl
+
 v⊑ {V} = rfl
 v⊑ {T} = v⊑t
 
@@ -199,7 +202,15 @@ checker\footnote{Effectively, this feature allows a selective use of
 extensional Type Theory.}.
 The order gives rise to a functor which is witnessed by
 |tm⊑ : q ⊑ s → Γ ⊢[ q ] A → Γ ⊢[ s ] A|, where |tm⊑ rfl x  = x| and
-|tm⊑ v⊑t  i = ` i|
+|tm⊑ v⊑t  i = ` i|.
+
+%if False
+\begin{code}
+tm⊑ : q ⊑ s → Γ ⊢[ q ] A → Γ ⊢[ s ] A
+tm⊑ rfl x  = x
+tm⊑ v⊑t  i = ` i
+\end{code}
+%endif
 
 By making functoriality of context extension parameteric, 
 |_^_ : Γ ⊨[ q ] Δ → ∀ A → Γ ▷ A ⊨[ q ] Δ ▷ A|, we are ready to define 
