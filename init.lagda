@@ -604,38 +604,26 @@ sucᴵ x A = x [ π₀ᴵ idᴵ ]ᴵ
 We state the eliminator for the initial CwF in terms of |Motive : Set₁| and 
 |Methods : Motive → Set₁| records as in \cite{altenkirch2016tt_in_tt}.
 
-\begin{code}
-<<<<<<< HEAD
+\begin{spec}
 module _ {𝕄} (𝕞 : Methods 𝕄) where
-\end{code}
-
-=======
-<<<<<<< Updated upstream
-=======
-module _ {𝕄} (𝕞 : Methods 𝕄) where
-\end{code}
+\end{spec}
 
 \vspace{-3ex}
->>>>>>> f92b59e (Shorten)
 \begin{minipage}{0.35\textwidth}
-\begin{code}
+\begin{spec}
   elim-con  : ∀ Γ → Conᴹ Γ
   elim-ty   : ∀ A → Tyᴹ  A
-\end{code}
+\end{spec}
 \end{minipage}
 \begin{minipage}{0.45\textwidth}
-\begin{code}
+\begin{spec}
   elim-cwf   : ∀ tᴵ → Tmᴹ (elim-con Γ) (elim-ty A) tᴵ
   elim-cwf*  : ∀ δᴵ → Tmsᴹ (elim-con Δ) (elim-con Γ) δᴵ
-\end{code}
+\end{spec}
 \end{minipage}
 
 %if False
 \begin{code}
-<<<<<<< HEAD
-=======
->>>>>>> Stashed changes
->>>>>>> f92b59e (Shorten)
 record Motive : Set₁ where
   field
     Conᴹ : Con → Set
