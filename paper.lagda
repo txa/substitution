@@ -83,8 +83,8 @@
 
 \begin{document}
 
-\AtBeginEnvironment{hscode}{\setlength{\parskip}{0pt} \vspace{-2ex}}
-\AtEndEnvironment{hscode}{\vspace{-2ex}}
+\AtBeginEnvironment{hscode}{\setlength{\parskip}{0pt} \vspace{-1.5ex}}
+\AtEndEnvironment{hscode}{\vspace{-1.5ex}}
 
 \maketitle
 
@@ -182,19 +182,14 @@ having to define several similar operations
 
 And indeed the operations on terms depend on the operations on
 variables. This duplication gets worse when we prove properties
-of substitution, such as the functor law:
-\begin{spec}
- x [ xs ∘ ys ] ≡ x [ xs ] [ ys ]
-\end{spec}
+of substitution, such as the functor law, |x [ xs ∘ ys ] ≡ x [ xs ] [ ys ]|.
 Since all components |x|, |xs|, |ys| can be either variables/renamings
 or terms/substitutions, we seemingly need to prove eight possibilities (with
 the repetition extending also to the intermediary lemmas). 
 Our solution is to introduce a type of sorts with |V : Sort| for
 variables/renamings and |T : Sort| for terms/substitutions, leading
-to a single substitution operation
-\begin{spec}
-_[_] : Γ ⊢[ q ] A → Δ ⊨[ r ] Γ → Δ ⊢[ q ⊔ r ] A  
-\end{spec}
+to a single substitution operation 
+|_[_] : Γ ⊢[ q ] A → Δ ⊨[ r ] Γ → Δ ⊢[ q ⊔ r ] A|
 where |q, r : Sort| and |q ⊔ r| is the least upper bound in the
 lattice of sorts (|V ⊑ T|). With this, we only need to prove one variant of the
 functor law, relying on the fact that |_⊔_| is associative.

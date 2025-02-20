@@ -19,6 +19,7 @@ can verify the laws of a simply typed category with families
 they can be specialised to simple types \cite{castellan2021categories}. We 
 summarize the definition of a simply typed CwF as follows:
 
+\vspace{-1ex}
 \begin{itemize}
 \item A category of contexts (|Con|) and substitutions (|_⊨_|),
 \item A set of types |Ty|,
@@ -29,6 +30,7 @@ summarize the definition of a simply typed CwF as follows:
   |(Γ ⊨ Δ) × (Γ ⊢ A|).
 \end{itemize}
 
+\vspace{-1ex}
 I.e. a simply typed CwF is just a CwF where the presheaf of types is constant.
 We will give the precise definition in the next section, hence it
 isn't necessary to be familiar with the categorical terminology to follow the 
@@ -36,7 +38,7 @@ rest of the paper.
 
 We can add further constructors like function types |_⇒_|. These usually
 come with a natural isomorphisms, giving rise to $\beta$ and $\eta$ laws,
-but since we are only interested in substitutions, we don't assume this. 
+but since we are only interested in substitutions, we don't assume these. 
 Instead we add the term formers for application
 (|_·_|) and lambda-abstraction |ƛ| as natural transformations.
 
@@ -91,13 +93,12 @@ completeness and stability in the language of normalisation functions.
 \subsection{Simply Typed CwFs}
 \label{sec:simply-typed-cwfs}
 
-We define a record to capture simply typed CWFs:
-\begin{code}
-record CwF-simple : Set₁ where
-\end{code}
+We define a record to capture simply typed CWFs: 
+|record CwF-simple : Set₁|.
 
 %if False
 \begin{code}
+record CwF-simple : Set₁ where
   infix   3  _⊢_
   infix   3  _⊨_
   infixl  4  _▷_
@@ -171,8 +172,8 @@ record CwF-simple : Set₁ where
 \end{code}
 %endif
 
-We start with the category of contexts, using the same naming scheme as
-introduced previously:
+For the contents, we begin with the category of contexts, using the 
+same naming conventions as introduced previously:
 
 \begin{minipage}{0.45\textwidth}
 \begin{spec}
@@ -242,7 +243,8 @@ We need to add the specific components for simply typed
 $\lambda$-calculus; we add the type constructors, the term
 constructors and the corresponding naturality laws:
 
-\begin{minipage}{0.45\textwidth}
+\noindent
+\begin{minipage}{0.5\textwidth}
 \begin{spec}
   o    : Ty
   _⇒_  : Ty → Ty → Ty
@@ -316,6 +318,7 @@ interleaved mutual
 \end{code}
 %endif
 
+\noindent
 \begin{minipage}{0.45\textwidth}
 \begin{code}
   is-cwf .CwF._⊨_  = _⊨[ T ]_
@@ -427,20 +430,14 @@ and |δ ∘ tm*⊑ v⊑t id ≡ δ|. This is where we can take full advantage of
 Similarly to substitutions, we must fix the sort of our terms to |T| 
 (in this case, so we can prove the identity law - note that applying the 
 identity substitution to a variable |i| produces the distinct term |` i|).
-
 %if False
 \begin{code}
   is-cwf .CwF.Ty           = Ty
+  is-cwf .CwF._⊢_   = _⊢[ T ]_
+  is-cwf .CwF._[_]  = _[_]
 \end{code}
 %endif
 
-\begin{minipage}{0.45\textwidth}
-\begin{code}
-  is-cwf .CwF._⊢_   = _⊢[ T ]_
-
-  is-cwf .CwF._[_]  = _[_]
-\end{code}
-\end{minipage}
 \begin{minipage}{0.45\textwidth}
 \begin{code}
   is-cwf .CwF.[id] {t = t}  =                   
@@ -448,6 +445,13 @@ identity substitution to a variable |i| produces the distinct term |` i|).
     t [ id ]           ≡⟨ [id] ⟩          
     t                  ∎
 \end{code}
+\end{minipage}
+\begin{minipage}{0.45\textwidth}
+\begin{spec}
+  is-cwf .CwF._⊢_   = _⊢[ T ]_
+
+  is-cwf .CwF._[_]  = _[_]
+\end{spec}
 \end{minipage}
 
 %if False
@@ -510,8 +514,9 @@ We also reuse our existing datatypes for contexts and types for convenience
 (note terms do not occur inside types in STLC).
 
 To state the dependent equations between outputs of the eliminator, we need
-dependent identity types. We can define these simply by matching on the identity
-between the LHS and RHS types.
+dependent identity types |_≡[_]≡_ : ∀ {A B : Set ℓ} → A → A ≡ B → B → Set ℓ|. 
+We can define these simply by matching on the identity
+between the LHS and RHS types |x ≡[ refl ]≡ y = x ≡ y|.
 
 %if False
 \begin{code}
@@ -524,10 +529,12 @@ private variable
 \end{code}
 %endif
 
+%if False
 \begin{code}
 _≡[_]≡_ : ∀ {A B : Set ℓ} → A → A ≡ B → B → Set ℓ
 x ≡[ refl ]≡ y = x ≡ y
 \end{code}
+%endif
 
 To avoid name clashes between our existing syntax and the initial CwF 
 constructors, we annotate every |ICwF| constructor with |ᴵ|. e.g.
@@ -947,11 +954,20 @@ means there are many more cases. We start with the motive:
 
 \begin{code}
 compl-𝕄 : Motive
-compl-𝕄 .Conᴹ _ = ⊤
-compl-𝕄 .Tyᴹ  _ = ⊤
-compl-𝕄 .Tmᴹ _ _ tᴵ = ⌜ norm tᴵ ⌝ ≡ tᴵ
-compl-𝕄 .Tmsᴹ _ _ δᴵ = ⌜ norm* δᴵ ⌝* ≡ δᴵ
 \end{code}
+
+\begin{minipage}{0.45\textwidth}
+\begin{code}
+compl-𝕄 .Tmᴹ _ _ tᴵ   = ⌜ norm tᴵ ⌝ ≡ tᴵ
+compl-𝕄 .Tmsᴹ _ _ δᴵ  = ⌜ norm* δᴵ ⌝* ≡ δᴵ
+\end{code}
+\end{minipage}
+\begin{minipage}{0.45\textwidth}
+\begin{code}
+compl-𝕄 .Conᴹ _  = ⊤
+compl-𝕄 .Tyᴹ  _  = ⊤
+\end{code}
+\end{minipage}
 
 To show these identities, we need to prove that our various recursively defined
 syntax operations are preserved by |⌜_⌝|.
@@ -1099,7 +1115,7 @@ identically: |⌜⊑⌝ : ∀ {x : Γ ⊢[ q ] A} → ⌜ tm⊑ ⊑t x ⌝ ≡ �
 \end{code}
 %endif
 
-We can now (finally) proceed with the proofs. There are quite a few
+We can now proceed with the preservation proofs. There are quite a few
 cases to cover, so for brevity we elide the proofs of |⌜[]⌝| and |⌜suc⌝|.
 
 %if False
@@ -1135,14 +1151,15 @@ cases to cover, so for brevity we elide the proofs of |⌜[]⌝| and |⌜suc⌝|
 \end{code}
 %endif
 
-\begin{minipage}{0.6\textwidth}
 \begin{code}
 ⌜^⌝ {q = q} = cong₂ _,ᴵ_ ⌜⁺⌝ (⌜zero⌝ {q = q})
 \end{code}
 
+\noindent
+\begin{minipage}{0.5\textwidth}
 \begin{code}
-⌜⁺⌝ {xs = ε} = sym •-ηᴵ
-⌜⁺⌝ {xs = xs , x} {A = A} = 
+⌜⁺⌝ {xs = ε}               = sym •-ηᴵ
+⌜⁺⌝ {xs = xs , x} {A = A}  = 
   ⌜ xs ⁺ A ⌝* ,ᴵ ⌜ suc[ _ ] x A ⌝
   ≡⟨ cong₂ _,ᴵ_ ⌜⁺⌝ (⌜suc⌝ {x = x}) ⟩
   (⌜ xs ⌝* ∘ᴵ wkᴵ) ,ᴵ (⌜ x ⌝ [ wkᴵ ]ᴵ)
@@ -1150,19 +1167,15 @@ cases to cover, so for brevity we elide the proofs of |⌜[]⌝| and |⌜suc⌝|
   (⌜ xs ⌝* ,ᴵ ⌜ x ⌝) ∘ᴵ wkᴵ ∎
 \end{code}
 \end{minipage}
-\begin{minipage}{0.35\textwidth}
+\begin{minipage}{0.45\textwidth}
 \begin{code}
-⌜id⌝′ {Γ = •} _ = sym •-ηᴵ
-⌜id⌝′ {Γ = Γ ▷ A} _ = 
-  ⌜ id ⁺ A ⌝* ,ᴵ zeroᴵ
-  ≡⟨ cong (_,ᴵ zeroᴵ) ⌜⁺⌝ ⟩
-  ⌜ id ⌝* ^ᴵ A
-  ≡⟨ cong (_^ᴵ A) ⌜id⌝ ⟩
-  idᴵ ^ᴵ A
-  ≡⟨ cong (_,ᴵ zeroᴵ) id∘ᴵ ⟩
-  wkᴵ ,ᴵ zeroᴵ
-  ≡⟨ ▷-ηᴵ ⟩
-  idᴵ ∎
+⌜id⌝′ {Γ = •}      _ = sym •-ηᴵ
+⌜id⌝′ {Γ = Γ ▷ A}  _ = 
+  ⌜ id ⁺ A ⌝* ,ᴵ zeroᴵ  ≡⟨ cong (_,ᴵ zeroᴵ) ⌜⁺⌝ ⟩
+  ⌜ id ⌝* ^ᴵ A          ≡⟨ cong (_^ᴵ A) ⌜id⌝ ⟩
+  idᴵ ^ᴵ A              ≡⟨ cong (_,ᴵ zeroᴵ) id∘ᴵ ⟩
+  wkᴵ ,ᴵ zeroᴵ          ≡⟨ ▷-ηᴵ ⟩
+  idᴵ                   ∎
 \end{code}
 \end{minipage}
 
@@ -1183,7 +1196,7 @@ cases to cover, so for brevity we elide the proofs of |⌜[]⌝| and |⌜suc⌝|
 %endif
 
 We also prove preservation of substitution composition 
-|⌜∘⌝ : ⌜ xs ∘ ys ⌝* ≡ ⌜ xs ⌝* ∘ᴵ ⌜ ys ⌝*| in similar fashion.
+|⌜∘⌝ : ⌜ xs ∘ ys ⌝* ≡ ⌜ xs ⌝* ∘ᴵ ⌜ ys ⌝*| in similar fashion, folding |⌜[]⌝|.
 
 %if False
 \begin{code}
@@ -1199,7 +1212,7 @@ We also prove preservation of substitution composition
 %endif
 
 The main cases of |Methods compl-𝕄| can now be proved by just applying the 
-preservation lemmas and inductive hypotheses.
+preservation lemmas and inductive hypotheses, e.g:
 
 %if False
 \begin{code}
@@ -1211,8 +1224,8 @@ compl-𝕞 : Methods compl-𝕄
 \end{code}
 %endif
 
-\begin{minipage}{0.35\textwidth}
 \noindent
+\begin{minipage}{0.35\textwidth}
 \begin{code}
 compl-𝕞 .idᴹ = 
   ⌜ tm*⊑ v⊑t id ⌝*  ≡⟨ ⌜⊑⌝* ⟩
@@ -1300,6 +1313,7 @@ compl-𝕞 .ƛ[]ᴹ  = duip
 \end{code}
 %endif
 
+\noindent
 And completeness is just one call to the eliminator away.
 
 \begin{code}

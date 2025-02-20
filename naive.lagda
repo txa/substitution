@@ -68,8 +68,8 @@ actual binding site).
 We also define substitutions as sequences of terms:
 \begin{code}
 data _⊨_ : Con → Con → Set where
-  ε   : Γ ⊨ •
-  _,_ : Γ ⊨ Δ → Γ ⊢ A → Γ ⊨ Δ ▷ A  
+  ε    : Γ ⊨ •
+  _,_  : Γ ⊨ Δ → Γ ⊢ A → Γ ⊨ Δ ▷ A  
 \end{code}
 Now to define the categorical structure (|_∘_|, |id|) we first need to define
 substitution for terms and variables:
@@ -99,27 +99,40 @@ As usual, we encounter a problem with the case for binders |ƛ_|. We are given a
 substitution |ts : Δ ⊨ Γ| but the body |t| lives in the extended context
 |t : Γ , A ⊢ B|. We need to exploit the fact that context extension
 |_▷_| is functorial: |_^_ : Γ ⊨ Δ → (A : Ty) → Γ ▷ A ⊨ Δ ▷ A|.
-Using |_^_| we can complete |_[_]|
+Using |_^_| we can complete |_[_]|: |(ƛ t)   [ ts ]       =  ƛ (t [ ts ^ _ ])|.
+
 %if false
 \begin{code}
 _[_] : Γ ⊢ A → Δ ⊨ Γ → Δ ⊢ A
 (` i)   [ ts ]       =  i v[ ts ]
 (t · u) [ ts ]       =  (t [ ts ]) · (u [ ts ])
-\end{code}
-%endif
-\begin{code}
 (ƛ t)   [ ts ]       =  ƛ (t [ ts ^ _ ])
 \end{code}
+%endif
+
 However, now we have to define |_^_|. This is easy (isn't it?) but we
-need weakening on substitutions: |_⁺_ : Γ ⊨ Δ → (A : Ty) → Γ ▷ A ⊨ Δ|:
+need weakening on substitutions:
+
+\noindent
+\begin{minipage}{0.4\textwidth}
+\begin{spec}
+ts ^ A = ts ⁺ A , ` zero 
+\end{spec}
+\end{minipage}
+\begin{minipage}{0.45\textwidth}
+\begin{spec}
+_⁺_ : Γ ⊨ Δ → (A : Ty) → Γ ▷ A ⊨ Δ
+\end{spec}
+\end{minipage}
+
 %if False
 \begin{code}
 _⁺_ : Γ ⊨ Δ → (A : Ty) → Γ ▷ A ⊨ Δ
-\end{code}
-%endif
-\begin{code}
 ts ^ A = ts ⁺ A , ` zero 
 \end{code}
+%endif
+
+\noindent
 Now we need to define |_⁺_|, which is nothing but a fold of weakening
 of terms:
 
@@ -129,7 +142,7 @@ suc-tm : Γ ⊢ B → (A : Ty) → Γ ▷ A ⊢ B
 \end{code}
 %endif
 \noindent
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}{0.4\textwidth}
 \begin{code}
 ε         ⁺ A  = ε
 (ts , t)  ⁺ A  = ts ⁺ A , suc-tm t A  

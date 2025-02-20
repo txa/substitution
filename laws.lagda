@@ -16,7 +16,7 @@ open import subst public
 \label{sec:proving-laws}
 
 We now present a formal proof of the categorical laws, proving each
-lemma only once while only using structural induction. Indeed the
+lemma only once while only using structural induction. Indeed 
 termination isn't completely trivial but is still inferred by the termination
 checker.
 
@@ -52,11 +52,10 @@ The identity law is now easily provable by structural induction:
 \begin{code}
 [id] {x = zero}     = refl
 [id] {x = suc i A}  = 
-   i [ id ⁺ A ] 
-   ≡⟨ ⁺-nat[]v {i = i} ⟩
+   i [ id ⁺ A ]  ≡⟨ ⁺-nat[]v {i = i} ⟩
    suc (i [ id ]) A
    ≡⟨ cong (λ j → suc j A) ([id] {x = i}) ⟩      
-   suc i A ∎
+   suc i A       ∎
 \end{code}
 \end{minipage}
 \begin{minipage}{0.45\textwidth}
@@ -86,12 +85,16 @@ We also make heavy use of congruence |cong f : a ≡ b → f a ≡ f b|
 and a version for binary functions
 |cong₂ g : a ≡ b → c ≡ d → g a c ≡ g b d|.
 
-The category law now is a fold of the functor law:
+The category law |∘id : xs ∘ id ≡ xs| is now simply a fold of the functor law
+(|[id]|).
+
+%if False
 \begin{code}
 ∘id : xs ∘ id ≡ xs
 ∘id {xs = ε}       = refl
 ∘id {xs = xs , x}  = cong₂ _,_ (∘id {xs = xs}) ([id] {x = x})
 \end{code}
+%endif
 
 \subsection{The left identity law}
 \label{sec:right-ident}
@@ -139,15 +142,15 @@ Therefore, we instead add a ``dummy'' |Sort| argument
 decrease (such that we can eventually just use |id∘ = id∘′ V|).
 \footnote{Perhaps surprisingly, this ``dummy'' argument does not even need to
 be of type |Sort| to satisfy Agda here. More discussion on this trick 
-can be found at 
+can be found at Agda issue
 \href{https://github.com/agda/agda/issues/7693}{\#7693}, but in summary:
 \begin{itemize} 
    \item Agda considers all base constructors (constructors with no parameters) 
    to be of minimal size structurally, so their presence can track size
    preservation of other base-constructor arguments across function calls.
-   \item It turns out that
+   \item \vspace{-0.75ex} It turns out that
    a strict decrease in |Sort| is not necessary everywhere for termination: 
-   the context also gets structurally smaller.
+   the context also gets structurally smaller in the call to |_⁺_| from |id|.
 \end{itemize}
 }
 
@@ -158,9 +161,9 @@ id∘ = id∘′ V
 {-# INLINE id∘ #-}
 \end{code}
 %endif
-To prove |id∘′|, we need the $\beta$-law for |_⁺_|: 
+To prove |id∘′|, we need the $\beta$-law for |_⁺_|,
 |⁺∘ : xs ⁺ A  ∘ (ys , x) ≡ xs ∘ ys|, which can be shown with a fold over a
-corresponding property for |suc[_]|:
+corresponding property for |suc[_]|,
 |suc[] : (suc[ q ] x _) [ ys , y ] ≡ x [ ys ] |.
 
 %if False
@@ -173,16 +176,13 @@ suc[] : (suc[ q ] x _) [ ys , y ] ≡ x [ ys ]
 \noindent
 \begin{minipage}{0.4\textwidth}
 \begin{code}
-suc[] {q = V}                            = 
-   refl
+suc[] {q = V} = refl
 suc[] {q = T} {x = x} {ys = ys} {y = y}  =
-  (suc[ T ] x _) [ ys , y ]
-  ≡⟨⟩
-  x [ id ⁺ _ ] [ ys , y ]
-  ≡⟨ sym ([∘] {x = x}) ⟩
-  x [ (id ⁺ _) ∘ (ys , y) ]
+  (suc[ T ] x _) [ ys , y ]  ≡⟨⟩
+  x [ id ⁺ _ ] [ ys , y ]    ≡⟨ sym ([∘] {x = x}) ⟩
+  x [ (id ⁺ _) ∘ (ys , y) ]  
   ≡⟨ cong (λ ρ → x [ ρ ]) ⁺∘  ⟩
-  x [ id ∘ ys  ]
+  x [ id ∘ ys  ]             
   ≡⟨ cong (λ ρ → x [ ρ ]) id∘ ⟩
   x [ ys ]  ∎
 \end{code}
@@ -190,18 +190,15 @@ suc[] {q = T} {x = x} {ys = ys} {y = y}  =
 \hfill
 \begin{minipage}{0.5\textwidth}
 \begin{code}
-⁺∘ {xs = ε}       = 
-   refl
+⁺∘ {xs = ε}       = refl
 ⁺∘ {xs = xs , x}  = 
    cong₂ _,_ (⁺∘ {xs = xs}) (suc[] {x = x})
 
 id∘′ {xs = ε}       _ = refl
 id∘′ {xs = xs , x}  _ = cong₂ _,_
-   (id ⁺ _ ∘ (xs , x)
-     ≡⟨ ⁺∘ {xs = id} ⟩
-   id ∘ xs 
-     ≡⟨ id∘ ⟩
-   xs ∎)
+   (id ⁺ _ ∘ (xs , x)  ≡⟨ ⁺∘ {xs = id} ⟩
+   id ∘ xs             ≡⟨ id∘ ⟩
+   xs                  ∎)
    refl
 \end{code}
 \end{minipage}
@@ -245,11 +242,13 @@ tm[] {q = T} = refl
 
 We are now ready to prove |[∘]| by structural induction:
 
-\begin{minipage}{0.5\textwidth}
+\noindent
+\begin{minipage}{0.55\textwidth}
 \begin{code}
-[∘] {x = zero} {xs = xs , x} = refl
-[∘] {x = suc i _} {xs = xs , x} = [∘] {x = i}
-[∘] {x = ` x}{xs = xs}{ys = ys} = 
+[∘] {x = zero}     {xs = xs , x}       = refl
+[∘] {x = suc i _}  {xs = xs , x}       = 
+   [∘] {x = i}
+[∘] {x = ` x}      {xs = xs}{ys = ys}  = 
    tm⊑ ⊑t (x [ xs ∘ ys ])
     ≡⟨ cong (tm⊑ ⊑t) ([∘] {x = x}) ⟩
    tm⊑ ⊑t (x [ xs ] [ ys ])
@@ -257,11 +256,11 @@ We are now ready to prove |[∘]| by structural induction:
    (tm⊑ ⊑t (x [ xs ])) [ ys ] ∎
 \end{code}
 \end{minipage}
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}{0.35\textwidth}
 \begin{code}
-[∘] {x = t · u} =
+[∘] {x = t · u}                  =
    cong₂ _·_ ([∘] {x = t}) ([∘] {x = u})
-[∘] {x = ƛ t}{xs = xs}{ys = ys} =
+[∘] {x = ƛ t}{xs = xs}{ys = ys}  =
    cong ƛ_ (
      t [ (xs ∘ ys) ^ _ ]
      ≡⟨ cong (λ zs → t [ zs ]) ^∘  ⟩
@@ -309,13 +308,10 @@ The case for |q = T| is more interesting and relies again on |[∘]| and
 |∘id|:
 \begin{code}
 ⁺-nat[] {q = T} {A = A} {x = x} {xs = xs} = 
-   x [ xs ⁺ A ]
-   ≡⟨ cong (λ zs → x [ zs ⁺ A ]) (sym ∘id) ⟩
-   x [ (xs ∘ id) ⁺ A ]     
-   ≡⟨ cong (λ zs → x [ zs ]) (sym (⁺-nat∘ {xs = xs})) ⟩
-   x [ xs ∘ (id ⁺ A) ]   
-   ≡⟨ [∘] {x = x} ⟩
-   x [ xs ] [ id ⁺ A ] ∎
+   x [ xs ⁺ A ]         ≡⟨ cong (λ zs → x [ zs ⁺ A ]) (sym ∘id) ⟩
+   x [ (xs ∘ id) ⁺ A ]  ≡⟨ cong (λ zs → x [ zs ]) (sym (⁺-nat∘ {xs = xs})) ⟩
+   x [ xs ∘ (id ⁺ A) ]  ≡⟨ [∘] {x = x} ⟩
+   x [ xs ] [ id ⁺ A ]  ∎
 \end{code}
 
 %if False
@@ -330,8 +326,8 @@ tm⊑zero v⊑t = refl
 \end{code}
 %endif
 
-It also turns out we need the $\beta$-law for |zero[_]|: 
-|zero[]  : zero[ q ] [ xs , x ] ≡ tm⊑ (⊑⊔r {q = q}) x|, which holds
+It also turns out we need |zero[]  : zero[ q ] [ xs , x ] ≡ tm⊑ (⊑⊔r {q = q}) x|
+, the $\beta$-law for |zero[_]|, which holds
 definitionally in the case for either |Sort|.
 
 %if False
@@ -342,23 +338,19 @@ zero[] {q = T} = refl
 \end{code}
 %endif 
 
+\noindent
 Finally, we have all the ingredients to prove the second functor law |^∘|:
 \footnote{Actually, we also need that zero commutes with |tm⊑|: that is for any
 |q⊑r : q ⊑ r| we have that |tm⊑zero q⊑r : zero[ r ] ≡ tm⊑ q⊑r zero[ q ]|.}
 \begin{code}
 ^∘ {r = r}{s = s}{xs = xs}{ys = ys} {A = A} = 
-    (xs ∘ ys) ^ A
-    ≡⟨⟩
-    (xs ∘ ys) ⁺ A , zero[ r ⊔ s ]    
-    ≡⟨ cong₂ _,_ (sym (⁺-nat∘ {xs = xs})) refl ⟩
-    xs ∘ (ys ⁺ A) , zero[ r ⊔ s ]
-    ≡⟨ cong₂ _,_ refl (tm⊑zero (⊑⊔r {r = s}{q = r})) ⟩        
-    xs ∘ (ys ⁺ A) , tm⊑ (⊑⊔r {q = r}) zero[ s ]
-    ≡⟨ cong₂ _,_
-         (sym (⁺∘ {xs = xs}))
-         (sym (zero[] {q = r}{x = zero[ s ]}))  ⟩    
-    (xs ⁺ A) ∘  (ys ^ A) , zero[ r ] [ ys ^ A ]
-    ≡⟨⟩  
-    (xs ^ A) ∘ (ys ^ A) ∎
+    (xs ∘ ys) ^ A                                ≡⟨⟩
+    (xs ∘ ys) ⁺ A , zero[ r ⊔ s ]                ≡⟨ cong₂ _,_ (sym (⁺-nat∘ {xs = xs})) refl ⟩
+    xs ∘ (ys ⁺ A) , zero[ r ⊔ s ]                
+      ≡⟨ cong₂ _,_ refl (tm⊑zero (⊑⊔r {r = s}{q = r})) ⟩        
+    xs ∘ (ys ⁺ A) , tm⊑ (⊑⊔r {q = r}) zero[ s ]  
+      ≡⟨ cong₂ _,_ (sym (⁺∘ {xs = xs})) (sym (zero[] {q = r}{x = zero[ s ]}))  ⟩    
+    (xs ⁺ A) ∘  (ys ^ A) , zero[ r ] [ ys ^ A ]  ≡⟨⟩  
+    (xs ^ A) ∘ (ys ^ A)                          ∎
 \end{code}
  
