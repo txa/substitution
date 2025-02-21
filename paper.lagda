@@ -159,29 +159,30 @@ erroneous. \cite{curry1958combinatory}
 % i.e. interpreting dependent types in higher categories. 
 
 % NEW INTRO
+% (shorter)
 
 The first author was writing an introduction to
-category theory for functional programmers. One
+category theory for functional programmers. 
+One example
 category is that of simply-typed $\lambda$-terms and
-substitutions; the text gives the definition and asks
-the reader to prove the category laws. Writing the
+substitutions; and proving the
+expected category laws
+seemed a suitable exercise.
+However, the
 answer was more difficult than expected, so
-% to minimise mistakes so we started
-we attempted to formalise the
+we attempted to mechanise the
 solution in Agda. The main setback is that the same
 proofs were repeated many times. One guideline of
-good software engineering is \textbf{do not write code
+good software engineering is to \textbf{not write code
 by copy and paste}, and that applies doubly to
 formal proofs.
 
 This paper is the result of our effort to refactor the proof.
-The method used also applies to other problems. In
+The method used also applies to other problems; in
 particular, we see the current construction as a warmup for the
 recursive definition of substitution for dependent type theory.
 This in turn may have interesting applications for coherence,
 i.e., interpreting dependent types in higher categories. 
-
-% [183 words --> 146 words (20% shorter)]
 
 \subsection{In a nutshell}
 \label{sec:nutshell}
