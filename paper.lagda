@@ -136,27 +136,51 @@ erroneous. \cite{curry1958combinatory}
 % [PHIL: End alternative introduction. Having written it, I think
 % I like the below better!]
 
+% OLD INTRO
+% The first author was writing lecture notes for an introduction to
+% category theory for functional programmers. A nice example of a
+% category is that of simply typed $\lambda$-terms and
+% substitutions; hence it seemed a good idea to give the definition and
+% ask the students to prove the category laws. When writing the answer,
+% they realised that it is not as easy as they thought, and to make sure that
+% there were no mistakes, they started to formalize the problem in Agda.
+% The main setback was that the same proofs got repeated many times. 
+% If there is one guideline of good software engineering then it is to
+% \textbf{not write code by copy and paste} and this applies even more so to 
+% formal proofs.
+% % Horrible hack: Remind LaTeX that "\\[<LENGTH>]" is a thing, because apparently
+% % it can sometimes forget...
+% \phantom{a} \\[0.0ex] \indent
+% This paper is the result of the effort to refactor the proof. We think
+% that the method used is interesting also for other problems. In
+% particular the current construction can be seen as a warmup for the
+% recursive definition of substitution for dependent type theory which
+% may have interesting applications for the coherence problem,
+% i.e. interpreting dependent types in higher categories. 
 
-The first author was writing lecture notes for an introduction to
-category theory for functional programmers. A nice example of a
-category is that of simply typed $\lambda$-terms and
-substitutions; hence it seemed a good idea to give the definition and
-ask the students to prove the category laws. When writing the answer,
-they realised that it is not as easy as they thought, and to make sure that
-there were no mistakes, they started to formalize the problem in Agda.
-The main setback was that the same proofs got repeated many times. 
-If there is one guideline of good software engineering then it is to
-\textbf{not write code by copy and paste} and this applies even more so to 
+% NEW INTRO
+
+The first author was writing an introduction to
+category theory for functional programmers. One
+category is that of simply-typed $\lambda$-terms and
+substitutions; the text gives the definition and asks
+the reader to prove the category laws. Writing the
+answer was more difficult than expected, so
+to minimise mistakes we started to formalise the
+solution in Agda. The main setback is that the same
+proofs were repeated many times. One guideline of
+good software engineering is \textbf{do not write code
+by copy and paste}, and that applies doubly to
 formal proofs.
-% Horrible hack: Remind LaTeX that "\\[<LENGTH>]" is a thing, because apparently
-% it can sometimes forget...
-\phantom{a} \\[0.0ex] \indent
-This paper is the result of the effort to refactor the proof. We think
-that the method used is interesting also for other problems. In
-particular the current construction can be seen as a warmup for the
-recursive definition of substitution for dependent type theory which
-may have interesting applications for the coherence problem,
-i.e. interpreting dependent types in higher categories. 
+
+This paper is the result of our effort to refactor the proof.
+The method used also applies to other problems. In
+particular, we see the current construction as a warmup for the
+recursive definition of substitution for dependent type theory.
+This in turn may have interesting applications for coherence,
+i.e., interpreting dependent types in higher categories. 
+
+% [183 words --> 146 words (20% shorter)]
 
 \subsection{In a nutshell}
 \label{sec:nutshell}
@@ -340,7 +364,10 @@ This is in contrast to Rocq and Lean; the
 former's |Fixpoint| command merely supports structural recursion on a
 single argument and the latter has only raw elimination principles as
 primitive. Luckily, both of these proof assistants layer on additional
-commands/tactics to support more natural use of non-primitive induction.
+commands/tactics to support more natural use of non-primitive induction 
+\footnote{Indeed, Lean can be convinced that our substitution operations
+terminate after specifying measures similar to those in section 
+\ref{sec:termination}, via the |decreasing_by| tactic.}.
 
 % For example, Lean features a pair of tactics |termination_by| and 
 % |decreasing_by| for specifying per-function termination measures and
