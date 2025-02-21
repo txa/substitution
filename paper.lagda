@@ -166,7 +166,8 @@ category is that of simply-typed $\lambda$-terms and
 substitutions; the text gives the definition and asks
 the reader to prove the category laws. Writing the
 answer was more difficult than expected, so
-to minimise mistakes we started to formalise the
+% to minimise mistakes so we started
+we attempted to formalise the
 solution in Agda. The main setback is that the same
 proofs were repeated many times. One guideline of
 good software engineering is \textbf{do not write code
