@@ -364,7 +364,10 @@ This is in contrast to Rocq and Lean; the
 former's |Fixpoint| command merely supports structural recursion on a
 single argument and the latter has only raw elimination principles as
 primitive. Luckily, both of these proof assistants layer on additional
-commands/tactics to support more natural use of non-primitive induction.
+commands/tactics to support more natural use of non-primitive induction 
+\footnote{Indeed, Lean can be convinced that our substitution operations
+terminate after specifying measures similar to those in section 
+\ref{sec:termination}, via the |decreasing_by| tactic.}.
 
 % For example, Lean features a pair of tactics |termination_by| and 
 % |decreasing_by| for specifying per-function termination measures and
