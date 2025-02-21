@@ -148,7 +148,11 @@
 %format ⊨[_] = "\models\![\_]"
 
 %format v[ = v "["
+%format ]v = "]" v
 %format _v[_] = "\_" v[ "\_" "]"
+%format _v[_]v = "\_" v[ "\_" ]v
+%format _[_]v = "\_" "[" "\_" ]v
+
 
 
 %format zero[ = zero "["
@@ -196,7 +200,7 @@
 %format ▷-η = "\rhd\!-\!\eta"
 %format π₀∘ = "\pi_0\!\circ"
 %format π₁∘ = "\pi_1\!\circ"
-%format ·[] = "\cdot\![]"
+%format ·[] = "\cdot[]"
 %format ƛ[] = "\lambda[]"
 
 %format ⊔ = "\sqcup"
