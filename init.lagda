@@ -1287,8 +1287,8 @@ the sledgehammer of set truncation (which prevents eliminating the initial
 CwF into any non-set).
 
 As we are working in vanilla Agda, we'll take a simpler approach, and rely on 
-UIP (
-|duip : ∀ {x y z w r} {p : x ≡ y} {q : z ≡ w} → p ≡[ r ]≡ q|\footnote{
+UIP 
+(|duip : ∀ {p : x ≡ y} {q : z ≡ w} → p ≡[ r ]≡ q|\footnote{
 Note that proving this form of (dependent) UIP relies 
 on type constructor injectivity (specifically, injectivity of |_≡_|). 
 We could use a weaker version taking an additional proof of |x ≡ z|, 
