@@ -74,11 +74,12 @@ definition of substitution gives rise to a simply typed CwF (section
 \ref{sec:cwf-recurs-subst}). We can define the initial CwF as a
 quotient inductive-inductive type (QIIT). To simplify our development, rather 
 than 
-using a Cubical Agda HIT,
-\footnote{Cubical Agda still lacks some essential automation,
-  e.g. integrating no-confusion properties into pattern matching.}
-we just postulate the existence of this QIIT in Agda (with
-the associated $\beta$-laws as rewriting rules). By initiality, there is an evaluation
+using a Cubical Agda 
+HIT\footnote{Cubical Agda still lacks some essential automation,
+  e.g. integrating no-confusion properties into pattern matching.},
+we postulate the existence of this QIIT in Agda (with
+the associated $\beta$-laws implemented with rewriting rules). 
+By initiality, there is an evaluation
 functor from the initial CwF to the recursively defined CwF (defined
 in section \ref{sec:cwf-recurs-subst}). On the
 other hand, we can embed the recursive CwF into the initial CwF;
@@ -93,7 +94,7 @@ completeness and stability in the language of normalisation functions.
 \subsection{Simply Typed CwFs}
 \label{sec:simply-typed-cwfs}
 
-We define a record to capture simply typed CWFs: 
+We define a record to capture simply typed CWFs,
 |record CwF-simple : Set₁|.
 
 %if False
@@ -266,7 +267,7 @@ We are building towards a proof of initiality for our recursive substitution
 syntax, but shall start by showing that our recursive substitution syntax obeys 
 the specified CwF laws, specifically that |CwF-simple| can be instantiated with 
 |_⊢[_]_|/|_⊨[_]_|. This will be more-or-less enough to implement the 
-``normalisation'' direction of our initial CwF |≃| recursive sub syntax 
+``normalisation'' direction of our initial CwF |≃| recursive substition syntax 
 isomorphism.
 
 Most of the work to prove these laws was already done in section
@@ -284,13 +285,14 @@ module CwF = CwF-simple
 Our first non-trivial decision is which type family to interpret substitutions 
 into. 
 In our first attempt, we tried to pair renamings/substitutions with their sorts 
-to stay polymorphic: |is-cwf .CwF._⊨_ = Σ Sort (Δ ⊨[_] Γ)|.
+to stay polymorphic, |is-cwf .CwF._⊨_ = Σ Sort (Δ ⊨[_] Γ)|.
 Unfortunately, this approach quickly breaks. The |•-η| CwF law forces us to 
 provide a 
 unique morphism to the terminal context (i.e. a unique weakening from the empty 
 context); |Σ Sort (Δ ⊨[_] Γ)| is simply too flexible here, allowing
 both |V , ε| and |T , ε|.
 
+\noindent
 Therefore, we instead fix the sort to |T|.
 
 %if False
@@ -461,8 +463,8 @@ identity substitution to a variable |i| produces the distinct term |` i|).
 %endif
 
 We now define projections |π₀ (δ , t) = δ| and |π₁ (δ , t) = t| and
-|▷-β₀|, |▷-β₁|, |▷-η|, |π₀∘| and |π₁∘| all hold by definition (though the
-latter three only after matching on the guaranteed-non-empty substitution). 
+|▷-β₀|, |▷-β₁|, |▷-η|, |π₀∘| and |π₁∘| all hold by definition (at least, after
+matching on the guaranteed-non-empty substitution). 
 
 %if False
 \begin{code}
@@ -479,8 +481,8 @@ latter three only after matching on the guaranteed-non-empty substitution).
 %endif
 
 Finally, we can deal with the cases specific to simply typed $\lambda$-calculus.
-|·[]| holds by definition, but the $\beta$-rule for substitutions applied to
-lambdas requires a bit of equational reasoning due to 
+|·[]| also holds by definition, but the $\beta$-rule for substitutions applied 
+to lambdas requires a bit of equational reasoning due to 
 differing implementations of |_^_|.
 
 %if False
@@ -512,11 +514,6 @@ Agda higher inductive type (HIT) because of technical limitations mentioned
 previously.
 We also reuse our existing datatypes for contexts and types for convenience
 (note terms do not occur inside types in STLC).
-
-To state the dependent equations between outputs of the eliminator, we need
-dependent identity types |_≡[_]≡_ : ∀ {A B : Set ℓ} → A → A ≡ B → B → Set ℓ|. 
-We can define these simply by matching on the identity
-between the LHS and RHS types |x ≡[ refl ]≡ y = x ≡ y|.
 
 %if False
 \begin{code}
@@ -610,6 +607,17 @@ sucᴵ x A = x [ π₀ᴵ idᴵ ]ᴵ
 % use this convention or was it taken from somewhere else?
 We state the eliminator for the initial CwF in terms of |Motive : Set₁| and 
 |Methods : Motive → Set₁| records as in \cite{altenkirch2016tt_in_tt}.
+Again to avoid name clashes, we annotate fields of these records (corresponding
+to how each type/constructor is eliminated) with |ᴹ|.
+
+To state the dependent equations in |Methods| between outputs of the eliminator,
+enforcing congruence of equality, (e.g. the functor law, which requires
+an equality between |tᴹ [ σᴹ ]ᴹ [ δᴹ ]ᴹ| and |tᴹ [ σᴹ ∘ᴹ δᴹ ]ᴹ|)
+we need
+dependent identity types\\
+|_≡[_]≡_ : A → A ≡ B → B → Set ℓ|. 
+We can define these simply by matching on the identity
+between the LHS and RHS types, |x ≡[ refl ]≡ y = x ≡ y|. 
 
 \begin{spec}
 module _ {𝕄} (𝕞 : Methods 𝕄) where
@@ -852,6 +860,7 @@ open Recursor public
 \end{code}
 %endif
 
+\noindent
 Normalisation into our substitution normal forms can now be achieved by with:
 
 \begin{spec}
@@ -861,7 +870,7 @@ norm = rec-cwf is-cwf
 
 Of course, normalisation shouldn't change the type of a term, or the context it
 is in, so we might hope for a simpler signature |Γ ⊢ᴵ A → Γ ⊢[ T ] A| and, 
-conveniently, rewrite rules (|rec-con is-cwf Γ ≡ Γ|, |rec-ty is-cwf A ≡ A|) 
+conveniently, rewrite rules (|rec-con is-cwf Γ ≡ Γ| and |rec-ty is-cwf A ≡ A|) 
 can get us there!
 
 %if False
@@ -956,13 +965,14 @@ means there are many more cases. We start with the motive:
 compl-𝕄 : Motive
 \end{code}
 
-\begin{minipage}{0.45\textwidth}
+\noindent
+\begin{minipage}{0.55\textwidth}
 \begin{code}
 compl-𝕄 .Tmᴹ _ _ tᴵ   = ⌜ norm tᴵ ⌝ ≡ tᴵ
 compl-𝕄 .Tmsᴹ _ _ δᴵ  = ⌜ norm* δᴵ ⌝* ≡ δᴵ
 \end{code}
 \end{minipage}
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}{0.35\textwidth}
 \begin{code}
 compl-𝕄 .Conᴹ _  = ⊤
 compl-𝕄 .Tyᴹ  _  = ⊤
@@ -1211,7 +1221,7 @@ We also prove preservation of substitution composition
 \end{code}
 %endif
 
-The main cases of |Methods compl-𝕄| can now be proved by just applying the 
+The main cases of |compl-𝕞 : Methods compl-𝕄| can now be proved by just applying the 
 preservation lemmas and inductive hypotheses, e.g:
 
 %if False
@@ -1293,7 +1303,7 @@ Note that proving this form of (dependent) UIP relies
 on type constructor injectivity (specifically, injectivity of |_≡_|). 
 We could use a weaker version taking an additional proof of |x ≡ z|, 
 but this would be clunkier to use; Agda has no hope of inferring such a
-proof by unification.}), enabling e.g. |compl-𝕞 .id∘ᴹ  = duip|
+proof by unification.}), enabling e.g. |compl-𝕞 .id∘ᴹ  = duip|.
 
 %if False
 \begin{code}

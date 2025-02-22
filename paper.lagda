@@ -170,11 +170,11 @@ expected category laws
 seemed a suitable exercise.
 However, the
 answer was more difficult than expected, so
-we attempted to mechanise the
-solution in Agda. The main setback is that the same
+we attempted to formalise the
+solution in Agda. The main setback was that the same
 proofs were repeated many times. One guideline of
 good software engineering is to \textbf{not write code
-by copy and paste}, and that applies doubly to
+by copy and paste}, and this applies doubly to
 formal proofs.
 
 This paper is the result of our effort to refactor the proof.
@@ -193,7 +193,8 @@ variables are substituted only for variables (|Γ ∋ A|) and proper substitutio
 (|Δ ⊨ Γ|) where variables are replaced with terms (|Γ ⊢ A|). This results in 
 having to define several similar operations
 
-\begin{minipage}{0.45\textwidth}
+\noindent
+\begin{minipage}{0.5\textwidth}
 \begin{spec}
   _v[_]v  : Γ ∋ A  → Δ ⊨v Γ  → Δ ∋ A
   _v[_]   : Γ ∋ A  → Δ ⊨ Γ   → Δ ⊢ A
@@ -232,10 +233,10 @@ structurally smaller than |T| (see section \ref{sec:fact-with-sorts})
 % pattern T = T>V V isV
 % \end{spec}
 and, indeed, our highly mutually
-recursive proof relying on this is accepted by Agda.
+recursive definitions relying on this are accepted by Agda.
 
 We also relate the recursive definition of substitution to a
-specification using a quotient-inductive-inductive type (QIIT) (a mutual 
+specification using a quotient-inductive-inductive type, or QIIT (a mutual 
 inductive type with equations) where
 substitution is a term former (i.e. explicit substitutions). 
 Specifically, our specification 
@@ -263,15 +264,13 @@ $\lambda$-terms when implementing \cite{alti:csl99}.
 
 The
 monadic approach has been further investigated in
-\cite{mcbride2006type}. The structure of the proofs is explained in
+\cite{mcbride2006type}, with the structure of the proofs explained in
 \cite{allais2017type} from a monadic perspective. Indeed this example
 is one of the motivations for relative monads
-\cite{altenkirch2015monads}.
-
-In the monadic approach, we represent substitutions as functions,
+\cite{altenkirch2015monads}. In the monadic approach, we represent substitutions 
+as functions,
 however it is not clear how to extend this to dependent types without
-% Cite very dependent types?
-``very dependent'' types.
+``very dependent'' \cite{hickey1996formal, altenkirch2023munchhausen} types.
 
 % We avoid the monadic perspective which here for two reasons: first we want
 % to give a simple self-contained proof avoiding too many advanced
@@ -281,11 +280,11 @@ however it is not clear how to extend this to dependent types without
 
 There are a number of publications on formalising substitution laws.
 Just to mention a few recent ones: 
-\cite{stark2019autosubst} develops a Coq library which automatically derives
+\cite{stark2019autosubst} develops a Rocq library which automatically derives
 substitution lemmas, but the proofs are repeated for renamings and
 substitutions. Their equational theory is similar to the simply
 typed CwFs we are using in section \ref{sec:initiality}.
-\cite{saffrich2024abstractions} is also using Agda, but extrinsically
+\cite{saffrich2024abstractions} uses Agda, but extrinsically
 (i.e. separating preterms and typed syntax). Here the approach from 
 \cite{allais2017type} is used to factor the construction using
 \emph{kits}. \cite{saffrich2024intrinsically} instead uses intrinsic syntax,
@@ -297,8 +296,8 @@ substitution lemmas repeated for all required combinations.
 \label{sec:using-agda}
 
 For the technical details of Agda we refer to the online documentation
-\cite{agda}. We only use plain Agda, inductive definitions and
-structurally recursive programs and proofs.  Termination is checked by
+\cite{agda}. We generally stick to plain Agda: inductive definitions and
+structurally recursive programs and proofs. Termination is checked by
 Agda's termination checker \cite{alti:jfp02} which uses a lexical
 combination of structural descent that is inferred by the termination
 checker by investigating all possible recursive paths. We will define
@@ -307,19 +306,19 @@ mutually recursive proofs which heavily rely on each other.
 The only recent
 feature we use, albeit sparingly, is the possibility to turn propositional
 equations into rewriting rules (i.e. definitional equalities). This
-makes the statement of some theorems more readable because we can avoid
-using |subst|, but it is not essential.
+makes the statement of some theorems more readable 
+(avoiding manual transports with |subst|), but it is not essential.
 
-We extensively use variable declarations to introduce implicit
+We extensively use |variable| declarations to introduce implicit
 quantification (we summarize the variable conventions in passing in
 the text). We also use $\forall{}$-prefix so we can elide types of function
 parameters where they can be inferred, i.e. instead of |{Γ : Con} → ..| we just 
 write |∀ {Γ} → ..|. Implicit variables, which are indicated by using |{..}| 
-instead of |(..)| in dependent function types,  can be instantiated using the 
-syntax |a {x = b}|.
+instead of |(..)| in dependent function types, can be instantiated using the 
+syntax |f {x = y}|.
 
-Agda syntax is very flexible, allowing mixfix syntax declarations using |_| to 
-indicate where the parameters go.
+Agda syntax is very flexible, allowing mixfix syntax declarations using '|_|`s 
+to indicate where the parameters go.
 In the proofs, we use the Agda standard library's definitions for equational 
 derivations, which exploit this flexibility.
 
@@ -366,8 +365,9 @@ This is in contrast to Rocq and Lean; the
 former's |Fixpoint| command merely supports structural recursion on a
 single argument and the latter has only raw elimination principles as
 primitive. Luckily, both of these proof assistants layer on additional
-commands/tactics to support more natural use of non-primitive induction 
-\footnote{Indeed, Lean can be convinced that our substitution operations
+commands/tactics to support more natural use of non-primitive 
+induction\footnote{Indeed, Lean can be convinced that our substitution 
+operations
 terminate after specifying measures similar to those in section 
 \ref{sec:termination}, via the |decreasing_by| tactic.}.
 

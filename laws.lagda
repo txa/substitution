@@ -161,21 +161,21 @@ id∘ = id∘′ V
 {-# INLINE id∘ #-}
 \end{code}
 %endif
+
 To prove |id∘′|, we need the $\beta$-law for |_⁺_|,
-|⁺∘ : xs ⁺ A  ∘ (ys , x) ≡ xs ∘ ys|, which can be shown with a fold over a
-corresponding property for |suc[_]|,
-|suc[] : (suc[ q ] x _) [ ys , y ] ≡ x [ ys ] |.
+|xs ⁺ A  ∘ (ys , x) ≡ xs ∘ ys|, which can be shown with a fold over a
+corresponding property for |suc[_]|.
 
 %if False
 \begin{code}
 ⁺∘ : xs ⁺ A ∘ (ys , x) ≡ xs ∘ ys
-suc[] : (suc[ q ] x _) [ ys , y ] ≡ x [ ys ] 
 \end{code}
 %endif
 
 \noindent
 \begin{minipage}{0.4\textwidth}
 \begin{code}
+suc[] : (suc[ q ] x _) [ ys , y ] ≡ x [ ys ] 
 suc[] {q = V} = refl
 suc[] {q = T} {x = x} {ys = ys} {y = y}  =
   (suc[ T ] x _) [ ys , y ]  ≡⟨⟩
@@ -189,6 +189,22 @@ suc[] {q = T} {x = x} {ys = ys} {y = y}  =
 \end{minipage}
 \hfill
 \begin{minipage}{0.5\textwidth}
+\begin{spec}
+⁺∘ : xs ⁺ A ∘ (ys , x) ≡ xs ∘ ys
+⁺∘ {xs = ε}       = refl
+⁺∘ {xs = xs , x}  = 
+   cong₂ _,_ (⁺∘ {xs = xs}) (suc[] {x = x})
+
+id∘′ {xs = ε}       _ = refl
+id∘′ {xs = xs , x}  _ = cong₂ _,_
+   (id ⁺ _ ∘ (xs , x)  ≡⟨ ⁺∘ {xs = id} ⟩
+   id ∘ xs             ≡⟨ id∘ ⟩
+   xs                  ∎)
+   refl
+\end{spec}
+\end{minipage}
+
+%if False
 \begin{code}
 ⁺∘ {xs = ε}       = refl
 ⁺∘ {xs = xs , x}  = 
@@ -201,7 +217,7 @@ id∘′ {xs = xs , x}  _ = cong₂ _,_
    xs                  ∎)
    refl
 \end{code}
-\end{minipage}
+%endif
 
 One may note that
 |⁺∘| relies on itself indirectly via |suc[]|. Like with the substitution
@@ -326,8 +342,9 @@ tm⊑zero v⊑t = refl
 \end{code}
 %endif
 
-It also turns out we need |zero[]  : zero[ q ] [ xs , x ] ≡ tm⊑ (⊑⊔r {q = q}) x|
-, the $\beta$-law for |zero[_]|, which holds
+It also turns out we need 
+|zero[]  : zero[ q ] [ xs , x ] ≡ tm⊑ (⊑⊔r {q = q}) x|, the $\beta$-law for 
+|zero[_]|, which holds
 definitionally in the case for either |Sort|.
 
 %if False

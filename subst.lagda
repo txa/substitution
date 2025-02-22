@@ -36,7 +36,7 @@ module Subst where
 %endif
 
 Our main idea is to turn the distinction between
-variables and terms into a parameter. The first approximation is to
+variables and terms into a parameter. The first approximation of this idea is to
 define a type |Sort| (|q, r, s|):
 \begin{spec}
 data Sort : Set where
@@ -84,17 +84,18 @@ pair of a natural number |n| and a proof |n ≤ 1| would also work, i.e.
 
 We can now define |T = T>V V isV : Sort| but, even better, we can tell Agda that
 this is a derived pattern with |pattern T = T>V V isV|.
-
 %if False
 \begin{code}
 pattern T = T>V V isV
 \end{code}
 %endif
-
 This means we can pattern match over |Sort| just with |V| and |T|,
 while ensuring |V| is visibly (to Agda's termination checker) structurally 
 smaller than |T|.
 
+\pagebreak
+
+\noindent
 We can now define terms and variables in one go (|x, y, z|):
 \begin{code}
 data _⊢[_]_ : Con → Sort → Ty → Set where
@@ -144,7 +145,7 @@ data _⊑_ : Sort → Sort → Set where
   v⊑t : V ⊑ T
 \end{code}
 \end{minipage}\\
-Yes, this is just boolean algebra. We need a number of laws:
+This is just boolean algebra. We need a number of laws:
 
 \noindent
 \begin{minipage}{0.45\textwidth}
@@ -189,18 +190,17 @@ $\sqcup\mathrm{v}$) into rewrite rules.
 % \begin{spec}
 % {-# \Keyword{REWRITE} $\sqcup\!\sqcup \; \sqcup\mathrm{v} \;$ #-}
 % \end{spec}
-
 %if False
 \begin{code}
 {-# REWRITE ⊔⊔ ⊔v #-} 
 \end{code}
 %endif
-
 This introduces new definitional equalities, i.e.
 |q ⊔ (r ⊔ s) = (q ⊔ r) ⊔ s| and |q ⊔ V = q| are now used by the type
 checker\footnote{Effectively, this feature allows a selective use of 
 extensional Type Theory.}.
-The order gives rise to a functor which is witnessed by
+
+The order on sorts gives rise to a functor, witnessed by
 |tm⊑ : q ⊑ s → Γ ⊢[ q ] A → Γ ⊢[ s ] A|, where |tm⊑ rfl x  = x| and
 |tm⊑ v⊑t  i = ` i|.
 
@@ -283,8 +283,10 @@ id = id-poly
 \end{code}
 %endif
 
+\pagebreak
+
 However, |suc| is more subtle since the case for |T| depends on its
-fold over substitutions (|_⁺_|):
+fold over substitutions:
 
 %if false
 \begin{code}
@@ -315,7 +317,7 @@ _⁺_  :  Γ ⊨[ q ] Δ → ∀ A
 (xs , x) ⁺ A = xs ⁺ A , suc[ _ ] x A 
 \end{code}
 %endif
-And now we can define |xs ^ A =  xs ⁺ A , zero[ _ ]|.
+And finally we can define |xs ^ A =  xs ⁺ A , zero[ _ ]|.
 %if False
 \begin{code}
 xs ^ A                 =  xs ⁺ A , zero[ _ ]
@@ -326,10 +328,10 @@ xs ^ A                 =  xs ⁺ A , zero[ _ ]
 \label{sec:termination}
 
 Unfortunately (as of Agda 2.7.0.1\footnote{
-One of the authors to this paper has submitted a PR 
+We have submitted a PR 
 (\href{https://github.com/agda/agda/pull/7695}{\#7695}) to Agda that 
 extends the termination checking algorithm such that these definitions
-are accepted directly.
+are accepted directly, so this might change in future versions.
 }), we now hit a termination error.
 
 %if False
@@ -365,8 +367,8 @@ to be tracked and termination to be correctly inferred by Agda.
 We present the call graph diagramatically (inlining |_^_|), 
 in the style of \cite{keller2010hereditary}.
 
-\begin{minipage}{0.6\textwidth}
-\begin{tikzcd}[scaleedge cd=1.1, sep=normal]
+\begin{minipage}{0.65\textwidth}
+\begin{tikzcd}[scaleedge cd=1.1, sep=large]
 & |suc[ q₄ ] t₄q₄Γ₄|
 \arrow[dd, bend left, "\substack{|r₃ < q₄|}"]
 \arrow[ldd, bend right, swap, "\substack{|r₂ < q₄|}"]
@@ -385,7 +387,7 @@ in the style of \cite{keller2010hereditary}.
 \end{tikzcd}
 \captionof{figure}{Call graph of substitution operations}
 \end{minipage}
-\begin{minipage}{0.3\textwidth}
+\begin{minipage}{0.25\textwidth}
 \renewcommand{\arraystretch}{1.2}
 \begin{center}
 \begin{tabular}{ ||c||c||c|| }
@@ -407,7 +409,7 @@ Function & Measure \\
 \end{minipage}
 \\[2.0ex]
 
-To justify termination formally, we note that along all cycles in the graph,
+To justify termination, we note that along all cycles in the graph,
 either the 
 |Sort| strictly decreases
 in size, or the size of the |Sort| is preserved and some other argument
@@ -419,8 +421,8 @@ In practice, we will generally require identity renamings, rather than
 substitutions, 
 and so we shall continue
 as if the original |id| definition worked (recovering |V|-only |id| from the
-|Sort|-polymorphic one is easy after all: we merely need to instantiate the
-|Sort| argument with |V|).
+|Sort|-polymorphic one is easy after all: we merely need to instantiate
+|{q = V}|).
 
 % Dummy argument explanation (unnecessary)
 

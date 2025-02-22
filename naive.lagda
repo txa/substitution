@@ -60,8 +60,8 @@ data _⊢_ : Con → Ty → Set where
 \end{code}
 \end{minipage}
 
-Here the constructor |`_| corresponds to \emph{variables are
-  $\lambda$-terms}. We write applications as |t · u|. Since we use de
+Here the constructor |`_| embeds variables in
+$\lambda$-terms. We write applications as |t · u|. Since we use de
 Bruijn variables, lambda abstraction |ƛ_| doesn't bind a name explicitly
 (instead, variables count the number of binders between them and their 
 actual binding site). 
@@ -98,8 +98,8 @@ _[_] : Γ ⊢ A → Δ ⊨ Γ → Δ ⊢ A
 As usual, we encounter a problem with the case for binders |ƛ_|. We are given a
 substitution |ts : Δ ⊨ Γ| but the body |t| lives in the extended context
 |t : Γ , A ⊢ B|. We need to exploit the fact that context extension
-|_▷_| is functorial: |_^_ : Γ ⊨ Δ → (A : Ty) → Γ ▷ A ⊨ Δ ▷ A|.
-Using |_^_| we can complete |_[_]|: |(ƛ t)   [ ts ]       =  ƛ (t [ ts ^ _ ])|.
+|_▷_| is functorial, |_^_ : Γ ⊨ Δ → (A : Ty) → Γ ▷ A ⊨ Δ ▷ A|.
+Using |_^_| we can define |(ƛ t)   [ ts ]       =  ƛ (t [ ts ^ _ ])|.
 
 %if false
 \begin{code}
@@ -156,13 +156,14 @@ suc-tm : Γ ⊢ B → (A : Ty) → Γ ▷ A ⊢ B
 But how can we define |suc-tm| when we only have weakening for variables? If we
 already had identity |id : Γ ⊨ Γ| and substitution we could write:
 |suc-tm t A = t [ id ⁺ A ] |, 
-but this is certainly not structurally recursive (and hence rejected
+but this is certainly not structurally recursive (and hence is rejected
 by Agda's termination checker).
 
-Actually, we realise that |id| is a renaming, i.e. it is a substitution
+To fix this, we use the fact that |id| is a renaming, i.e. it is 
+a substitution
 only containing variables, and we can easily define |_⁺v_| for
 renamings. This leads to a structurally recursive definition, but we
-have to repeat the definition of substitutions for renamings.
+have to repeat the substitution definition for renamings.
 
 \centering
 \begin{code}
@@ -202,13 +203,12 @@ suc-tm t A       = t [ idv ⁺v A ]v
 \end{code}
 \end{minipage}
 
-This may not seem too bad: to obtain structural termination we just have to
-duplicate a few definitions, but it gets even worse when proving the
+This may not seem too bad: to ensure structural termination we just have to
+duplicate a few definitions, but it gets much worse when proving the
 laws. For example, to prove associativity, we first need to prove functoriality 
 of substitution: |[∘] : t [ us ∘ vs ] ≡ t [ us ] [ vs ]|.
 Since |t, us, vs| can be variables/renamings or terms/substitutions,
-there are in principle eight combinations (though it turns out that four is 
-enough). 
+there are in principle eight combinations. 
 Each time, we must to prove a number of lemmas again in a different setting.
 
 In the rest of the paper we describe a technique for factoring these definitions
