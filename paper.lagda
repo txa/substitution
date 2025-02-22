@@ -336,10 +336,13 @@ avoid name clashes, e.g. preliminary definitions from section
 \section{Conclusions and further work}
 \label{sec:concl-furth-work}
 
-The subject of the paper is a problem which everybody (including
+The subject of the paper is a problem which we expect everybody (including
 ourselves) would have thought to be trivial.
-% As it turns out, it isn't, and 
-% we spent quite some time going down alleys that didn't work. 
+As it turns out, it isn't, and 
+we spent quite some time 
+going down alleys that didn't work, 
+and getting to grips with the subtleties of Agda's termination checking.
+
 % With hindsight, the main idea seems rather
 % obvious: introduce sorts as a datatype with the structure of a boolean
 % algebra. To implement the solution in Agda, we managed to
