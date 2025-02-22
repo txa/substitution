@@ -298,7 +298,7 @@ substitution lemmas repeated for all required combinations.
 
 For the technical details of Agda we refer to the online documentation
 \cite{agda}. We generally stick to plain Agda: inductive definitions and
-structurally recursive programs and proofs. Termination is checked by
+structurally recursive programs/proofs. Termination is checked by
 Agda's termination checker \cite{alti:jfp02} which uses a lexical
 combination of structural descent that is inferred by the termination
 checker by investigating all possible recursive paths. We will define
@@ -318,7 +318,7 @@ write |∀ {Γ} → ..|. Implicit variables, which are indicated by using |{..}|
 instead of |(..)| in dependent function types, can be instantiated using the 
 syntax |f {x = y}|.
 
-Agda syntax is very flexible, allowing mixfix syntax declarations using '|_|`s 
+Agda syntax is very flexible, allowing mixfix syntax declarations using `|_|'s 
 to indicate where the parameters go.
 In the proofs, we use the Agda standard library's definitions for equational 
 derivations, which exploit this flexibility.

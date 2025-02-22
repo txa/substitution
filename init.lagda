@@ -610,15 +610,6 @@ We state the eliminator for the initial CwF in terms of |Motive : Set₁| and
 Again to avoid name clashes, we annotate fields of these records (corresponding
 to how each type/constructor is eliminated) with |ᴹ|.
 
-To state the dependent equations in |Methods| between outputs of the eliminator,
-enforcing congruence of equality, (e.g. the functor law, which requires
-an equality between |tᴹ [ σᴹ ]ᴹ [ δᴹ ]ᴹ| and |tᴹ [ σᴹ ∘ᴹ δᴹ ]ᴹ|)
-we need
-dependent identity types\\
-|_≡[_]≡_ : A → A ≡ B → B → Set ℓ|. 
-We can define these simply by matching on the identity
-between the LHS and RHS types, |x ≡[ refl ]≡ y = x ≡ y|. 
-
 \begin{spec}
 module _ {𝕄} (𝕞 : Methods 𝕄) where
 \end{spec}
@@ -647,6 +638,15 @@ record Motive : Set₁ where
     Tmsᴹ : Conᴹ Δ → Conᴹ Γ → Δ ⊨ᴵ Γ → Set
 \end{code}
 %endif
+
+To state the dependent equations in |Methods| between outputs of the eliminator,
+enforcing congruence of equality (e.g. the functor law, which asks for 
+|tᴹ [ σᴹ ]ᴹ [ δᴹ ]ᴹ| and |tᴹ [ σᴹ ∘ᴹ δᴹ ]ᴹ| to be equated)
+we need
+dependent identity types
+|_≡[_]≡_ : A → A ≡ B → B → Set ℓ|. 
+We can define these simply by matching on the identity
+between |A| and |B|, |x ≡[ refl ]≡ y = x ≡ y|. 
 
 %if False
 \begin{code}
