@@ -262,13 +262,14 @@ Andreas Abel used a very similar technique
 to ours in his unpublished Agda proof \cite{abel:subst11} for untyped
 $\lambda$-terms when implementing \cite{alti:csl99}.
 
-The
-monadic approach has been further investigated in
-\cite{mcbride2006type}, with the structure of the proofs explained in
+The monadic approach has been investigated in \cite{mcbride2006type}, 
+where the duplication between renamings and substitutions is factored 
+into 
+\emph{kits}. The structure of the proofs is explained in
 \cite{allais2017type} from a monadic perspective. Indeed this example
 is one of the motivations for relative monads
 \cite{altenkirch2015monads}. In the monadic approach, we represent substitutions 
-as functions,
+as functions;,
 however it is not clear how to extend this to dependent types without
 ``very dependent'' \cite{hickey1996formal, altenkirch2023munchhausen} types.
 
@@ -285,9 +286,9 @@ substitution lemmas, but the proofs are repeated for renamings and
 substitutions. Their equational theory is similar to the simply
 typed CwFs we are using in section \ref{sec:initiality}.
 \cite{saffrich2024abstractions} uses Agda, but extrinsically
-(i.e. separating preterms and typed syntax). Here the approach from 
-\cite{allais2017type} is used to factor the construction using
-\emph{kits}. \cite{saffrich2024intrinsically} instead uses intrinsic syntax,
+(i.e. separating preterms and typed syntax). Here, the approach from 
+\cite{allais2017type} is applied to factor the construction using
+kits. \cite{saffrich2024intrinsically} instead uses intrinsic syntax,
 but with renamings and substitutions defined separately, and relevant 
 substitution lemmas repeated for all required combinations.
 
