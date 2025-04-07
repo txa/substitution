@@ -99,11 +99,11 @@ smaller than |T|.
 We can now define terms and variables in one go (|x, y, z|):
 \begin{code}
 data _⊢[_]_ : Con → Sort → Ty → Set where
-  zero : Γ ▷ A ⊢[ V ] A
-  suc  : Γ  ⊢[ V ]  A → (B : Ty) → Γ ▷ B  ⊢[ V ]  A
-  `_   : Γ  ⊢[ V ]  A → Γ  ⊢[ T ]  A
-  _·_  : Γ ⊢[ T ] A ⇒ B → Γ ⊢[ T ] A → Γ ⊢[ T ] B
-  ƛ_   : Γ ▷ A ⊢[ T ] B → Γ ⊢[ T ] A ⇒ B
+  zero  : Γ ▷ A ⊢[ V ] A
+  suc   : Γ  ⊢[ V ]  A → (B : Ty) → Γ ▷ B  ⊢[ V ]  A
+  `_    : Γ  ⊢[ V ]  A → Γ  ⊢[ T ]  A
+  _·_   : Γ ⊢[ T ] A ⇒ B → Γ ⊢[ T ] A → Γ ⊢[ T ] B
+  ƛ_    : Γ ▷ A ⊢[ T ] B → Γ ⊢[ T ] A ⇒ B
 \end{code}
 
 While almost identical to the previous definition (|Γ ⊢[ V ] A| corresponds to

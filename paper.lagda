@@ -165,14 +165,14 @@ The first author was writing an introduction to
 category theory for functional programmers. 
 One example
 category is that of simply-typed $\lambda$-terms and
-substitutions; and proving the
+recursive substitutions; and proving the
 expected category laws
 seemed a suitable exercise.
 However, the
 answer was more difficult than expected, so
-we attempted to formalise the
-solution in Agda. The main setback was that the same
-proofs were repeated many times. One guideline of
+we attempted to mechanise the
+solution in Agda, and hit a new setback: multiple proofs had to be
+repeated multiple times. One guideline of
 good software engineering is to \textbf{not write code
 by copy and paste}, and this applies doubly to
 formal proofs.
