@@ -1,6 +1,6 @@
 %if full
 \begin{code}
-{-# OPTIONS --rewriting #-}
+{-# OPTIONS --rewriting --local-confluence-check #-}
 module subst where
 
 open import Relation.Binary.PropositionalEquality hiding ([_])
@@ -153,13 +153,14 @@ This is just boolean algebra. We need a number of laws:
 ⊑t : s ⊑ T
 v⊑ : V ⊑ s
 ⊑q⊔ : q ⊑ (q ⊔ r)
+⊑⊔r : r ⊑ (q ⊔ r)
 \end{code}
 \end{minipage}
 \begin{minipage}{0.45\textwidth}
 \begin{code}
-⊑⊔r : r ⊑ (q ⊔ r)
 ⊔⊔ : q ⊔ (r ⊔ s) ≡ (q ⊔ r) ⊔ s
 ⊔v : q ⊔ V ≡ q
+⊔t : q ⊔ T ≡ T
 \end{code}
 \end{minipage}\\
 which are easy to prove by case analysis, e.g. |⊑t {V} = v⊑t| and 
@@ -183,22 +184,29 @@ v⊑ {T} = v⊑t
 
 ⊔v {V} = refl
 ⊔v {T} = refl
+
+⊔t {V} = refl
+⊔t {T} = refl
 \end{code}
 %endif
 To improve readability we turn the equations ($\sqcup\sqcup$, 
-$\sqcup\mathrm{v}$) into rewrite rules.
+$\sqcup\mathrm{v}$, $\sqcup\mathrm{t}$) into rewrite rules.
 % \begin{spec}
 % {-# \Keyword{REWRITE} $\sqcup\!\sqcup \; \sqcup\mathrm{v} \;$ #-}
 % \end{spec}
 %if False
 \begin{code}
-{-# REWRITE ⊔⊔ ⊔v #-} 
+{-# REWRITE ⊔⊔ ⊔v ⊔t #-} 
 \end{code}
 %endif
 This introduces new definitional equalities, i.e.
-|q ⊔ (r ⊔ s) = (q ⊔ r) ⊔ s| and |q ⊔ V = q| are now used by the type
+|q ⊔ (r ⊔ s) = (q ⊔ r) ⊔ s| is now used by the type
 checker\footnote{Effectively, this feature allows a selective use of 
-extensional Type Theory.}.
+extensional Type Theory. We enable Agda's confluence checking with
+|--local-confluence-check| as a sanity-check that our rewrites
+are reasonable (Agda can also check confluence globally, but this requires
+manually resolving critical pairs with extra rewrite rules, which
+becomes somewhat tedious).}.
 
 The order on sorts gives rise to a functor, witnessed by
 |tm⊑ : q ⊑ s → Γ ⊢[ q ] A → Γ ⊢[ s ] A|, where |tm⊑ rfl x  = x| and
@@ -328,11 +336,12 @@ xs ^ A                 =  xs ⁺ A , zero[ _ ]
 \label{sec:termination}
 
 Unfortunately (as of Agda 2.7.0.1\footnote{
-We have submitted a PR 
-(\href{https://github.com/agda/agda/pull/7695}{\#7695}) to Agda that 
-extends the termination checking algorithm such that these definitions
-are accepted directly, so this might change in future versions.
-}), we now hit a termination error.
+It is possible to extend Agda's termination checker such that the these
+definitions are accepted directly, and indeed we have a fork of Agda 
+(\href{https://github.com/agda/agda/pull/7695}{\#7695}) which implements such
+an extension, though it is unlikely to upstreamed anytime soon due to
+concerns over performance and elegance.}), 
+we now hit a termination error.
 
 %if False
 \begin{spec}

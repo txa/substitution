@@ -207,6 +207,7 @@
 %format _⊔_ = "\_\sqcup\_"
 %format ⊔⊔ = "\sqcup\!\sqcup"
 %format ⊔v = "\sqcup\!" v
+%format ⊔t = "\sqcup\!" t
 
 %format ⊑ = "\sqsubseteq"
 %format _⊑_ = "\_\sqsubseteq\_"

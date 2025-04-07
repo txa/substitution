@@ -1,6 +1,6 @@
 %if False
 \begin{code}
-{-# OPTIONS --rewriting #-}
+{-# OPTIONS --rewriting --local-confluence-check #-}
 module laws where
 
 open import Relation.Binary.PropositionalEquality hiding ([_])

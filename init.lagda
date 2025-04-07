@@ -342,7 +342,7 @@ however, make identity a little trickier.
 We need the equivalent substitution |Γ ⊨[ T ] Γ|.
 
 We first extend |tm⊑| to renamings/substitutions with a fold: 
-|tm*⊑ : q ⊑ s → Γ ⊨[ q ] Δ → Γ ⊨[ s ] Δ|, and nd prove various lemmas about how 
+|tm*⊑ : q ⊑ s → Γ ⊨[ q ] Δ → Γ ⊨[ s ] Δ|, and prove various lemmas about how 
 |tm*⊑| coercions can be lifted outside of our substitution operators:
 
 \begin{minipage}{0.35\textwidth}
@@ -876,7 +876,7 @@ can get us there!
 %if False
 \begin{code}
 Con≡ : rec-con is-cwf Γ ≡ Γ
-Ty≡  : rec-ty is-cwf A ≡ A
+Ty≡  : rec-ty  is-cwf A ≡ A
 
 Con≡ {Γ = •} = refl
 Con≡ {Γ = Γ ▷ A} = cong₂ _▷_ Con≡ Ty≡
@@ -1330,5 +1330,3 @@ And completeness is just one call to the eliminator away.
 compl : ⌜ norm tᴵ ⌝ ≡ tᴵ
 compl {tᴵ = tᴵ} = elim-cwf compl-𝕞 tᴵ
 \end{code}
-
-  
