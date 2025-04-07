@@ -251,11 +251,12 @@ substitutions are the \emph{substitution normal forms}.
 \subsection{Related work}
 \label{sec:related-work}
 
-\cite{de_bruijn_lambda_1972} introduces his eponymous indices and
-also the notion of simultaneous substitution. We are here using a
+De Bruijn introduced his eponymous indices and
+also the notion of simultaneous substitution in \cite{de_bruijn_lambda_1972}. 
+We are here using a
 typed version of de Bruijn indices, e.g. see \cite{alti:csl99} where
 the problem of showing termination of a simple definition of
-substitution (for the untyped $\lambda$-calculus) is addressed using a
+substitution (for the untyped $\lambda$-calculus) was addressed using a
 well-founded recursion. The present approach seems to be
 simpler and scales better, avoiding well-founded recursion.
 Andreas Abel used a very similar technique
