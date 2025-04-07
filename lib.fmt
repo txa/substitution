@@ -125,10 +125,10 @@
 %format reflᶜ = "\mathrm{refl}^c"
 %format substᶜ = "\mathrm{subst}^c"
 
-%format _⊨_  = "\_\models\_"
-%format ⊨  = "\models"
-%format _⊨v_  = "\_\models\!{\mathrm{v}}\_"
-%format ⊨v  = "\models\!{\mathrm{v}}"
+%format _⊩_  = "\_\Vdash\_"
+%format ⊩  = "\Vdash"
+%format _⊩v_  = "\_\Vdash\!{\mathrm{v}}\_"
+%format ⊩v  = "\Vdash\!{\mathrm{v}}"
 
 %%format ƛ = "\text{\textcrlambda}"
 %%format ƛ_ = "\text{\textcrlambda}\_"
@@ -142,10 +142,10 @@
 %format ]_ = "]\_"
 %format _[_] = "\_[\_]"
 
-%format _⊨[_]_ = "\_\models\![\_]\_"
-%format ⊨[ = "\models\!["
-%format _⊨[ = "\_\models\!["
-%format ⊨[_] = "\models\![\_]"
+%format _⊩[_]_ = "\_\Vdash\![\_]\_"
+%format ⊩[ = "\Vdash\!["
+%format _⊩[ = "\_\Vdash\!["
+%format ⊩[_] = "\Vdash\![\_]"
 
 %format v[ = v "["
 %format ]v = "]" v
@@ -280,7 +280,7 @@
 %format .CwF. = "\mathrm{.CwF.}"
 %format .CwF._∘_  = .CwF. _∘_
 %format .CwF._⊢_  = .CwF. _⊢_
-%format .CwF._⊨_  = .CwF. _⊨_
+%format .CwF._⊩_  = .CwF. _⊩_
 %format .CwF._▷_  = .CwF. _▷_
 %format .CwF.ε    = .CwF. ε
 %format .CwF.∘∘   = .CwF. ∘∘
@@ -304,8 +304,8 @@
 %format ᴵ     = "^{\mathrm{I}}"
 %format ⊢ᴵ    = ⊢ ᴵ
 %format _⊢ᴵ_  = "\_" ⊢ᴵ "\_"
-%format ⊨ᴵ    = ⊨ ᴵ
-%format _⊨ᴵ_  = "\_" ⊨ᴵ "\_"
+%format ⊩ᴵ    = ⊩ ᴵ
+%format _⊩ᴵ_  = "\_" ⊩ᴵ "\_"
 %format tᴵ    = t ᴵ
 %format uᴵ    = u ᴵ
 %format vᴵ    = v ᴵ

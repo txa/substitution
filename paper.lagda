@@ -188,22 +188,22 @@ i.e., interpreting dependent types in higher categories.
 \label{sec:nutshell}
 
 When working with substitution for a calculus with binders, we find
-that you have to differentiate between renamings (|Δ ⊨v Γ|) where 
+that you have to differentiate between renamings (|Δ ⊩v Γ|) where 
 variables are substituted only for variables (|Γ ∋ A|) and proper substitutions 
-(|Δ ⊨ Γ|) where variables are replaced with terms (|Γ ⊢ A|). This results in 
+(|Δ ⊩ Γ|) where variables are replaced with terms (|Γ ⊢ A|). This results in 
 having to define several similar operations
 
 \noindent
 \begin{minipage}{0.5\textwidth}
 \begin{spec}
-  _v[_]v  : Γ ∋ A  → Δ ⊨v Γ  → Δ ∋ A
-  _v[_]   : Γ ∋ A  → Δ ⊨ Γ   → Δ ⊢ A
+  _v[_]v  : Γ ∋ A  → Δ ⊩v Γ  → Δ ∋ A
+  _v[_]   : Γ ∋ A  → Δ ⊩ Γ   → Δ ⊢ A
 \end{spec}
 \end{minipage}
 \begin{minipage}{0.45\textwidth}
 \begin{spec}
-  _[_]v   : Γ ⊢ A  → Δ ⊨v Γ  → Δ ⊢ A
-  _[_]    : Γ ⊢ A  → Δ ⊨ Γ   → Δ ⊢ A
+  _[_]v   : Γ ⊢ A  → Δ ⊩v Γ  → Δ ⊢ A
+  _[_]    : Γ ⊢ A  → Δ ⊩ Γ   → Δ ⊢ A
 \end{spec}
 \end{minipage}
 
@@ -216,7 +216,7 @@ the repetition extending also to the intermediary lemmas).
 Our solution is to introduce a type of sorts with |V : Sort| for
 variables/renamings and |T : Sort| for terms/substitutions, leading
 to a single substitution operation 
-|_[_] : Γ ⊢[ q ] A → Δ ⊨[ r ] Γ → Δ ⊢[ q ⊔ r ] A|
+|_[_] : Γ ⊢[ q ] A → Δ ⊩[ r ] Γ → Δ ⊢[ q ⊔ r ] A|
 where |q, r : Sort| and |q ⊔ r| is the least upper bound in the
 lattice of sorts (|V ⊑ T|). With this, we only need to prove one variant of the
 functor law, relying on the fact that |_⊔_| is associative.

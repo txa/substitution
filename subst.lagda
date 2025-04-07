@@ -14,7 +14,7 @@ variable
   Γ Δ Θ : Con  
 
 infix   3  _⊢[_]_
-infix   3  _⊨[_]_
+infix   3  _⊩[_]_
 infixl  4  _,_
 infix   5  _∘_
 infix   5  ƛ_
@@ -112,9 +112,9 @@ we can now
 parametrize all definitions and theorems explicitly. As a first step,
 we can generalize renamings and substitutions (|xs, ys, zs|):
 \begin{code}
-data _⊨[_]_ : Con → Sort → Con → Set where
-  ε    : Γ ⊨[ q ] •
-  _,_  : Γ ⊨[ q ] Δ → Γ ⊢[ q ] A → Γ ⊨[ q ] Δ ▷ A  
+data _⊩[_]_ : Con → Sort → Con → Set where
+  ε    : Γ ⊩[ q ] •
+  _,_  : Γ ⊩[ q ] Δ → Γ ⊢[ q ] A → Γ ⊩[ q ] Δ ▷ A  
 \end{code}
 %if False
 \begin{code}
@@ -122,7 +122,7 @@ variable
   i j k    : Γ ⊢[ V ] A
   t u v    : Γ ⊢[ T ] A
   x y z : Γ ⊢[ q ] A
-  xs ys zs : Γ ⊨[ q ] Δ  
+  xs ys zs : Γ ⊩[ q ] Δ  
 \end{code}
 %endif
 
@@ -221,18 +221,18 @@ tm⊑ v⊑t  i = ` i
 %endif
 
 By making functoriality of context extension parameteric, 
-|_^_ : Γ ⊨[ q ] Δ → ∀ A → Γ ▷ A ⊨[ q ] Δ ▷ A|, we are ready to define 
+|_^_ : Γ ⊩[ q ] Δ → ∀ A → Γ ▷ A ⊩[ q ] Δ ▷ A|, we are ready to define 
 substitution and renaming in one operation:
 %if False
 \begin{code}
-_^_ : Γ ⊨[ q ] Δ → ∀ A → Γ ▷ A ⊨[ q ] Δ ▷ A
+_^_ : Γ ⊩[ q ] Δ → ∀ A → Γ ▷ A ⊩[ q ] Δ ▷ A
 \end{code}
 %endif
 
 \noindent
 \begin{minipage}{0.62\textwidth}
 \begin{code}
-_[_] : Γ ⊢[ q ] A → Δ ⊨[ r ] Γ → Δ ⊢[ q ⊔ r ] A
+_[_] : Γ ⊢[ q ] A → Δ ⊩[ r ] Γ → Δ ⊢[ q ⊔ r ] A
 zero       [ xs , x ]  = x
 (suc i _)  [ xs , x ]  = i [ xs ]
 \end{code}
@@ -255,7 +255,7 @@ We can also implement |id| using |_^_| (by folding contexts), but to define
 
 \begin{minipage}{0.45\textwidth}
 \begin{spec}
-id : Γ ⊨[ V ] Γ
+id : Γ ⊩[ V ] Γ
 id {Γ = •}      =  ε
 id {Γ = Γ ▷ A}  =  id ^ A
 \end{spec}
@@ -270,19 +270,19 @@ zero[ T ]      =  ` zero
 
 %if False
 \begin{code}
-id-poly : Γ ⊨[ q ] Γ 
+id-poly : Γ ⊩[ q ] Γ 
 id-poly {Γ = •} = ε
 id-poly {Γ = Γ ▷ A} = id-poly ^ A
 
-id : Γ ⊨[ V ] Γ 
+id : Γ ⊩[ V ] Γ 
 id = id-poly
 {-# INLINE id #-}
 
 -- Alternative:
 
--- id′ : Sort → Γ ⊨[ V ] Γ
+-- id′ : Sort → Γ ⊩[ V ] Γ
 
--- id : Γ ⊨[ V ] Γ
+-- id : Γ ⊩[ V ] Γ
 -- id = id′ V
 -- {-# INLINE id #-}
 
@@ -298,7 +298,7 @@ fold over substitutions:
 
 %if false
 \begin{code}
-_⁺_ : Γ ⊨[ q ] Δ → (A : Ty) → Γ ▷ A ⊨[ q ] Δ
+_⁺_ : Γ ⊩[ q ] Δ → (A : Ty) → Γ ▷ A ⊩[ q ] Δ
 \end{code}
 %endif
 
@@ -313,8 +313,8 @@ suc[ T ] t  A  = t [ id ⁺  A ]
 \end{minipage}
 \begin{minipage}{0.45\textwidth}
 \begin{spec}
-_⁺_  :  Γ ⊨[ q ] Δ → ∀ A 
-     →  Γ ▷ A ⊨[ q ] Δ
+_⁺_  :  Γ ⊩[ q ] Δ → ∀ A 
+     →  Γ ▷ A ⊩[ q ] Δ
 ε         ⁺ A = ε
 (xs , x)  ⁺ A = xs ⁺ A , suc[ _ ] x A 
 \end{spec}
@@ -354,7 +354,7 @@ The cause turns out to be |id|. Termination here hinges on weakening for terms
 (|suc[ T ] t A|) building
 and applying a renaming (i.e. a sequence of variables, for which weakening is
 trivial) rather than a full substutution. Note that if |id| produced
-`|Γ ⊨[ T ] Γ|'s, or if we implemented 
+`|Γ ⊩[ T ] Γ|'s, or if we implemented 
 weakening for variables (|suc[ V ] i A|) with |i [ id ⁺ A ]|, our operations
 would still be
 type-correct, but would genuinely loop, so perhaps Agda is right to be
@@ -443,14 +443,14 @@ as if the original |id| definition worked (recovering |V|-only |id| from the
 % 
 % \begin{minipage}{0.45\textwidth}
 % \begin{spec}
-% id′ : Bool → Γ ⊨[ V ] Γ
+% id′ : Bool → Γ ⊩[ V ] Γ
 % id′ {Γ = •}      d = ε
 % id′ {Γ = Γ ▷ A}  d = id′ d ^ A
 % \end{spec}
 % \end{minipage}
 % \begin{minipage}{0.45\textwidth}
 % \begin{spec}
-% id : Γ ⊨[ V ] Γ 
+% id : Γ ⊩[ V ] Γ 
 % id = id′ true
 % {-#  \Keyword{INLINE} $\Varid{id}$ #-} 
 % \end{spec}
@@ -504,15 +504,15 @@ as if the original |id| definition worked (recovering |V|-only |id| from the
 % (|< t > = id , t|), 
 % but we can easily recover this with a monomorphic |id| by extending |tm⊑| to 
 % lists of terms (see \ref{sec::cwf-recurs-subst}). For the rest of the paper, 
-% we will use |id : Γ ⊨[ V ] Γ| without assumptions about how it is 
+% we will use |id : Γ ⊩[ V ] Γ| without assumptions about how it is 
 % implemented.}
 
-Finally, we define composition, |_∘_ : Γ ⊨[ q ] Θ → Δ ⊨[ r ] Γ → Δ ⊨[ q ⊔ r ] Θ|
+Finally, we define composition, |_∘_ : Γ ⊩[ q ] Θ → Δ ⊩[ r ] Γ → Δ ⊩[ q ⊔ r ] Θ|
 by folding substitution.
 
 %if False
 \begin{code}
-_∘_ : Γ ⊨[ q ] Θ → Δ ⊨[ r ] Γ → Δ ⊨[ q ⊔ r ] Θ
+_∘_ : Γ ⊩[ q ] Θ → Δ ⊩[ r ] Γ → Δ ⊩[ q ⊔ r ] Θ
 ε ∘ ys         = ε
 (xs , x) ∘ ys  = (xs ∘ ys) , x [ ys ]
 \end{code}
