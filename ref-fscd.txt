@@ -1,0 +1,252 @@
+----------------------- REVIEW 1 ---------------------
+SUBMISSION: 82
+TITLE: Substitution without copy and paste
+AUTHORS: Thorsten Altenkirch, Nathaniel Burke and Philip Wadler
+
+----------- Overall evaluation -----------
+SCORE: 2 (accept)
+----- TEXT:
+# Summary
+
+The authors present an encoding technique for syntaxes with
+binding based on a type of sorts that internalises the idea
+that variables are smaller than terms.
+
+It allows them to declare a single sort-polymorphic traversal
+that generalises both renamings and substitutions. They can
+then prove generic lemmas about such sort-polymorphic traversals
+(e.g. identity laws & fusion lemmas).
+
+The sort-polymorphic approach ensures they do not need to
+repeat themselves in the programs (linear number of repetitions
+when you define one traversal per sort) and in the proofs
+(quadratic number of repetitions when you talk about the
+interaction of various traversals).
+
+They conclude with a definition of simply typed CwF and prove
+that the model defined by their syntax is indeed initial.
+
+# Comments
+
+Hello again!
+
+Solid paper interleaving good new ideas, solid formalisations
+and honest descriptions of technical challenges that will be
+interesting to interactive theorem provers power users and
+developers.
+
+## Rewrite rules for least upper bound
+
+Is there a reason why you're not proving & adding to the
+rewrite machinery all the laws of the form variable vs.
+constant? E.g. (q  T  T) is missing.
+Is it because they're not needed in your particular use case?
+
+Can you also please mention whether you're using the OPTION
+ensuring all the laws you throw in are confluent? If not,
+why not?
+
+## Parametric suc
+
+You highlight that defining a parametric suc is difficult.
+Can you clarify earlier why it's not simply declared as
+parametric at line 162? I know that's a question that got
+asked last time and I think it's legitimate.
+It's perfectly fine to just say that you want to stick closely
+to a var + tm approach rather than something that's more
+reminiscent of STLC with explicit substitutions or Kmett's
+notion of Scopes: https://hackage.haskell.org/package/bound-2.0.7/docs/Bound-Scope.html#t:Scope
+
+Edit: ah, I see this is mentioned in l514! It may be worth
+adding a forward pointer to it in the relevant section.
+
+## Termination
+
+Thanks a lot for actually doing this analysis as requested!
+This makes it much more convincing, whether Agda agrees or not.
+
+## CwF.id
+
+l368 you say that id doesn't fit CwF.id as it produces a renaming
+but on l209 you say that an easy solution to the termination issue
+is to make id sort polymorphic. Sounds like it would also solve your
+CwF.id issue so why not adopt the sort-polymorphic version across
+the board? Does it make some proofs harder?
+
+You're now proving 6 lemmas about the interactions of V-to-T weakening
+and composition, substitution, weakening. Does this negate the claim
+that your setup leads to a lack of repetition if you've now created
+new kinds of coherence lemmas to prove?
+
+# Refactoring
+
+## Preorder
+
+It's overkill but you could define __ as the order
+induced by the definition of divisibility built from
+seeing __ as a multiplication  la
+https://agda.github.io/agda-stdlib/v2.2/Algebra.Definitions.RawMagma.html
+
+It may be a more convenient generic definition in a case
+where you'd have more sorts and so more constructors.
+
+# Related work
+
+l59
+> [10] introduces his eponymous indices
+
+Explicitly namecheck De Bruijn. In general don't use numeric
+citations as nouns (you later on mention Abel by name which
+is much better).
+
+
+# Typos
+
+l371: "and nd"
+----------- Questions for authors (optional) -----------
+The main one relates to l373:
+
+You're now proving 6 lemmas about the interactions of V-to-T weakening
+and composition, substitution, weakening. Does this negate the claim
+that your setup leads to a lack of repetition if you've now created
+new kinds of coherence lemmas to prove?
+
+
+----------------------- REVIEW 2 ---------------------
+SUBMISSION: 82
+TITLE: Substitution without copy and paste
+AUTHORS: Thorsten Altenkirch, Nathaniel Burke and Philip Wadler
+
+----------- Overall evaluation -----------
+SCORE: 1 (weak accept)
+----- TEXT:
+This paper begins by stating that the first author found that 
+
+  ++ proving the syntactic category with objects function-types, morphisms simply typed lambda-calculus terms-in-context, and composition given by (simultaneous) substitutions is indeed a category
+
+more difficult than expected. However, the difficulty was of no surprise to this reviewer! 
+
+What exactly does this paper do? 
+
+The authors state that in working with terms with binders (only the case of lambda-calculus is considered) they must 
+
+  ++ differentiate between substitutions of variables for variables and substitutions of terms for
+     variables. 
+
+In fact in the paper, four similar substitution operations are defined. It is then noted that issues arise when proving properties of substitution. Consider proving a property of substitution such as x [ xs * ys ] = x [ xs ] [ ys ]. A name such as xs could denote variables or terms. As each case is considered, proofs with very similar  key conceptual steps (similar structure) are repeated and for this reason one ends up cutting and pasting (and presumably lightly editing) large chunks of code. 
+
+The solution is to define a type Sort of variables and terms, V and T, and define a structural order T>V so that, crudely speaking, variables are a sub-sort of terms. Some key definitions appear on lines 159 to 171.  After this the paper 
+
+  ++ Deals with termination issues in section 3.
+
+  ++ Proves categorical laws in section 4. 
+
+  ++ Defines categories with families (CwF) for the simply typed lambda-calculus in section 5 and proves
+     that the syntactic definition in the paper is isomorphic to the (unique) initial CwF. 
+
+  ++ Concludes in section 6. 
+
+Let me say what I like about the paper. 
+
+It is good to see recognition of the fact that apparently simple problems involving substitution involving binders are difficult. Many researchers know this, but a surprising number do not. I think one must get ones hands dirty to fully appreciate what is going on. I found it interesting to read the technical details, see what technical issues were confronted within Agda, and how they were dealt with. I think the material is technically complex and from that perspective suitable for publication in FSCD. 
+
+Now for what I did not like. 
+
+It took me some time to understand/decode the syntax in the paper. It does not help that in section 1.1, the reader is immediately exposed to syntax with no explanation whatsoever! I had to move on to section 2 and gradually unpick key definitions one-by-one. I know this is an Agda paper, but I think many things would be much clearer if the key ideas were first written down using a vanilla syntax for simply typed lambda-calculus. 
+
+Im not keen on the fact that many of the problems encountered (and solved) are Agda specific. It would be much better if the paper isolated key conceptual problems and provided generic solutions, perhaps in addition to the specific Agda solution presented. If we regard the current paper as one extreme of the problem to hand, and the approaches required in a simple mathematical account of substitution at the other extreme (see below), surely there must be a more generic formulation of the problems you raise? 
+
+When I first read section 1.1 I was confused for quite a while as to what the problems really are, conceptually. If one constructs the initial object (call it  InitSynCat) in the category of cartesian closed categories, and proves initiality in reasonable detail but by hand, yes, the proof is painstakingly long, but one only needs to define simultaneous substitution of terms for variables and that immediately provides simultaneous re-naming (and hence one may define alpha-equivalence using the latterI know you dont cover alpha-equivalence of named-variables in the paper). Stating that <term>[<var>/<var>] is an instance of <term>[<term>/<var>] is not something (I think) most mathematicians would quibble over. The problem in the paper, solved by V<T, just does not arise in a proof sketched out mathematically on paper, so-to-speak . 
+
+You say that proving the laws in InitSynCat was difficult, so you tried to do proofs in Agda, and the main problem was the cut and paste of (repeated) proofs. Im assuming that your original proof of the laws consisted of mathematical proofs set out on paper, before you moved to Agda, but was that the case? You dont make this clear! But assuming this was the case, was there a cut-and-paste issue with your original mathematical proof? What exactly was difficult? If there was a cut and paste issue, I am slightly confused, given my comments in the previous paragraph. I looked over some notes I have of a proof of initiality of InitSynCat, and the proofs of all the usual laws required of a category. Long and tedious, definitely! Repeated proofs? This I do not see. 
+
+Related to all these points, I wonder if it would be beneficial to slightly expand the related work section 1.2 and write a little more detail about the works of other authors. 
+
+Should this paper be published? 
+
+The content is technically accomplished, and highly non-trivial, and since it is coded in Agda most likely correct. As a reader with considerable experience in this area, I found it an interesting read and would not be unhappy to see the work recognized (weak accept). However, personally I think at the very least the paper needs a considerable amount of re-writing early on, to better introduce the essence of the problem at hand, and the syntax used. 
+
+On the other hand, the paper feels incomplete to me, since I would really like to read a more generic and fundamental account of the problem from a conceptual point of view. It would also help to have more of an overview of each section appearing within section 1, so the reader has a greater awareness of what is to come.
+----------- Questions for authors (optional) -----------
+My review indicates matters which need addressing and some implicit questions.
+
+
+----------------------- REVIEW 3 ---------------------
+SUBMISSION: 82
+TITLE: Substitution without copy and paste
+AUTHORS: Thorsten Altenkirch, Nathaniel Burke and Philip Wadler
+
+----------- Overall evaluation -----------
+SCORE: -1 (weak reject)
+----- TEXT:
+The problem is dealing with renaming and substitution with
+out redundancy in proofs.
+
+The authors propose a solution in the context of Agda.
+The paper begins with a scenario describing the natural, but
+wrong way to deal with substitution.  They use notation is
+is not explained.
+
+As background the authors point to the Agda manual. Then proceed
+to develop the proposed formalization of substitution in Agda,
+discussing the fine points of Agda's terminal checking etc. The
+notation gets unmanagable for someone who has no familiarity of
+Agda. This reviewer does not feel obliged to read the Agda manual
+in order to judge the paper.
+
+After developing definitions of contexts, (lambda) terms,
+variables, and substitutions, the authors detail proofs that
+substitution satisfies the laws of a functor. They seem to assume
+the other properties of a category are obvious.
+
+They then show the category (objects are Contexts) is simply typed
+category with families (a CwF). The notion of CwF is formalized in
+Agda, using the previous formaliztion of a category of contexts
+and initiality is proved.
+
+The authors emphasize that formalization of substitution and
+verification of desired properties is non-trivial.  Hence the
+presentation with discussion of dead ends ...
+ 
+The key idea seems to be to treat variables as a subsort of terms.
+Which seems to be the default in a first-order logic setting.
+The authors should discuss why this is not the case for them.
+It could be enlightening to connect FOL to HOT like formalisms
+in this dimension.
+
+The authors suggest that the presented formalization could have
+many applications and be useful to others working in (HO) type theory.
+
+
+----------------------- REVIEW 4 ---------------------
+SUBMISSION: 82
+TITLE: Substitution without copy and paste
+AUTHORS: Thorsten Altenkirch, Nathaniel Burke and Philip Wadler
+
+----------- Overall evaluation -----------
+SCORE: 2 (accept)
+----- TEXT:
+Summary
+
+This paper is a contribution to the art and science of formal proof development. It describes a way to "reuse code" when defining and proving properties of renaming and substitution in the simply-typed lambda calculus -- more precisely, it shows how to have a compact treatment of four substitution operators: (1) term-for-variable substitution, (2) variable-for-variable substitution (often called "renaming"), and these performed (A) in variables and (B) in terms. As a second contribution, the paper connects the concrete definition of terms and their constructor and substitution operators with an abstract definition as the initial simply-typed category with families (a simplification of a concept previously used as a model for dependently typed calculi). Everything is performed in the Agda proof assistants, and literate Agda code snippets are included in the paper.
+
+
+Evaluation
+
+Although I am not an Agda user, I enjoyed reading this paper. The trick to representing the various substitution operators compactly, via two sorts that are made to be structurally ordered (to please the recursion checks), is a nice little piece of formal engineering -- importantly, it is in principle generalizable to other syntaxes with bindings, and variations of this trick could be implemented in proof assistants different from Agda. Also, the explicit connection with initiality is an exemplary case of category theory not only talking the talk but also walking the walk in relationship with proof assistant technology. The paper is obviously focussed on the Agda ecosystem, and its use of the Agda-specific system and jargon could lose some readers that otherwise would benefit from the general ideas -- so while the Agda-fluent readers do form an important part of the FSCD community, I urge the authors to include more explanations and intuitions for the wider audience.
+
+
+More comments for the authors
+
+It was not clear how the two-sorted setting and the multitude of substitution/renaming operators shows in the initiality characterization from section 5. It seems to me that just the simple types and their terms together with the contexts endowed with the constructors and the term-for variable substitution, are initial in the category of simply-typed CwF (enriched with syntax-specific operators corresponding to the constructors), right?
+
+I would have been very excited to see you taking advantage of the initiality result, by showing for example how it can be used to define a recursive function while obtaining substitution commutation (more or less) for free. For example, when defining the semantic interpretation of simply-typed terms in Henkin-style structures, by organizing these structures as an enriched simply-typed CwF in the natural way, the initiality of syntax would give, as a "bonus", the so-called substitution lemma: saying that interpreting a substituted term is the same as interpreting the term in an updated environment. For example, such substitution-enriched recursion principles based on initiality are worked out in a nominal setting in Popescu and Gunter's paper: Recursion principles for syntax with bindings and substitution" (ICFP 2011).
+
+I suggest citing and discussing the early Fiore-Plotkin-Turi paper "Abstract Syntax and Variable Binding" (LICS 1999). Its results are probably superseded by some of the work you cite, but for me that paper is the mother of all substitution-enriched recursive principles. In their substitution algebra axiomatization, variable-for-variable substitution (renaming) coming from the sheaf structure coexists and interacts with term-for variable substitution.
+
+Your sort-based trick reminded me of the ad hoc polymorphism employed in object-oriented languages, where the method to be called is determined at run-time.
+
+I would suggest avoiding the symbol |= for context substitution, as this is usually associated with semantic satisfaction. You could consider using ||- instead? This still incurs an overlap (with the notation for forcing) but it is less of a problem.
+----------- Questions for authors (optional) -----------
+Please feel free to address any of my questions or comments from the review.
+
