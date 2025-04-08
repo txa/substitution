@@ -4,9 +4,9 @@ module naive where
 
 infix   3  _∋_
 infix   3  _⊢_
-infix   3  _⊨_
+infix   3  _⊩_
 infixl  4  _,_
-infix   3  _⊨v_
+infix   3  _⊩v_
 infix   8  _[_]
 infix   8  _[_]v
 \end{code}
@@ -67,28 +67,28 @@ Bruijn variables, lambda abstraction |ƛ_| doesn't bind a name explicitly
 actual binding site). 
 We also define substitutions as sequences of terms:
 \begin{code}
-data _⊨_ : Con → Con → Set where
-  ε    : Γ ⊨ •
-  _,_  : Γ ⊨ Δ → Γ ⊢ A → Γ ⊨ Δ ▷ A  
+data _⊩_ : Con → Con → Set where
+  ε    : Γ ⊩ •
+  _,_  : Γ ⊩ Δ → Γ ⊢ A → Γ ⊩ Δ ▷ A  
 \end{code}
 Now to define the categorical structure (|_∘_|, |id|) we first need to define
 substitution for terms and variables:
 %if False
 \begin{code}
-_^_ : Γ ⊨ Δ → (A : Ty) → Γ ▷ A ⊨ Δ ▷ A
+_^_ : Γ ⊩ Δ → (A : Ty) → Γ ▷ A ⊩ Δ ▷ A
 \end{code}
 %endif
 
 \begin{minipage}{0.45\textwidth}
 \begin{code}
-_v[_] : Γ ∋ A → Δ ⊨ Γ → Δ ⊢ A
+_v[_] : Γ ∋ A → Δ ⊩ Γ → Δ ⊢ A
 zero       v[ ts , t ] = t
 (suc i _)  v[ ts , t ] = i v[ ts ]
 \end{code}
 \end{minipage}
 \begin{minipage}{0.45\textwidth}
 \begin{spec}
-_[_] : Γ ⊢ A → Δ ⊨ Γ → Δ ⊢ A
+_[_] : Γ ⊢ A → Δ ⊩ Γ → Δ ⊢ A
 (` i)    [ ts ] = i v[ ts ]
 (t · u)  [ ts ] = (t [ ts ]) · (u [ ts ])
 (ƛ t)    [ ts ] = ƛ ?
@@ -96,14 +96,14 @@ _[_] : Γ ⊢ A → Δ ⊨ Γ → Δ ⊢ A
 \end{minipage}
 
 As usual, we encounter a problem with the case for binders |ƛ_|. We are given a
-substitution |ts : Δ ⊨ Γ| but the body |t| lives in the extended context
+substitution |ts : Δ ⊩ Γ| but the body |t| lives in the extended context
 |t : Γ , A ⊢ B|. We need to exploit the fact that context extension
-|_▷_| is functorial, |_^_ : Γ ⊨ Δ → (A : Ty) → Γ ▷ A ⊨ Δ ▷ A|.
+|_▷_| is functorial, |_^_ : Γ ⊩ Δ → (A : Ty) → Γ ▷ A ⊩ Δ ▷ A|.
 Using |_^_| we can define |(ƛ t)   [ ts ]       =  ƛ (t [ ts ^ _ ])|.
 
 %if false
 \begin{code}
-_[_] : Γ ⊢ A → Δ ⊨ Γ → Δ ⊢ A
+_[_] : Γ ⊢ A → Δ ⊩ Γ → Δ ⊢ A
 (` i)   [ ts ]       =  i v[ ts ]
 (t · u) [ ts ]       =  (t [ ts ]) · (u [ ts ])
 (ƛ t)   [ ts ]       =  ƛ (t [ ts ^ _ ])
@@ -121,13 +121,13 @@ ts ^ A = ts ⁺ A , ` zero
 \end{minipage}
 \begin{minipage}{0.45\textwidth}
 \begin{spec}
-_⁺_ : Γ ⊨ Δ → (A : Ty) → Γ ▷ A ⊨ Δ
+_⁺_ : Γ ⊩ Δ → (A : Ty) → Γ ▷ A ⊩ Δ
 \end{spec}
 \end{minipage}
 
 %if False
 \begin{code}
-_⁺_ : Γ ⊨ Δ → (A : Ty) → Γ ▷ A ⊨ Δ
+_⁺_ : Γ ⊩ Δ → (A : Ty) → Γ ▷ A ⊩ Δ
 ts ^ A = ts ⁺ A , ` zero 
 \end{code}
 %endif
@@ -154,7 +154,7 @@ suc-tm : Γ ⊢ B → (A : Ty) → Γ ▷ A ⊢ B
 \end{spec}
 \end{minipage}\\
 But how can we define |suc-tm| when we only have weakening for variables? If we
-already had identity |id : Γ ⊨ Γ| and substitution we could write:
+already had identity |id : Γ ⊩ Γ| and substitution we could write:
 |suc-tm t A = t [ id ⁺ A ] |, 
 but this is certainly not structurally recursive (and hence is rejected
 by Agda's termination checker).
@@ -167,35 +167,35 @@ have to repeat the substitution definition for renamings.
 
 \centering
 \begin{code}
-data _⊨v_ : Con → Con → Set where
-  ε   : Γ ⊨v •
-  _,_ : Γ ⊨v Δ → Γ ∋ A → Γ ⊨v Δ ▷ A
+data _⊩v_ : Con → Con → Set where
+  ε   : Γ ⊩v •
+  _,_ : Γ ⊩v Δ → Γ ∋ A → Γ ⊩v Δ ▷ A
 \end{code}
 \noindent
 \justifying
 \begin{minipage}{0.45\textwidth}
 \begin{code}
-_v[_]v : Γ ∋ A → Δ ⊨v Γ → Δ ∋ A
+_v[_]v : Γ ∋ A → Δ ⊩v Γ → Δ ∋ A
 zero       v[ is , i ]v  = i
 (suc i _)  v[ is , j ]v  = i v[ is ]v
 
-_⁺v_ : Γ ⊨v Δ → ∀ A → Γ ▷ A ⊨v Δ
+_⁺v_ : Γ ⊩v Δ → ∀ A → Γ ▷ A ⊩v Δ
 ε         ⁺v A           = ε
 (is , i)  ⁺v A           = is ⁺v A , suc i A
 
-_^v_ : Γ ⊨v Δ → ∀ A → Γ ▷ A ⊨v Δ ▷ A
+_^v_ : Γ ⊩v Δ → ∀ A → Γ ▷ A ⊩v Δ ▷ A
 is ^v A                  = is ⁺v A , zero 
 \end{code}
 \end{minipage}
 \hfill
 \begin{minipage}{0.45\textwidth}
 \begin{code}
-_[_]v : Γ ⊢ A → Δ ⊨v Γ → Δ ⊢ A
+_[_]v : Γ ⊢ A → Δ ⊩v Γ → Δ ⊢ A
 (` i)   [ is ]v  =  ` (i v[ is ]v)
 (t · u) [ is ]v  =  (t [ is ]v) · (u [ is ]v)
 (ƛ t)   [ is ]v  =  ƛ (t [ is ^v _ ]v)
 
-idv : Γ ⊨v Γ
+idv : Γ ⊩v Γ
 idv {Γ = •}      = ε
 idv {Γ = Γ ▷ A}  = idv ^v A
 

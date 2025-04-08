@@ -165,14 +165,14 @@ The first author was writing an introduction to
 category theory for functional programmers. 
 One example
 category is that of simply-typed $\lambda$-terms and
-substitutions; and proving the
+recursive substitutions; and proving the
 expected category laws
 seemed a suitable exercise.
 However, the
 answer was more difficult than expected, so
-we attempted to formalise the
-solution in Agda. The main setback was that the same
-proofs were repeated many times. One guideline of
+we attempted to mechanise the
+solution in Agda, and hit a new setback: multiple proofs had to be
+repeated multiple times. One guideline of
 good software engineering is to \textbf{not write code
 by copy and paste}, and this applies doubly to
 formal proofs.
@@ -188,22 +188,22 @@ i.e., interpreting dependent types in higher categories.
 \label{sec:nutshell}
 
 When working with substitution for a calculus with binders, we find
-that you have to differentiate between renamings (|Δ ⊨v Γ|) where 
+that you have to differentiate between renamings (|Δ ⊩v Γ|) where 
 variables are substituted only for variables (|Γ ∋ A|) and proper substitutions 
-(|Δ ⊨ Γ|) where variables are replaced with terms (|Γ ⊢ A|). This results in 
+(|Δ ⊩ Γ|) where variables are replaced with terms (|Γ ⊢ A|). This results in 
 having to define several similar operations
 
 \noindent
 \begin{minipage}{0.5\textwidth}
 \begin{spec}
-  _v[_]v  : Γ ∋ A  → Δ ⊨v Γ  → Δ ∋ A
-  _v[_]   : Γ ∋ A  → Δ ⊨ Γ   → Δ ⊢ A
+  _v[_]v  : Γ ∋ A  → Δ ⊩v Γ  → Δ ∋ A
+  _v[_]   : Γ ∋ A  → Δ ⊩ Γ   → Δ ⊢ A
 \end{spec}
 \end{minipage}
 \begin{minipage}{0.45\textwidth}
 \begin{spec}
-  _[_]v   : Γ ⊢ A  → Δ ⊨v Γ  → Δ ⊢ A
-  _[_]    : Γ ⊢ A  → Δ ⊨ Γ   → Δ ⊢ A
+  _[_]v   : Γ ⊢ A  → Δ ⊩v Γ  → Δ ⊢ A
+  _[_]    : Γ ⊢ A  → Δ ⊩ Γ   → Δ ⊢ A
 \end{spec}
 \end{minipage}
 
@@ -216,7 +216,7 @@ the repetition extending also to the intermediary lemmas).
 Our solution is to introduce a type of sorts with |V : Sort| for
 variables/renamings and |T : Sort| for terms/substitutions, leading
 to a single substitution operation 
-|_[_] : Γ ⊢[ q ] A → Δ ⊨[ r ] Γ → Δ ⊢[ q ⊔ r ] A|
+|_[_] : Γ ⊢[ q ] A → Δ ⊩[ r ] Γ → Δ ⊢[ q ⊔ r ] A|
 where |q, r : Sort| and |q ⊔ r| is the least upper bound in the
 lattice of sorts (|V ⊑ T|). With this, we only need to prove one variant of the
 functor law, relying on the fact that |_⊔_| is associative.
@@ -251,11 +251,12 @@ substitutions are the \emph{substitution normal forms}.
 \subsection{Related work}
 \label{sec:related-work}
 
-\cite{de_bruijn_lambda_1972} introduces his eponymous indices and
-also the notion of simultaneous substitution. We are here using a
+De Bruijn introduced his eponymous indices and
+also the notion of simultaneous substitution in \cite{de_bruijn_lambda_1972}. 
+We are here using a
 typed version of de Bruijn indices, e.g. see \cite{alti:csl99} where
 the problem of showing termination of a simple definition of
-substitution (for the untyped $\lambda$-calculus) is addressed using a
+substitution (for the untyped $\lambda$-calculus) was addressed using a
 well-founded recursion. The present approach seems to be
 simpler and scales better, avoiding well-founded recursion.
 Andreas Abel used a very similar technique
@@ -374,7 +375,7 @@ induction, making our approach at least somewhat
 transferable\footnote{Indeed, Lean can be convinced that our substitution 
 operations
 terminate after specifying measures similar to those in section 
-\ref{sec:termination}, via the |decreasing_by| tactic.}.
+\ref{sec:termination}, via the |termination_by| tactic.}.
 
 % For example, Lean features a pair of tactics |termination_by| and 
 % |decreasing_by| for specifying per-function termination measures and

@@ -1,6 +1,6 @@
 %if full
 \begin{code}
-{-# OPTIONS --rewriting #-}
+{-# OPTIONS --rewriting --local-confluence-check #-}
 module subst where
 
 open import Relation.Binary.PropositionalEquality hiding ([_])
@@ -14,7 +14,7 @@ variable
   Γ Δ Θ : Con  
 
 infix   3  _⊢[_]_
-infix   3  _⊨[_]_
+infix   3  _⊩[_]_
 infixl  4  _,_
 infix   5  _∘_
 infix   5  ƛ_
@@ -99,11 +99,11 @@ smaller than |T|.
 We can now define terms and variables in one go (|x, y, z|):
 \begin{code}
 data _⊢[_]_ : Con → Sort → Ty → Set where
-  zero : Γ ▷ A ⊢[ V ] A
-  suc  : Γ  ⊢[ V ]  A → (B : Ty) → Γ ▷ B  ⊢[ V ]  A
-  `_   : Γ  ⊢[ V ]  A → Γ  ⊢[ T ]  A
-  _·_  : Γ ⊢[ T ] A ⇒ B → Γ ⊢[ T ] A → Γ ⊢[ T ] B
-  ƛ_   : Γ ▷ A ⊢[ T ] B → Γ ⊢[ T ] A ⇒ B
+  zero  : Γ ▷ A ⊢[ V ] A
+  suc   : Γ  ⊢[ V ]  A → (B : Ty) → Γ ▷ B  ⊢[ V ]  A
+  `_    : Γ  ⊢[ V ]  A → Γ  ⊢[ T ]  A
+  _·_   : Γ ⊢[ T ] A ⇒ B → Γ ⊢[ T ] A → Γ ⊢[ T ] B
+  ƛ_    : Γ ▷ A ⊢[ T ] B → Γ ⊢[ T ] A ⇒ B
 \end{code}
 
 While almost identical to the previous definition (|Γ ⊢[ V ] A| corresponds to
@@ -112,9 +112,9 @@ we can now
 parametrize all definitions and theorems explicitly. As a first step,
 we can generalize renamings and substitutions (|xs, ys, zs|):
 \begin{code}
-data _⊨[_]_ : Con → Sort → Con → Set where
-  ε    : Γ ⊨[ q ] •
-  _,_  : Γ ⊨[ q ] Δ → Γ ⊢[ q ] A → Γ ⊨[ q ] Δ ▷ A  
+data _⊩[_]_ : Con → Sort → Con → Set where
+  ε    : Γ ⊩[ q ] •
+  _,_  : Γ ⊩[ q ] Δ → Γ ⊢[ q ] A → Γ ⊩[ q ] Δ ▷ A  
 \end{code}
 %if False
 \begin{code}
@@ -122,7 +122,7 @@ variable
   i j k    : Γ ⊢[ V ] A
   t u v    : Γ ⊢[ T ] A
   x y z : Γ ⊢[ q ] A
-  xs ys zs : Γ ⊨[ q ] Δ  
+  xs ys zs : Γ ⊩[ q ] Δ  
 \end{code}
 %endif
 
@@ -153,13 +153,14 @@ This is just boolean algebra. We need a number of laws:
 ⊑t : s ⊑ T
 v⊑ : V ⊑ s
 ⊑q⊔ : q ⊑ (q ⊔ r)
+⊑⊔r : r ⊑ (q ⊔ r)
 \end{code}
 \end{minipage}
 \begin{minipage}{0.45\textwidth}
 \begin{code}
-⊑⊔r : r ⊑ (q ⊔ r)
 ⊔⊔ : q ⊔ (r ⊔ s) ≡ (q ⊔ r) ⊔ s
 ⊔v : q ⊔ V ≡ q
+⊔t : q ⊔ T ≡ T
 \end{code}
 \end{minipage}\\
 which are easy to prove by case analysis, e.g. |⊑t {V} = v⊑t| and 
@@ -183,22 +184,29 @@ v⊑ {T} = v⊑t
 
 ⊔v {V} = refl
 ⊔v {T} = refl
+
+⊔t {V} = refl
+⊔t {T} = refl
 \end{code}
 %endif
 To improve readability we turn the equations ($\sqcup\sqcup$, 
-$\sqcup\mathrm{v}$) into rewrite rules.
+$\sqcup\mathrm{v}$, $\sqcup\mathrm{t}$) into rewrite rules.
 % \begin{spec}
 % {-# \Keyword{REWRITE} $\sqcup\!\sqcup \; \sqcup\mathrm{v} \;$ #-}
 % \end{spec}
 %if False
 \begin{code}
-{-# REWRITE ⊔⊔ ⊔v #-} 
+{-# REWRITE ⊔⊔ ⊔v ⊔t #-} 
 \end{code}
 %endif
 This introduces new definitional equalities, i.e.
-|q ⊔ (r ⊔ s) = (q ⊔ r) ⊔ s| and |q ⊔ V = q| are now used by the type
+|q ⊔ (r ⊔ s) = (q ⊔ r) ⊔ s| is now used by the type
 checker\footnote{Effectively, this feature allows a selective use of 
-extensional Type Theory.}.
+extensional Type Theory. We enable Agda's confluence checking with
+|--local-confluence-check| as a sanity-check that our rewrites
+are reasonable (Agda can also check confluence globally, but this requires
+manually resolving critical pairs with extra rewrite rules, which
+becomes somewhat tedious).}.
 
 The order on sorts gives rise to a functor, witnessed by
 |tm⊑ : q ⊑ s → Γ ⊢[ q ] A → Γ ⊢[ s ] A|, where |tm⊑ rfl x  = x| and
@@ -213,18 +221,18 @@ tm⊑ v⊑t  i = ` i
 %endif
 
 By making functoriality of context extension parameteric, 
-|_^_ : Γ ⊨[ q ] Δ → ∀ A → Γ ▷ A ⊨[ q ] Δ ▷ A|, we are ready to define 
+|_^_ : Γ ⊩[ q ] Δ → ∀ A → Γ ▷ A ⊩[ q ] Δ ▷ A|, we are ready to define 
 substitution and renaming in one operation:
 %if False
 \begin{code}
-_^_ : Γ ⊨[ q ] Δ → ∀ A → Γ ▷ A ⊨[ q ] Δ ▷ A
+_^_ : Γ ⊩[ q ] Δ → ∀ A → Γ ▷ A ⊩[ q ] Δ ▷ A
 \end{code}
 %endif
 
 \noindent
 \begin{minipage}{0.62\textwidth}
 \begin{code}
-_[_] : Γ ⊢[ q ] A → Δ ⊨[ r ] Γ → Δ ⊢[ q ⊔ r ] A
+_[_] : Γ ⊢[ q ] A → Δ ⊩[ r ] Γ → Δ ⊢[ q ⊔ r ] A
 zero       [ xs , x ]  = x
 (suc i _)  [ xs , x ]  = i [ xs ]
 \end{code}
@@ -247,7 +255,7 @@ We can also implement |id| using |_^_| (by folding contexts), but to define
 
 \begin{minipage}{0.45\textwidth}
 \begin{spec}
-id : Γ ⊨[ V ] Γ
+id : Γ ⊩[ V ] Γ
 id {Γ = •}      =  ε
 id {Γ = Γ ▷ A}  =  id ^ A
 \end{spec}
@@ -262,19 +270,19 @@ zero[ T ]      =  ` zero
 
 %if False
 \begin{code}
-id-poly : Γ ⊨[ q ] Γ 
+id-poly : Γ ⊩[ q ] Γ 
 id-poly {Γ = •} = ε
 id-poly {Γ = Γ ▷ A} = id-poly ^ A
 
-id : Γ ⊨[ V ] Γ 
+id : Γ ⊩[ V ] Γ 
 id = id-poly
 {-# INLINE id #-}
 
 -- Alternative:
 
--- id′ : Sort → Γ ⊨[ V ] Γ
+-- id′ : Sort → Γ ⊩[ V ] Γ
 
--- id : Γ ⊨[ V ] Γ
+-- id : Γ ⊩[ V ] Γ
 -- id = id′ V
 -- {-# INLINE id #-}
 
@@ -290,7 +298,7 @@ fold over substitutions:
 
 %if false
 \begin{code}
-_⁺_ : Γ ⊨[ q ] Δ → (A : Ty) → Γ ▷ A ⊨[ q ] Δ
+_⁺_ : Γ ⊩[ q ] Δ → (A : Ty) → Γ ▷ A ⊩[ q ] Δ
 \end{code}
 %endif
 
@@ -305,8 +313,8 @@ suc[ T ] t  A  = t [ id ⁺  A ]
 \end{minipage}
 \begin{minipage}{0.45\textwidth}
 \begin{spec}
-_⁺_  :  Γ ⊨[ q ] Δ → ∀ A 
-     →  Γ ▷ A ⊨[ q ] Δ
+_⁺_  :  Γ ⊩[ q ] Δ → ∀ A 
+     →  Γ ▷ A ⊩[ q ] Δ
 ε         ⁺ A = ε
 (xs , x)  ⁺ A = xs ⁺ A , suc[ _ ] x A 
 \end{spec}
@@ -328,11 +336,12 @@ xs ^ A                 =  xs ⁺ A , zero[ _ ]
 \label{sec:termination}
 
 Unfortunately (as of Agda 2.7.0.1\footnote{
-We have submitted a PR 
-(\href{https://github.com/agda/agda/pull/7695}{\#7695}) to Agda that 
-extends the termination checking algorithm such that these definitions
-are accepted directly, so this might change in future versions.
-}), we now hit a termination error.
+It is possible to extend Agda's termination checker such that the these
+definitions are accepted directly, and indeed we have a fork of Agda 
+(\href{https://github.com/agda/agda/pull/7695}{\#7695}) which implements such
+an extension, though it is unlikely to upstreamed anytime soon due to
+concerns over performance and elegance.}), 
+we now hit a termination error.
 
 %if False
 \begin{spec}
@@ -345,7 +354,7 @@ The cause turns out to be |id|. Termination here hinges on weakening for terms
 (|suc[ T ] t A|) building
 and applying a renaming (i.e. a sequence of variables, for which weakening is
 trivial) rather than a full substutution. Note that if |id| produced
-`|Γ ⊨[ T ] Γ|'s, or if we implemented 
+`|Γ ⊩[ T ] Γ|'s, or if we implemented 
 weakening for variables (|suc[ V ] i A|) with |i [ id ⁺ A ]|, our operations
 would still be
 type-correct, but would genuinely loop, so perhaps Agda is right to be
@@ -434,14 +443,14 @@ as if the original |id| definition worked (recovering |V|-only |id| from the
 % 
 % \begin{minipage}{0.45\textwidth}
 % \begin{spec}
-% id′ : Bool → Γ ⊨[ V ] Γ
+% id′ : Bool → Γ ⊩[ V ] Γ
 % id′ {Γ = •}      d = ε
 % id′ {Γ = Γ ▷ A}  d = id′ d ^ A
 % \end{spec}
 % \end{minipage}
 % \begin{minipage}{0.45\textwidth}
 % \begin{spec}
-% id : Γ ⊨[ V ] Γ 
+% id : Γ ⊩[ V ] Γ 
 % id = id′ true
 % {-#  \Keyword{INLINE} $\Varid{id}$ #-} 
 % \end{spec}
@@ -495,15 +504,15 @@ as if the original |id| definition worked (recovering |V|-only |id| from the
 % (|< t > = id , t|), 
 % but we can easily recover this with a monomorphic |id| by extending |tm⊑| to 
 % lists of terms (see \ref{sec::cwf-recurs-subst}). For the rest of the paper, 
-% we will use |id : Γ ⊨[ V ] Γ| without assumptions about how it is 
+% we will use |id : Γ ⊩[ V ] Γ| without assumptions about how it is 
 % implemented.}
 
-Finally, we define composition, |_∘_ : Γ ⊨[ q ] Θ → Δ ⊨[ r ] Γ → Δ ⊨[ q ⊔ r ] Θ|
+Finally, we define composition, |_∘_ : Γ ⊩[ q ] Θ → Δ ⊩[ r ] Γ → Δ ⊩[ q ⊔ r ] Θ|
 by folding substitution.
 
 %if False
 \begin{code}
-_∘_ : Γ ⊨[ q ] Θ → Δ ⊨[ r ] Γ → Δ ⊨[ q ⊔ r ] Θ
+_∘_ : Γ ⊩[ q ] Θ → Δ ⊩[ r ] Γ → Δ ⊩[ q ⊔ r ] Θ
 ε ∘ ys         = ε
 (xs , x) ∘ ys  = (xs ∘ ys) , x [ ys ]
 \end{code}

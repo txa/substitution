@@ -1,6 +1,6 @@
 %if False
 \begin{code}
-{-# OPTIONS --rewriting #-}
+{-# OPTIONS --rewriting --local-confluence-check #-}
 module laws where
 
 open import Relation.Binary.PropositionalEquality hiding ([_])
@@ -39,7 +39,7 @@ variable, which can be shown by simple induction over said variable:
 \footnote{We are using the naming conventions introduced in sections
   \ref{sec:naive-approach} and \ref{sec:fact-with-sorts}, e.g.
   |i : Γ ∋ A|.}
-% ⁺-nat[]v : {i : Γ  ⊢[ V ] B}{xs : Δ ⊨[ q ] Γ}
+% ⁺-nat[]v : {i : Γ  ⊢[ V ] B}{xs : Δ ⊩[ q ] Γ}
 %   → i [ xs ⁺ A ] ≡ suc[ q ] (i [ xs ]) A
 \begin{code}
 ⁺-nat[]v : i [ xs ⁺ A ] ≡ suc[ q ] (i [ xs ]) A
@@ -239,7 +239,7 @@ second functor law for context extension:
 |^∘ : (xs ∘ ys) ^ A ≡ (xs ^ A) ∘ (ys ^ A)|.
 %if False
 \begin{code}
-^∘ :  {xs : Γ ⊨[ r ] Θ}{ys : Δ ⊨[ s ] Γ}{A : Ty}
+^∘ :  {xs : Γ ⊩[ r ] Θ}{ys : Δ ⊩[ s ] Γ}{A : Ty}
       → (xs ∘ ys) ^ A ≡ (xs ^ A) ∘ (ys ^ A)
 \end{code}
 %endif
@@ -249,7 +249,7 @@ To verify the variable case we also need that |tm⊑| commutes with substitution
 which is easy to prove by case analysis.
 %if False
 \begin{code}
-tm[] : {x : Θ ⊢[ q ] A}{xs : Γ ⊨[ r ] Θ}
+tm[] : {x : Θ ⊢[ q ] A}{xs : Γ ⊩[ r ] Θ}
      → tm⊑ ⊑t (x [ xs ]) ≡ (tm⊑ ⊑t x) [ xs ]
 tm[] {q = V} = refl
 tm[] {q = T} = refl
@@ -309,7 +309,7 @@ which unsurprisingly must be shown by establishing a corresponding
 property for substitutions: |⁺-nat[] : x [ xs ⁺ A ] ≡ suc[ _ ] (x [ xs ]) A|.
 %if False
 \begin{code}
-⁺-nat[] : ∀ {x : Γ ⊢[ q ] B} {xs : Δ ⊨[ r ] Γ} 
+⁺-nat[] : ∀ {x : Γ ⊢[ q ] B} {xs : Δ ⊩[ r ] Γ} 
         → x [ xs ⁺ A ] ≡ suc[ _ ] (x [ xs ]) A
 \end{code}
 %endif
