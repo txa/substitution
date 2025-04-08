@@ -1,0 +1,122 @@
+Thank you for your thoughtful reviews. Questions are answered in the
+order raised.
+
+Reviewer 1:
+
+    Is there a reason why you're not proving & adding to the
+    rewrite machinery all the laws of the form variable vs.
+    constant?
+
+We don't need them, but we agree that it is a good idea to add them
+and to add --local-confluence-check. We will update the paper.
+
+   ## Parametric suc
+   ah, I see this is mentioned in l514! It may be worth
+   adding a forward pointer to it in the relevant section.
+
+We will add a forward reference.
+
+   ## CwF.id
+
+Monomorphic id makes the proofs easier. We would need the lifting
+lemmas anyway because e.g. id∘'s RHS would contain a lift we would
+need to move around. We will explain this better.
+
+  ## Preorder
+
+  It's overkill but you could define __ as the order
+  induced by the definition of divisibility built from
+
+This is a good idea, we will mention this alternative.
+
+Thank you for pointing to the mistake with De Bruijn - we will fix all typos.
+
+  You're now proving 6 lemmas about the interactions of V-to-T weakening
+  and composition, substitution, weakening. Does this negate the claim
+  that your setup leads to a lack of repetition if you've now created
+  new kinds of coherence lemmas to prove?
+
+Good point. We add some boilerplate which leads to a number of trivial
+theorems which is different from having to repeat a more sophisticated
+theorem. However, it would certainly be good if we could reduce or
+automatize the boilerplate.
+
+----------------------------------------------------------------------
+reviewer 2
+
+   It took me some time to understand/decode the syntax in the paper. It
+   does not help that in section 1.1, the reader is immediately exposed
+   to syntax with no explanation whatsoever! I had to move on to section
+   2 and gradually unpick key definitions one-by-one
+
+Apologies. We will rewrite to make the paper more readable for an Agda
+novice.
+
+  I'm not keen on the fact that many of the problems encountered (and
+  solved) are Agda specific.
+
+We don't think that this is the case. We briefly discuss the situation
+for other proof systems in the conclusions. We will expand the discussion,
+and mention relevant points in the introduction.
+
+  The problem in the paper, solved by V<T, just does not arise in a
+  proof sketched out mathematically on paper, so-to-speak .
+
+The problem shows up in the paper proof if you are concerned that your
+proof is well-founded. The alternative is to explicitly introduce a
+well-founded ordering which was done in [6] but this seems like an
+overkill once you realize that a structural order does the job.
+
+----------------------------------------------------------------------
+reviewer 3
+
+   The paper begins with a scenario describing the natural, but
+   wrong way to deal with substitution.  They use notation is
+   is not explained.
+
+Apologies. We will rewrite to make the paper more readable for an Agda
+novice.
+
+  After developing definitions of contexts, (lambda) terms,
+  variables, and substitutions, the authors detail proofs that
+  substitution satisfies the laws of a functor. They seem to assume
+  the other properties of a category are obvious.
+
+We do explicitly prove all the laws of the category. Functoriality
+of substitution is only a lemma.
+
+   The key idea seems to be to treat variables as a subsort of terms.
+   Which seems to be the default in a first-order logic setting.
+
+This doesn't resolve the issue to show that your definitions are
+well-founded. In our setting there is an injection from variables to
+terms. Replacing the injection by an embedding is a notational change
+but doesn't change the proof.
+
+----------------------------------------------------------------------
+reviewer 4
+
+   so while the Agda-fluent readers do form an important part of the FSCD
+   community, I urge the authors to include more explanations and
+   intuitions for the wider audience.
+
+Apologies. We will rewrite to make the paper more readable for an Agda
+novice.
+
+   I would have been very excited to see you taking advantage of the
+   initiality result,
+
+The real payoff is when using dependent types where using explicit
+substitution laws ends up in transport hell. We will add this to the
+discussion.
+
+   I suggest citing and discussing the early Fiore-Plotkin-Turi paper
+   "Abstract Syntax and Variable Binding" (LICS 1999).
+
+Thank you - we will add the reference and discuss the relation.
+
+   I would suggest avoiding the symbol |= for context substitution, as
+   this is usually associated with semantic satisfaction. You could
+   consider using ||- instead?
+
+Good point - we will adopt the proposal.
