@@ -1,6 +1,6 @@
 %if False
 \begin{code}
-{-# OPTIONS --rewriting --local-confluence-check #-}
+{-# OPTIONS --rewriting #-}
 module laws where
 
 open import Relation.Binary.PropositionalEquality hiding ([_])
@@ -31,7 +31,7 @@ The main lemma is the identity law for the substitution functor
 |[id] : x [ id ] ≡ x|.
 %if False
 \begin{code}
-[id] : x [ id ] ≡ x
+[id] : x [ id {q} ] ≡ tm⊑ (⊑q⊔ {r} {q}) x
 \end{code}
 %endif
 To prove the successor case, we need naturality of |suc[ q ]| applied to a 
@@ -50,18 +50,37 @@ The identity law is now easily provable by structural induction:
 
 \begin{minipage}{0.45\textwidth}
 \begin{code}
-[id] {x = zero}     = refl
+zero⊑ : zero[_] {Γ = Γ} {A = A} q ≡ tm⊑ v⊑ zero
+zero⊑ {q = V} = refl
+zero⊑ {q = T} = refl
+
+suc⊑ : suc[ q ] (tm⊑ v⊑ i) A ≡ tm⊑ v⊑ (suc i A)
+suc⊑ {q = V} = refl
+suc⊑ {q = T} {i = i} = cong `_ (
+  i [ id ⁺ _ ]    ≡⟨ ⁺-nat[]v {i = i} ⟩
+  suc (i [ id ]) _ ≡⟨ cong (λ x → suc x _) ([id] {q = V}) ⟩
+  suc i _          ∎)
+
+v⊑q⊑t : tm⊑ {q = q} ⊑t (tm⊑ v⊑ i) ≡ ` i
+v⊑q⊑t {q = V} = refl
+v⊑q⊑t {q = T} = refl
+
+[id] {x = zero}     = zero⊑
 [id] {x = suc i A}  = 
    i [ id ⁺ A ]  ≡⟨ ⁺-nat[]v {i = i} ⟩
-   suc (i [ id ]) A
-   ≡⟨ cong (λ j → suc j A) ([id] {x = i}) ⟩      
-   suc i A       ∎
+   suc[ _ ] (i [ id ]) A
+   ≡⟨ cong (λ j → suc[ _ ] j A) ([id] {x = i}) ⟩
+   suc[ _ ] (tm⊑ v⊑ i) A
+   ≡⟨ suc⊑ ⟩      
+   tm⊑ v⊑ (suc i A)       ∎
 \end{code}
 \end{minipage}
 \begin{minipage}{0.45\textwidth}
 \begin{code}
-[id] {x = ` i}    =
-   cong `_ ([id] {x = i})
+[id] {x = ` i} {q = q}    =
+   tm⊑ ⊑t (i [ id ])         ≡⟨ cong (tm⊑ ⊑t) ([id] {x = i}) ⟩
+   tm⊑ {q = q} ⊑t (tm⊑ v⊑ i) ≡⟨ v⊑q⊑t {q = q} ⟩
+   ` i ∎
 [id] {x = t · u}  =
    cong₂ _·_ ([id] {x = t}) ([id] {x = u})
 [id] {x = ƛ t}    =
@@ -90,7 +109,20 @@ The category law |∘id : xs ∘ id ≡ xs| is now simply a fold of the functor 
 
 %if False
 \begin{code}
-∘id : xs ∘ id ≡ xs
+tm*⊑ : q ⊑ s → Γ ⊩[ q ] Δ → Γ ⊩[ s ] Δ
+tm*⊑ q⊑s ε = ε
+tm*⊑ q⊑s (σ , x) = tm*⊑ q⊑s σ , tm⊑ q⊑s x
+
+tmq⊑q : ∀ {q⊑q : q ⊑ q} → tm⊑ q⊑q x ≡ x
+tmq⊑q {q⊑q = rfl} = refl
+
+tm*q⊑q : ∀ {q⊑q : q ⊑ q} → tm*⊑ q⊑q xs ≡ xs
+tm*q⊑q {xs = ε}      = refl
+tm*q⊑q {xs = xs , x} = cong₂ _,_ tm*q⊑q tmq⊑q 
+
+{-# REWRITE tmq⊑q tm*q⊑q #-}
+
+∘id : xs ∘ id {q} ≡ tm*⊑ (⊑q⊔ {r} {q}) xs
 ∘id {xs = ε}       = refl
 ∘id {xs = xs , x}  = cong₂ _,_ (∘id {xs = xs}) ([id] {x = x})
 \end{code}
@@ -107,6 +139,11 @@ Let's state the functor law but postpone the proof until the next section:
 |[∘] : x [ xs ∘ ys ] ≡ x [ xs ] [ ys ]|. 
 %if False
 \begin{code}
+q⊔q : q ⊔ q ≡ q
+q⊔q {q = V} = refl
+q⊔q {q = T} = refl
+{-# REWRITE q⊔q #-} -- Breaks confluence!!
+
 [∘] : x [ xs ∘ ys ] ≡ x [ xs ] [ ys ]
 \end{code}
 %endif
@@ -121,7 +158,7 @@ Alternatively we would have to insert a transport using |subst|.}
 Of course, we must also state the left-identity law |id∘ : id ∘ xs ≡ xs|. 
 %if False
 \begin{code}
-id∘ : id ∘ xs ≡ xs
+id∘ : id {q} ∘ xs ≡ tm*⊑ (⊑⊔r {r} {q}) xs
 \end{code}
 %endif
 Similarly to |id|, Agda will not accept a direct implementation of |id∘| as 
@@ -153,14 +190,6 @@ can be found at Agda issue
    the context also gets structurally smaller in the call to |_⁺_| from |id|.
 \end{itemize}
 }
-
-%if False
-\begin{code}
-id∘′ : Sort → id ∘ xs ≡ xs
-id∘ = id∘′ V
-{-# INLINE id∘ #-}
-\end{code}
-%endif
 
 To prove |id∘′|, we need the $\beta$-law for |_⁺_|,
 |xs ⁺ A  ∘ (ys , x) ≡ xs ∘ ys|, which can be shown with a fold over a
@@ -210,12 +239,16 @@ id∘′ {xs = xs , x}  _ = cong₂ _,_
 ⁺∘ {xs = xs , x}  = 
    cong₂ _,_ (⁺∘ {xs = xs}) (suc[] {x = x})
 
-id∘′ {xs = ε}       _ = refl
-id∘′ {xs = xs , x}  _ = cong₂ _,_
-   (id ⁺ _ ∘ (xs , x)  ≡⟨ ⁺∘ {xs = id} ⟩
-   id ∘ xs             ≡⟨ id∘ ⟩
-   xs                  ∎)
-   refl
+zero[]  : zero[ q ] [ xs , x ] ≡ tm⊑ (⊑⊔r {q = q}) x 
+zero[] {q = V} = refl
+zero[] {q = T} = refl
+
+id∘         {xs = ε}       = refl
+id∘ {q = q} {xs = xs , x}  = cong₂ _,_
+   (id ⁺ _ ∘ (xs , x)     ≡⟨ ⁺∘ {xs = id} ⟩
+   id ∘ xs                ≡⟨ id∘ ⟩
+   tm*⊑ (⊑⊔r {q = q}) xs  ∎)
+   (zero[] {q = q})
 \end{code}
 %endif
 
@@ -323,10 +356,10 @@ already proven (|⁺-nat[]v|).
 The case for |q = T| is more interesting and relies again on |[∘]| and
 |∘id|:
 \begin{code}
-⁺-nat[] {q = T} {A = A} {x = x} {xs = xs} = 
-   x [ xs ⁺ A ]         ≡⟨ cong (λ zs → x [ zs ⁺ A ]) (sym ∘id) ⟩
-   x [ (xs ∘ id) ⁺ A ]  ≡⟨ cong (λ zs → x [ zs ]) (sym (⁺-nat∘ {xs = xs})) ⟩
-   x [ xs ∘ (id ⁺ A) ]  ≡⟨ [∘] {x = x} ⟩
+⁺-nat[] {q = T} {r = r} {A = A} {x = x} {xs = xs} = 
+   x [ xs ⁺ A ]          ≡⟨ cong (λ zs → x [ zs ⁺ A ]) (sym (∘id {xs = xs} {q = V})) ⟩
+   x [ (xs ∘ id) ⁺ A ]   ≡⟨ cong (λ zs → x [ zs ]) (sym (⁺-nat∘ {xs = xs})) ⟩
+   x [ xs ∘ (id ⁺ A) ]   ≡⟨ [∘] {x = x} ⟩
    x [ xs ] [ id ⁺ A ]  ∎
 \end{code}
 
@@ -347,14 +380,6 @@ It also turns out we need
 |zero[_]|, which holds
 definitionally in the case for either |Sort|.
 
-%if False
-\begin{code}
-zero[]  : zero[ q ] [ xs , x ] ≡ tm⊑ (⊑⊔r {q = q}) x 
-zero[] {q = V} = refl
-zero[] {q = T} = refl
-\end{code}
-%endif 
-
 \noindent
 Finally, we have all the ingredients to prove the second functor law |^∘|:
 \footnote{Actually, we also need that zero commutes with |tm⊑|: that is for any
@@ -368,6 +393,6 @@ Finally, we have all the ingredients to prove the second functor law |^∘|:
     xs ∘ (ys ⁺ A) , tm⊑ (⊑⊔r {q = r}) zero[ s ]  
       ≡⟨ cong₂ _,_ (sym (⁺∘ {xs = xs})) (sym (zero[] {q = r}{x = zero[ s ]}))  ⟩    
     (xs ⁺ A) ∘  (ys ^ A) , zero[ r ] [ ys ^ A ]  ≡⟨⟩  
-    (xs ^ A) ∘ (ys ^ A)                          ∎
+    (xs ^ A) ∘ (ys ^ A)                          ∎                
 \end{code}
- 
+      

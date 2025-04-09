@@ -303,10 +303,6 @@ Therefore, we instead fix the sort to |T|.
 π₁ : Δ ⊩[ q ] (Γ ▷ A) → Δ ⊢[ q ] A
 π₁ (δ , M) = M
 
-tm*⊑ : q ⊑ s → Γ ⊩[ q ] Δ → Γ ⊩[ s ] Δ
-tm*⊑ q⊑s ε = ε
-tm*⊑ q⊑s (σ , x) = tm*⊑ q⊑s σ , tm⊑ q⊑s x
-
 interleaved mutual
   ⊑∘ : tm*⊑ v⊑t xs ∘ ys ≡ xs ∘ ys
   ∘⊑ : ∀ {xs : Δ ⊩[ T ] Γ} {ys : Θ ⊩[ V ] Δ} → xs ∘ tm*⊑ v⊑t ys ≡ xs ∘ ys
@@ -367,17 +363,19 @@ using one new law, relating our two
 ways of weakening variables.
 
 \begin{code}
-  suc[id⁺] : i [ id ⁺ A ] ≡ suc i A
+
+  suc[id⁺] : i [ id {q} ⁺ A ] ≡ tm⊑ v⊑ (suc i A)
   suc[id⁺] {i = i} {A = A} =
-    i [ id ⁺ A ]      ≡⟨ ⁺-nat[]v {i = i} ⟩ 
-    suc (i [ id ]) A  ≡⟨ cong (λ j → suc j A) [id] ⟩
-    suc i A ∎
+    i [ id ⁺ A ]           ≡⟨ ⁺-nat[]v {i = i} ⟩ 
+    suc[ _ ] (i [ id ]) A  ≡⟨ cong (λ j → suc[ _ ] j A) ([id] {x = i}) ⟩
+    suc[ _ ] (tm⊑ v⊑ i) A  ≡⟨ suc⊑ ⟩
+    tm⊑ v⊑ (suc i A) ∎
 \end{code}
 
 %if False
 \begin{code}
   ⊑⁺ {xs = ε}      = refl
-  ⊑⁺ {xs = xs , x} = cong₂ _,_ ⊑⁺ (cong (`_) suc[id⁺])
+  ⊑⁺ {xs = xs , x} = cong₂ _,_ (⊑⁺ {xs = xs}) (cong (`_) suc[id⁺])
   
   ⊑∘ {xs = ε} = refl
   ⊑∘ {xs = xs , x} = cong₂ _,_ ⊑∘ refl
@@ -388,13 +386,13 @@ ways of weakening variables.
   v[⊑] {i = zero}    {ys = ys , y} = refl
   v[⊑] {i = suc i _} {ys = ys , y} = v[⊑] {i = i}
 
-  ⊑^ = cong₂ _,_ ⊑⁺ refl
+  ⊑^ {xs = xs} = cong₂ _,_ (⊑⁺ {xs = xs}) refl
 
   t[⊑] {t = ` i}           = v[⊑] {i = i}
   t[⊑] {t = t · u}         = cong₂ _·_ (t[⊑] {t = t}) (t[⊑] {t = u})
   t[⊑] {t = ƛ t} {ys = ys} =
     ƛ t [ tm*⊑ ⊑t ys ^ _ ]
-    ≡⟨ cong (λ ρ → ƛ t [ ρ ]) ⊑^ ⟩
+    ≡⟨ cong (λ ρ → ƛ t [ ρ ]) (⊑^ {xs = ys}) ⟩
     ƛ t [ tm*⊑ ⊑t (ys ^ _) ] 
     ≡⟨ cong ƛ_ (t[⊑] {t = t}) ⟩
      ƛ t [ ys ^ _ ] ∎
@@ -405,7 +403,7 @@ We can now build an identity substitution by applying this coercion to the
 identity renaming: |is-cwf .CwF.id = tm*⊑ v⊑t id|.
 %if False
 \begin{code}
-  is-cwf .CwF.id = tm*⊑ v⊑t id
+  is-cwf .CwF.id = id
 \end{code}
 %endif
 The left and right identity CwF laws take the form |tm*⊑ v⊑t id ∘ δ ≡ δ|
@@ -414,18 +412,12 @@ and |δ ∘ tm*⊑ v⊑t id ≡ δ|. This is where we can take full advantage of
 
 \begin{minipage}{0.45\textwidth}
 \begin{code}
-  is-cwf .CwF.id∘ {δ = δ} = 
-    tm*⊑ v⊑t id ∘ δ  ≡⟨ ⊑∘ ⟩   
-    id ∘ δ           ≡⟨ id∘ ⟩  
-    δ ∎
+  is-cwf .CwF.id∘ {δ = δ} = id∘
 \end{code}
 \end{minipage}
 \begin{minipage}{0.45\textwidth}
 \begin{code}
-  is-cwf .CwF.∘id {δ = δ} =
-    δ ∘ tm*⊑ v⊑t id  ≡⟨ ∘⊑ ⟩   
-    δ ∘ id           ≡⟨ ∘id ⟩  
-    δ ∎
+  is-cwf .CwF.∘id {δ = δ} = ∘id
 \end{code}
 \end{minipage}
 
@@ -434,7 +426,7 @@ Similarly to substitutions, we must fix the sort of our terms to |T|
 identity substitution to a variable |i| produces the distinct term |` i|).
 %if False
 \begin{code}
-  is-cwf .CwF.Ty           = Ty
+  is-cwf .CwF.Ty    = Ty
   is-cwf .CwF._⊢_   = _⊢[ T ]_
   is-cwf .CwF._[_]  = _[_]
 \end{code}
@@ -442,10 +434,7 @@ identity substitution to a variable |i| produces the distinct term |` i|).
 
 \begin{minipage}{0.45\textwidth}
 \begin{code}
-  is-cwf .CwF.[id] {t = t}  =                   
-    t [ tm*⊑ v⊑t id ]  ≡⟨ t[⊑] {t = t} ⟩  
-    t [ id ]           ≡⟨ [id] ⟩          
-    t                  ∎
+  is-cwf .CwF.[id] {t = t}  = [id] {x = t}
 \end{code}
 \end{minipage}
 \begin{minipage}{0.45\textwidth}
@@ -499,8 +488,7 @@ differing implementations of |_^_|.
   is-cwf .CwF.ƛ[] {A = A} {t = x} {δ = ys} =           
     ƛ x [ ys ^ A ]                ≡⟨ cong (λ ρ → ƛ x [ ρ ^ A ]) (sym ∘id) ⟩         
     ƛ x [ (ys ∘ id) ^ A ]         ≡⟨ cong (λ ρ → ƛ x [ ρ , ` zero ]) (sym ⁺-nat∘) ⟩  
-    ƛ x [ ys ∘ id ⁺ A , ` zero ]  ≡⟨ cong (λ ρ → ƛ x [ ρ , ` zero ]) (sym (∘⊑ {ys = id ⁺ _})) ⟩
-    ƛ x [ ys ∘ tm*⊑ v⊑t (id ⁺ A) , ` zero ] ∎
+    ƛ x [ ys ∘ (id ⁺ A) , ` zero ] ∎
 \end{code}
 
 We have shown our recursive substitution syntax satisfies the CwF laws, but we
@@ -949,9 +937,8 @@ details worth mentioning:
 stab : norm ⌜ x ⌝ ≡ tm⊑ ⊑t x
 stab {x = zero}     = refl
 stab {x = suc i B}  =
-  norm ⌜ i ⌝ [ tm*⊑ v⊑t (id ⁺ B) ]  ≡⟨ t[⊑] {t = norm ⌜ i ⌝} ⟩
-  norm ⌜ i ⌝ [ id ⁺ B ]             ≡⟨ cong (λ j → suc[ _ ] j B) (stab {x = i}) ⟩
-  ` i [ id ⁺ B ]                    ≡⟨ cong `_ suc[id⁺] ⟩
+  norm ⌜ i ⌝ [ id ⁺ B ]     ≡⟨ cong (λ j → j [ id ⁺ B ]) (stab {x = i}) ⟩
+  i [ id ⁺ B ]              ≡⟨ suc[id⁺] ⟩
   ` suc i B ∎
 stab {x = ` i}      = stab {x = i}
 stab {x = t · u}    = cong₂ _·_ (stab {x = t}) (stab {x = u})
@@ -1019,11 +1006,8 @@ implementing |⌜id⌝| to keep Agda's termination checker happy.
 ⌜[]⌝  : ⌜ x [ ys ] ⌝ ≡ ⌜ x ⌝ [ ⌜ ys ⌝* ]ᴵ
 ⌜^⌝   : ∀ {xs : Δ ⊩[ q ] Γ} → ⌜ xs ^ A ⌝* ≡ ⌜ xs ⌝* ^ᴵ A
 ⌜⁺⌝   : ⌜ xs ⁺ A ⌝* ≡ ⌜ xs ⌝* ∘ᴵ wkᴵ
-⌜id⌝  : ⌜ id {Γ = Γ} ⌝* ≡ idᴵ
+⌜id⌝  : ⌜ id {q = q} {Γ = Γ} ⌝* ≡ idᴵ
 ⌜suc⌝ : ⌜ suc[ q ] x B ⌝ ≡ ⌜ x ⌝ [ wkᴵ ]ᴵ
-
-⌜id⌝′ : Sort → ⌜ id {Γ = Γ} ⌝* ≡ idᴵ
-⌜id⌝ = ⌜id⌝′ V
 \end{code}
 %endif
 
@@ -1179,13 +1163,13 @@ cases to cover, so for brevity we elide the proofs of |⌜[]⌝| and |⌜suc⌝|
 \end{minipage}
 \begin{minipage}{0.45\textwidth}
 \begin{code}
-⌜id⌝′ {Γ = •}      _ = sym •-ηᴵ
-⌜id⌝′ {Γ = Γ ▷ A}  _ = 
-  ⌜ id ⁺ A ⌝* ,ᴵ zeroᴵ  ≡⟨ cong (_,ᴵ zeroᴵ) ⌜⁺⌝ ⟩
-  ⌜ id ⌝* ^ᴵ A          ≡⟨ cong (_^ᴵ A) ⌜id⌝ ⟩
-  idᴵ ^ᴵ A              ≡⟨ cong (_,ᴵ zeroᴵ) id∘ᴵ ⟩
-  wkᴵ ,ᴵ zeroᴵ          ≡⟨ ▷-ηᴵ ⟩
-  idᴵ                   ∎
+⌜id⌝ {Γ = •}      = sym •-ηᴵ
+⌜id⌝ {q = q} {Γ = Γ ▷ A}  =
+  ⌜ id ⁺ A ⌝* ,ᴵ ⌜ zero[ q ] ⌝  ≡⟨ cong₂ _,ᴵ_ ⌜⁺⌝ (⌜zero⌝ {q = q}) ⟩
+  ⌜ id ⌝* ^ᴵ A                  ≡⟨ cong (_^ᴵ A) ⌜id⌝ ⟩
+  idᴵ ^ᴵ A                      ≡⟨ cong (_,ᴵ zeroᴵ) id∘ᴵ ⟩
+  wkᴵ ,ᴵ zeroᴵ                  ≡⟨ ▷-ηᴵ ⟩
+  idᴵ                           ∎
 \end{code}
 \end{minipage}
 
@@ -1237,15 +1221,15 @@ compl-𝕞 : Methods compl-𝕄
 \noindent
 \begin{minipage}{0.35\textwidth}
 \begin{code}
-compl-𝕞 .idᴹ = 
-  ⌜ tm*⊑ v⊑t id ⌝*  ≡⟨ ⌜⊑⌝* ⟩
-  ⌜ id ⌝*           ≡⟨ ⌜id⌝ ⟩
-  idᴵ ∎
+compl-𝕞 .idᴹ = ⌜id⌝
+  -- ⌜ tm*⊑ v⊑t id ⌝*  ≡⟨ ⌜⊑⌝* ⟩
+  -- ⌜ id ⌝*           ≡⟨ ⌜id⌝ ⟩
+  -- idᴵ ∎
 \end{code}
 \end{minipage}
 \begin{minipage}{0.6\textwidth}
 \begin{code}
-compl-𝕞 ._∘ᴹ_ {σᴵ = σᴵ} {δᴵ = δᴵ} σᴹ δᴹ = 
+compl-𝕞 ._∘ᴹ_ {σᴵ = σᴵ} {δᴵ = δᴵ} σᴹ δᴹ =
   ⌜ norm* σᴵ ∘ norm* δᴵ ⌝*        ≡⟨ ⌜∘⌝ ⟩
   ⌜ norm* σᴵ ⌝* ∘ᴵ ⌜ norm* δᴵ ⌝*  ≡⟨ cong₂ _∘ᴵ_ σᴹ δᴹ ⟩
   σᴵ ∘ᴵ δᴵ ∎
@@ -1254,7 +1238,7 @@ compl-𝕞 ._∘ᴹ_ {σᴵ = σᴵ} {δᴵ = δᴵ} σᴹ δᴹ =
 
 %if False
 \begin{code}
-compl-𝕞 ._[_]ᴹ {tᴵ = tᴵ} {δᴵ = δᴵ} tᴹ δᴹ = 
+compl-𝕞 ._[_]ᴹ {tᴵ = tᴵ} {δᴵ = δᴵ} tᴹ δᴹ =
   ⌜ norm tᴵ [ norm* δᴵ ] ⌝
   ≡⟨ ⌜[]⌝ {x = norm tᴵ} ⟩
   ⌜ norm tᴵ ⌝ [ ⌜ norm* δᴵ ⌝* ]ᴵ
@@ -1264,7 +1248,7 @@ compl-𝕞 .•ᴹ = tt
 compl-𝕞 .εᴹ = refl
 compl-𝕞 ._▷ᴹ_ _ _ = tt
 compl-𝕞 ._,ᴹ_ δᴹ tᴹ = cong₂ _,ᴵ_ δᴹ tᴹ
-compl-𝕞 .π₀ᴹ {δᴵ = δᴵ} δᴹ = 
+compl-𝕞 .π₀ᴹ {δᴵ = δᴵ} δᴹ =
   ⌜ π₀ (norm* δᴵ) ⌝*
   ≡⟨ ⌜π₀⌝ ⟩
   π₀ᴵ ⌜ norm* δᴵ ⌝*
@@ -1330,3 +1314,4 @@ And completeness is just one call to the eliminator away.
 compl : ⌜ norm tᴵ ⌝ ≡ tᴵ
 compl {tᴵ = tᴵ} = elim-cwf compl-𝕞 tᴵ
 \end{code}
+   
