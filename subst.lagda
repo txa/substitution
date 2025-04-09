@@ -336,11 +336,9 @@ xs ^ A                 =  xs ⁺ A , zero[ _ ]
 \label{sec:termination}
 
 Unfortunately (as of Agda 2.7.0.1\footnote{
-It is possible to extend Agda's termination checker such that the these
-definitions are accepted directly, and indeed we have a fork of Agda 
-(\href{https://github.com/agda/agda/pull/7695}{\#7695}) which implements such
-an extension, though it is unlikely to upstreamed anytime soon due to
-concerns over performance and elegance.}), 
+At the cost of some elegance and performance, it is possible to extend Agda's 
+termination checker such that these definitions are accepted directly
+(\href{https://github.com/agda/agda/pull/7695}{\#7695}).}), 
 we now hit a termination error.
 
 %if False
