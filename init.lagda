@@ -304,13 +304,6 @@ Therefore, we instead fix the sort to |T|.
 π₁ (δ , M) = M
 
 interleaved mutual
-  ⊑∘ : tm*⊑ v⊑t xs ∘ ys ≡ xs ∘ ys
-  ∘⊑ : ∀ {xs : Δ ⊩[ T ] Γ} {ys : Θ ⊩[ V ] Δ} → xs ∘ tm*⊑ v⊑t ys ≡ xs ∘ ys
-  v[⊑] : i [ tm*⊑ v⊑t ys ] ≡ tm⊑ v⊑t i [ ys ]
-  t[⊑] : t [ tm*⊑ v⊑t ys ] ≡ t [ ys ]
-  ⊑⁺ : tm*⊑ ⊑t xs ⁺ A ≡ tm*⊑ v⊑t (xs ⁺ A)
-  ⊑^ : tm*⊑ v⊑t xs ^ A ≡ tm*⊑ v⊑t (xs ^ A)
-
   is-cwf : CwF-simple
   is-cwf .CwF.Con = Con
 \end{code}
@@ -363,7 +356,6 @@ using one new law, relating our two
 ways of weakening variables.
 
 \begin{code}
-
   suc[id⁺] : i [ id {q} ⁺ A ] ≡ tm⊑ v⊑ (suc i A)
   suc[id⁺] {i = i} {A = A} =
     i [ id ⁺ A ]           ≡⟨ ⁺-nat[]v {i = i} ⟩ 
@@ -374,28 +366,6 @@ ways of weakening variables.
 
 %if False
 \begin{code}
-  ⊑⁺ {xs = ε}      = refl
-  ⊑⁺ {xs = xs , x} = cong₂ _,_ (⊑⁺ {xs = xs}) (cong (`_) suc[id⁺])
-  
-  ⊑∘ {xs = ε} = refl
-  ⊑∘ {xs = xs , x} = cong₂ _,_ ⊑∘ refl
-
-  ∘⊑ {xs = ε} = refl
-  ∘⊑ {xs = xs , x} = cong₂ _,_ ∘⊑ (t[⊑] {t = x})
-
-  v[⊑] {i = zero}    {ys = ys , y} = refl
-  v[⊑] {i = suc i _} {ys = ys , y} = v[⊑] {i = i}
-
-  ⊑^ {xs = xs} = cong₂ _,_ (⊑⁺ {xs = xs}) refl
-
-  t[⊑] {t = ` i}           = v[⊑] {i = i}
-  t[⊑] {t = t · u}         = cong₂ _·_ (t[⊑] {t = t}) (t[⊑] {t = u})
-  t[⊑] {t = ƛ t} {ys = ys} =
-    ƛ t [ tm*⊑ ⊑t ys ^ _ ]
-    ≡⟨ cong (λ ρ → ƛ t [ ρ ]) (⊑^ {xs = ys}) ⟩
-    ƛ t [ tm*⊑ ⊑t (ys ^ _) ] 
-    ≡⟨ cong ƛ_ (t[⊑] {t = t}) ⟩
-     ƛ t [ ys ^ _ ] ∎
 \end{code}
 %endif
 
@@ -1099,13 +1069,8 @@ identically: |⌜⊑⌝ : ∀ {x : Γ ⊢[ q ] A} → ⌜ tm⊑ ⊑t x ⌝ ≡ �
 %if False
 \begin{code}
 ⌜⊑⌝ : ∀ {x : Γ ⊢[ q ] A} → ⌜ tm⊑ ⊑t x ⌝ ≡ ⌜ x ⌝
-⌜⊑⌝* : ⌜ tm*⊑ ⊑t xs ⌝* ≡ ⌜ xs ⌝*
-
 ⌜⊑⌝ {q = V} = refl
 ⌜⊑⌝ {q = T} = refl
-
-⌜⊑⌝* {xs = ε} = refl
-⌜⊑⌝* {xs = xs , x} = cong₂ _,ᴵ_ ⌜⊑⌝* (⌜⊑⌝ {x = x})
 \end{code}
 %endif
 
@@ -1222,9 +1187,6 @@ compl-𝕞 : Methods compl-𝕄
 \begin{minipage}{0.35\textwidth}
 \begin{code}
 compl-𝕞 .idᴹ = ⌜id⌝
-  -- ⌜ tm*⊑ v⊑t id ⌝*  ≡⟨ ⌜⊑⌝* ⟩
-  -- ⌜ id ⌝*           ≡⟨ ⌜id⌝ ⟩
-  -- idᴵ ∎
 \end{code}
 \end{minipage}
 \begin{minipage}{0.6\textwidth}
