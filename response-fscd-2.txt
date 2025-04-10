@@ -18,9 +18,9 @@ We will add a forward reference.
 
    ## CwF.id
 
-Monomorphic id makes the proofs easier. We would need the lifting
-lemmas anyway because e.g. id∘'s RHS would contain a lift we would
-need to move around. We will explain this better.
+We've now tried the proof without and with polymorphic id. We
+still think that without is preferable, because it simplifies
+some of the laws. We will add a discussion of the tradeoffs.
 
   ## Preorder
 
@@ -36,18 +36,17 @@ Thank you for pointing to the mistake with De Bruijn - we will fix all typos.
   that your setup leads to a lack of repetition if you've now created
   new kinds of coherence lemmas to prove?
 
-Good point. We add some boilerplate which leads to a number of trivial
-theorems which is different from having to repeat a more sophisticated
-theorem. However, it would certainly be good if we could reduce or
-automatize the boilerplate.
+Indeed, there is a tradeoff here. The traditional way requires many
+similar but subtly different proofs, our way requires six boilerplate
+lemmas.  We think it worthwhile to have in the literature a technique
+that formally explicates the underlying similarities. Among other
+things, doing so means someone may work out how to further simplify
+the boilerplate.
 
 ----------------------------------------------------------------------
 reviewer 2
 
-   It took me some time to understand/decode the syntax in the paper. It
-   does not help that in section 1.1, the reader is immediately exposed
-   to syntax with no explanation whatsoever! I had to move on to section
-   2 and gradually unpick key definitions one-by-one
+   It took me some time to understand/decode the syntax in the paper.
 
 Apologies. We will rewrite to make the paper more readable for an Agda
 novice.
@@ -55,24 +54,24 @@ novice.
   I'm not keen on the fact that many of the problems encountered (and
   solved) are Agda specific.
 
-We don't think that this is the case. We briefly discuss the situation
-for other proof systems in the conclusions. We will expand the discussion,
-and mention relevant points in the introduction.
+Exactly the same issues arise in Rocq, Lean, and Idris, or a rigorous
+paper proof.  We briefly discuss the situation for other proof systems
+in the conclusions. We will expand the discussion, and mention
+relevant points in the introduction.
 
   The problem in the paper, solved by V<T, just does not arise in a
   proof sketched out mathematically on paper, so-to-speak .
 
 The problem shows up in the paper proof if you are concerned that your
 proof is well-founded. The alternative is to explicitly introduce a
-well-founded ordering which was done in [6] but this seems like an
-overkill once you realize that a structural order does the job.
+well-founded ordering which was done in [6] by one of the authors.
+This seems like overkill, once you realize that structural recursion
+does the job.
 
 ----------------------------------------------------------------------
 reviewer 3
 
-   The paper begins with a scenario describing the natural, but
-   wrong way to deal with substitution.  They use notation is
-   is not explained.
+   They use notation is is [sic] not explained.
 
 Apologies. We will rewrite to make the paper more readable for an Agda
 novice.
@@ -82,16 +81,17 @@ novice.
   substitution satisfies the laws of a functor. They seem to assume
   the other properties of a category are obvious.
 
-We do explicitly prove all the laws of the category. Functoriality
-of substitution is only a lemma.
+This is incorrect. We explicitly prove all the laws of the
+category. Functoriality of substitution is only a small part of our
+proof.
 
    The key idea seems to be to treat variables as a subsort of terms.
    Which seems to be the default in a first-order logic setting.
 
-This doesn't resolve the issue to show that your definitions are
-well-founded. In our setting there is an injection from variables to
-terms. Replacing the injection by an embedding is a notational change
-but doesn't change the proof.
+The implication here is incorrect. In our setting there is an
+injection from variables to terms. Replacing the injection by an
+embedding (i.e., making variables a subsort of terms) is a notational
+change but doesn't fundamentally change the proof.
 
 ----------------------------------------------------------------------
 reviewer 4
