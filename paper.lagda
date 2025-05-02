@@ -47,16 +47,14 @@
 
 \bibliographystyle{./jfplike}
 
-\title{Substitution without copy and paste}
-
 \begin{document}
 
 \journaltitle{JFP}
 \cpr{Cambridge University Press}
 \doival{10.1017/xxxxx}
 
-\lefttitle{Substitution Without Copy and Paste}
-\righttitle{Journal of Functional Programming}
+\lefttitle{T. Altenkirch, N. Burke and P. Wadler}
+\righttitle{Substitution Without Copy and Paste}
 
 \totalpg{\pageref{lastpage01}}
 \jnlDoiYr{2022}
@@ -65,13 +63,13 @@
 
 \begin{authgrp}
 \author{Thorsten Altenkirch}
-\affiliation{University of Nottingham, UK\\
+\affiliation{University of Nottingham, Nottingham, UK\\
         (\email{thorsten.altenkirch@@nottingham.ac.uk})}
 \author{Nathaniel Burke}
-\affiliation{Imperial College London, UK\\
+\affiliation{Imperial College London, London, UK\\
         (\email{thorsten.altenkirch@@nottingham.ac.uk})}
 \author{Philip Wadler}
-\affiliation{University of Edinburgh, UK\\
+\affiliation{University of Edinburgh, Edinburgh, UK\\
         (\email{wadler@@inf.ed.ac.uk})}
 \end{authgrp}
 
@@ -129,7 +127,7 @@ substitution gives rise to a simply typed category with families (CwF)
 and indeed that it is isomorphic to the initial simply typed CwF.
 \end{abstract}
 
-\maketitle[F]
+\maketitle[T]
 
 \section{Introduction}
 \label{sec:introduction}
@@ -521,5 +519,6 @@ we believe that the construction here can be useful to others.
 
 \bibliography{./local}
 
+\label{lastpage01}
 
 \end{document}
