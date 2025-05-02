@@ -48,7 +48,8 @@ variable, which can be shown by simple induction over said variable:
 \end{code}
 The identity law is now easily provable by structural induction:
 
-\begin{minipage}{0.45\textwidth}
+\noindent
+\begin{minipage}{0.5\textwidth}
 \begin{code}
 [id] {x = zero}     = refl
 [id] {x = suc i A}  = 
@@ -145,12 +146,13 @@ be of type |Sort| to satisfy Agda here. More discussion on this trick
 can be found at Agda issue
 \href{https://github.com/agda/agda/issues/7693}{\#7693}, but in summary:
 \begin{itemize} 
-   \item Agda considers all base constructors (constructors with no parameters) 
+   \item \vspace{-2ex} Agda considers all base constructors (constructors with no parameters) 
    to be of minimal size structurally, so their presence can track size
    preservation of other base-constructor arguments across function calls.
-   \item \vspace{-0.75ex} It turns out that
+   \item \vspace{-2ex} It turns out that
    a strict decrease in |Sort| is not necessary everywhere for termination: 
-   the context also gets structurally smaller in the call to |_⁺_| from |id|.
+   note that the context also gets structurally smaller in the call to |_⁺_| 
+   from |id|.
 \end{itemize}
 }
 
@@ -173,13 +175,14 @@ corresponding property for |suc[_]|.
 %endif
 
 \noindent
-\begin{minipage}{0.4\textwidth}
+\begin{minipage}{0.5\textwidth}
 \begin{code}
 suc[] : (suc[ q ] x _) [ ys , y ] ≡ x [ ys ] 
 suc[] {q = V} = refl
-suc[] {q = T} {x = x} {ys = ys} {y = y}  =
+suc[] {q = T} {x = x} {ys = ys} {y = y} =
   (suc[ T ] x _) [ ys , y ]  ≡⟨⟩
-  x [ id ⁺ _ ] [ ys , y ]    ≡⟨ sym ([∘] {x = x}) ⟩
+  x [ id ⁺ _ ] [ ys , y ]    
+  ≡⟨ sym ([∘] {x = x}) ⟩
   x [ (id ⁺ _) ∘ (ys , y) ]  
   ≡⟨ cong (λ ρ → x [ ρ ]) ⁺∘  ⟩
   x [ id ∘ ys  ]             
@@ -188,12 +191,13 @@ suc[] {q = T} {x = x} {ys = ys} {y = y}  =
 \end{code}
 \end{minipage}
 \hfill
-\begin{minipage}{0.5\textwidth}
+\begin{minipage}{0.45\textwidth}
 \begin{spec}
 ⁺∘ : xs ⁺ A ∘ (ys , x) ≡ xs ∘ ys
 ⁺∘ {xs = ε}       = refl
 ⁺∘ {xs = xs , x}  = 
-   cong₂ _,_ (⁺∘ {xs = xs}) (suc[] {x = x})
+   cong₂ _,_  (⁺∘ {xs = xs}) 
+              (suc[] {x = x})
 
 id∘′ {xs = ε}       _ = refl
 id∘′ {xs = xs , x}  _ = cong₂ _,_
@@ -258,33 +262,48 @@ tm[] {q = T} = refl
 
 We are now ready to prove |[∘]| by structural induction:
 
-\noindent
-\begin{minipage}{0.55\textwidth}
 \begin{code}
-[∘] {x = zero}     {xs = xs , x}       = refl
-[∘] {x = suc i _}  {xs = xs , x}       = 
-   [∘] {x = i}
-[∘] {x = ` x}      {xs = xs}{ys = ys}  = 
-   tm⊑ ⊑t (x [ xs ∘ ys ])
-    ≡⟨ cong (tm⊑ ⊑t) ([∘] {x = x}) ⟩
-   tm⊑ ⊑t (x [ xs ] [ ys ])
-    ≡⟨ tm[] {x = x [ xs ]} ⟩        
-   (tm⊑ ⊑t (x [ xs ])) [ ys ] ∎
+[∘] {x = zero}     {xs = xs , x}         = refl
+[∘] {x = suc i _}  {xs = xs , x}         = [∘] {x = i}
+[∘] {x = ` x}      {xs = xs}  {ys = ys}  = 
+   tm⊑ ⊑t (x [ xs ∘ ys ])      ≡⟨ cong (tm⊑ ⊑t) ([∘] {x = x}) ⟩
+   tm⊑ ⊑t (x [ xs ] [ ys ])    ≡⟨ tm[] {x = x [ xs ]} ⟩        
+   (tm⊑ ⊑t (x [ xs ])) [ ys ]  ∎
+[∘] {x = t · u}                           = cong₂ _·_ ([∘] {x = t}) ([∘] {x = u})
+[∘] {x = ƛ t}      {xs = xs}  {ys = ys}   = cong ƛ_ (
+   t [ (xs ∘ ys) ^ _ ]         ≡⟨ cong (λ zs → t [ zs ]) ^∘  ⟩
+   t [ (xs ^ _) ∘ (ys ^ _)  ]  ≡⟨ [∘] {x = t} ⟩           
+   (t [ xs ^ _ ]) [ ys ^ _ ]   ∎)
 \end{code}
-\end{minipage}
-\begin{minipage}{0.35\textwidth}
-\begin{code}
-[∘] {x = t · u}                  =
-   cong₂ _·_ ([∘] {x = t}) ([∘] {x = u})
-[∘] {x = ƛ t}{xs = xs}{ys = ys}  =
-   cong ƛ_ (
-     t [ (xs ∘ ys) ^ _ ]
-     ≡⟨ cong (λ zs → t [ zs ]) ^∘  ⟩
-     t [ (xs ^ _) ∘ (ys ^ _)  ]
-     ≡⟨ [∘] {x = t} ⟩           
-     (t [ xs ^ _ ]) [ ys ^ _ ] ∎)
-\end{code}
-\end{minipage}
+
+% \noindent
+% \begin{minipage}{0.5\textwidth}
+% \begin{code}
+% [∘] {x = zero}     {xs = xs , x}       = 
+%    refl
+% [∘] {x = suc i _}  {xs = xs , x}       = 
+%    [∘] {x = i}
+% [∘] {x = ` x}      {xs = xs}{ys = ys}  = 
+%    tm⊑ ⊑t (x [ xs ∘ ys ])
+%     ≡⟨ cong (tm⊑ ⊑t) ([∘] {x = x}) ⟩
+%    tm⊑ ⊑t (x [ xs ] [ ys ])
+%     ≡⟨ tm[] {x = x [ xs ]} ⟩        
+%    (tm⊑ ⊑t (x [ xs ])) [ ys ] ∎
+% \end{code}
+% \end{minipage}
+% \begin{minipage}{0.35\textwidth}
+% \begin{code}
+% [∘] {x = t · u}                  =
+%    cong₂ _·_ ([∘] {x = t}) ([∘] {x = u})
+% [∘] {x = ƛ t}{xs = xs}{ys = ys}  =
+%    cong ƛ_ (
+%      t [ (xs ∘ ys) ^ _ ]
+%      ≡⟨ cong (λ zs → t [ zs ]) ^∘  ⟩
+%      t [ (xs ^ _) ∘ (ys ^ _)  ]
+%      ≡⟨ [∘] {x = t} ⟩           
+%      (t [ xs ^ _ ]) [ ys ^ _ ] ∎)
+% \end{code}
+% \end{minipage}
 
 Associativity |∘∘ : xs ∘ (ys ∘ zs) ≡ (xs ∘ ys) ∘ zs| can be proven merely by a 
 fold of |[∘]| over substitutions.
@@ -361,8 +380,8 @@ Finally, we have all the ingredients to prove the second functor law |^∘|:
 |q⊑r : q ⊑ r| we have that |tm⊑zero q⊑r : zero[ r ] ≡ tm⊑ q⊑r zero[ q ]|.}
 \begin{code}
 ^∘ {r = r}{s = s}{xs = xs}{ys = ys} {A = A} = 
-    (xs ∘ ys) ^ A                                ≡⟨⟩
-    (xs ∘ ys) ⁺ A , zero[ r ⊔ s ]                ≡⟨ cong₂ _,_ (sym (⁺-nat∘ {xs = xs})) refl ⟩
+    (xs ∘ ys) ^ A                  ≡⟨⟩
+    (xs ∘ ys) ⁺ A , zero[ r ⊔ s ]  ≡⟨ cong₂ _,_ (sym (⁺-nat∘ {xs = xs})) refl ⟩
     xs ∘ (ys ⁺ A) , zero[ r ⊔ s ]                
       ≡⟨ cong₂ _,_ refl (tm⊑zero (⊑⊔r {r = s}{q = r})) ⟩        
     xs ∘ (ys ⁺ A) , tm⊑ (⊑⊔r {q = r}) zero[ s ]  

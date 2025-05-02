@@ -43,20 +43,21 @@ variable
 $\lambda$-terms (|t, u, v|):
 
 \noindent
-\begin{minipage}{0.4\textwidth}
+\begin{minipage}{0.45\textwidth}
 \begin{code}
 data _∋_ : Con → Ty → Set where 
-  zero  : Γ ▷ A ∋ A
-  suc   : Γ ∋ A → (B : Ty) → Γ ▷ B ∋ A
+  zero  :  Γ ▷ A ∋ A
+  suc   :  Γ ∋ A → (B : Ty) 
+        →  Γ ▷ B ∋ A
 \end{code}
 \end{minipage}
 \hfill
 \begin{minipage}{0.5\textwidth}
 \begin{code}
 data _⊢_ : Con → Ty → Set where 
-  `_   : Γ ∋ A → Γ ⊢ A
-  _·_  : Γ ⊢ A ⇒ B → Γ ⊢ A → Γ ⊢ B
-  ƛ_   : Γ ▷ A ⊢ B → Γ ⊢ A ⇒ B  
+  `_   :  Γ ∋ A → Γ ⊢ A
+  _·_  :  Γ ⊢ A ⇒ B → Γ ⊢ A →  Γ ⊢ B
+  ƛ_   :  Γ ▷ A ⊢ B → Γ ⊢ A ⇒ B  
 \end{code}
 \end{minipage}
 
@@ -79,7 +80,7 @@ _^_ : Γ ⊩ Δ → (A : Ty) → Γ ▷ A ⊩ Δ ▷ A
 \end{code}
 %endif
 
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}{0.5\textwidth}
 \begin{code}
 _v[_] : Γ ∋ A → Δ ⊩ Γ → Δ ⊢ A
 zero       v[ ts , t ] = t
@@ -192,7 +193,8 @@ is ^v A                  = is ⁺v A , zero
 \begin{code}
 _[_]v : Γ ⊢ A → Δ ⊩v Γ → Δ ⊢ A
 (` i)   [ is ]v  =  ` (i v[ is ]v)
-(t · u) [ is ]v  =  (t [ is ]v) · (u [ is ]v)
+(t · u) [ is ]v  =  
+  (t [ is ]v) · (u [ is ]v)
 (ƛ t)   [ is ]v  =  ƛ (t [ is ^v _ ]v)
 
 idv : Γ ⊩v Γ

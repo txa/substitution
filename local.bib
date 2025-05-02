@@ -38,8 +38,14 @@
   pages =	 {1--41},
   month =	 {January}
 }
-@misc{agda,
-  author = "The Agda Team",
+@misc{Agda_Developers_Agda,
+author = {{The Agda Team}},
+title = {{Agda}},
+url = {https://agda.readthedocs.io/},
+version = {2.8.0}
+}
+@software{agda,
+  author = {{The Agda Team}},
   title = "Agda Documentation",
   howpublished = "\url{https://agda.readthedocs.io}",
   year = 	 2024,
@@ -47,7 +53,7 @@
 }
 @inproceedings{kaposi2023towards,
   title={Towards quotient inductive-inductive-recursive types},
-  author={Ambrus Kaposi},
+  author={Kaposi, Ambrus},
   booktitle={29th International Conference on Types for Proofs and Programs TYPES 2023--Abstracts},
   year = 	 2023,  
   pages={124}
@@ -188,8 +194,8 @@ numpages = {12},
 title = "Everybody's got to be somewhere",
 abstract = "The key to any nameless representation of syntax is how it indicates the variables we choose to use and thus, implicitly, those we discard. Standard de Bruijn representations delay discarding maximally till the leaves of terms where one is chosen from the variables in scope at the expense of the rest. Consequently, introducing new but unused variables requires term traversal. This paper introduces a nameless 'co-de-Bruijn' representation which makes the opposite canonical choice, delaying discarding minimally, as near as possible to the root. It is literate Agda: dependent types make it a practical joy to express and be driven by strong intrinsic invariants which ensure that scope is aggressively whittled down to just the support of each subterm, in which every remaining variable occurs somewhere. The construction is generic, delivering a universe of syntaxes with higher-order metavariables, for which the appropriate notion of substitution is hereditary. The implementation of simultaneous substitution exploits tight scope control to avoid busywork and shift terms without traversal. Surprisingly, it is also intrinsically terminating, by structural recursion alone. ",
 keywords = "variables, syntaxes, nameless representation, structural recursion",
-author = "Conor McBride",
-year = "2018",
+author = {McBride, Conor},
+year = {2018},
 month = jul,
 day = "10",
 doi = "10.4204/EPTCS.275.6",

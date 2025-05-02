@@ -57,7 +57,7 @@ mutual
 \end{code}
 %endif
 \noindent
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}{0.5\textwidth}
 \begin{code}
   data Sort : Set where
     V    : Sort
@@ -92,8 +92,6 @@ pattern T = T>V V isV
 This means we can pattern match over |Sort| just with |V| and |T|,
 while ensuring |V| is visibly (to Agda's termination checker) structurally 
 smaller than |T|.
-
-\pagebreak
 
 \noindent
 We can now define terms and variables in one go (|x, y, z|):
@@ -202,11 +200,7 @@ $\sqcup\mathrm{v}$, $\sqcup\mathrm{t}$) into rewrite rules.
 This introduces new definitional equalities, i.e.
 |q ⊔ (r ⊔ s) = (q ⊔ r) ⊔ s| is now used by the type
 checker\footnote{Effectively, this feature allows a selective use of 
-extensional Type Theory. We enable Agda's confluence checking with
-|--local-confluence-check| as a sanity-check that our rewrites
-are reasonable (Agda can also check confluence globally, but this requires
-manually resolving critical pairs with extra rewrite rules, which
-becomes somewhat tedious).}.
+extensional Type Theory.}.
 
 The order on sorts gives rise to a functor, witnessed by
 |tm⊑ : q ⊑ s → Γ ⊢[ q ] A → Γ ⊢[ s ] A|, where |tm⊑ rfl x  = x| and
@@ -229,19 +223,22 @@ _^_ : Γ ⊩[ q ] Δ → ∀ A → Γ ▷ A ⊩[ q ] Δ ▷ A
 \end{code}
 %endif
 
-\noindent
-\begin{minipage}{0.62\textwidth}
 \begin{code}
 _[_] : Γ ⊢[ q ] A → Δ ⊩[ r ] Γ → Δ ⊢[ q ⊔ r ] A
-zero       [ xs , x ]  = x
-(suc i _)  [ xs , x ]  = i [ xs ]
 \end{code}
-\end{minipage}
-\begin{minipage}{0.3\textwidth}
+
+\noindent
+\begin{minipage}{0.55\textwidth}
 \begin{code}
 (` i)      [ xs ]      = tm⊑  ⊑t  (i [ xs ])
 (t · u)    [ xs ]      = (t [ xs ]) · (u [ xs ])
 (ƛ t)      [ xs ]      = ƛ (t [ xs ^ _ ]) 
+\end{code}
+\end{minipage}
+\begin{minipage}{0.3\textwidth}
+\begin{code}
+zero       [ xs , x ]  = x
+(suc i _)  [ xs , x ]  = i [ xs ]
 \end{code}
 \end{minipage}
 
@@ -291,8 +288,6 @@ id = id-poly
 \end{code}
 %endif
 
-\pagebreak
-
 However, |suc| is more subtle since the case for |T| depends on its
 fold over substitutions:
 
@@ -303,7 +298,7 @@ _⁺_ : Γ ⊩[ q ] Δ → (A : Ty) → Γ ▷ A ⊩[ q ] Δ
 %endif
 
 \noindent
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}{0.5\textwidth}
 \begin{code}
 suc[_]  :  ∀ q → Γ ⊢[ q ] B → ∀ A 
         →  Γ ▷ A ⊢[ q ] B
@@ -374,7 +369,8 @@ to be tracked and termination to be correctly inferred by Agda.
 We present the call graph diagramatically (inlining |_^_|), 
 in the style of \cite{keller2010hereditary}.
 
-\begin{minipage}{0.65\textwidth}
+\noindent
+\begin{minipage}{0.675\textwidth}
 \begin{tikzcd}[scaleedge cd=1.1, sep=large]
 & |suc[ q₄ ] t₄q₄Γ₄|
 \arrow[dd, bend left, "\substack{|r₃ < q₄|}"]
@@ -394,7 +390,7 @@ in the style of \cite{keller2010hereditary}.
 \end{tikzcd}
 \captionof{figure}{Call graph of substitution operations}
 \end{minipage}
-\begin{minipage}{0.25\textwidth}
+\begin{minipage}{0.3\textwidth}
 \renewcommand{\arraystretch}{1.2}
 \begin{center}
 \begin{tabular}{ ||c||c||c|| }
