@@ -345,14 +345,15 @@ We first extend |tm⊑| to renamings/substitutions with a fold:
 |tm*⊑ : q ⊑ s → Γ ⊩[ q ] Δ → Γ ⊩[ s ] Δ|, and prove various lemmas about how 
 |tm*⊑| coercions can be lifted outside of our substitution operators:
 
-\begin{minipage}{0.35\textwidth}
+\noindent
+\begin{minipage}{0.45\textwidth}
 \begin{spec}
   ⊑∘   : tm*⊑ v⊑t xs ∘ ys   ≡ xs ∘ ys
   ∘⊑   : xs ∘ tm*⊑ v⊑t ys   ≡ xs ∘ ys
   t[⊑] : t [ tm*⊑ v⊑t ys ]  ≡ t [ ys ]
 \end{spec}
 \end{minipage}
-\begin{minipage}{0.6\textwidth}
+\begin{minipage}{0.5\textwidth}
 \begin{spec}
   ⊑⁺   : tm*⊑ ⊑t xs ⁺ A     ≡ tm*⊑ v⊑t (xs ⁺ A)
   ⊑^   : tm*⊑ v⊑t xs ^ A    ≡ tm*⊑ v⊑t (xs ^ A)
