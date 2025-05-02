@@ -43,20 +43,21 @@ variable
 $\lambda$-terms (|t, u, v|):
 
 \noindent
-\begin{minipage}{0.4\textwidth}
+\begin{minipage}{0.45\textwidth}
 \begin{code}
 data _∋_ : Con → Ty → Set where 
-  zero  : Γ ▷ A ∋ A
-  suc   : Γ ∋ A → (B : Ty) → Γ ▷ B ∋ A
+  zero  :  Γ ▷ A ∋ A
+  suc   :  Γ ∋ A → (B : Ty) 
+        →  Γ ▷ B ∋ A
 \end{code}
 \end{minipage}
 \hfill
 \begin{minipage}{0.5\textwidth}
 \begin{code}
 data _⊢_ : Con → Ty → Set where 
-  `_   : Γ ∋ A → Γ ⊢ A
-  _·_  : Γ ⊢ A ⇒ B → Γ ⊢ A → Γ ⊢ B
-  ƛ_   : Γ ▷ A ⊢ B → Γ ⊢ A ⇒ B  
+  `_   :  Γ ∋ A → Γ ⊢ A
+  _·_  :  Γ ⊢ A ⇒ B → Γ ⊢ A →  Γ ⊢ B
+  ƛ_   :  Γ ▷ A ⊢ B → Γ ⊢ A ⇒ B  
 \end{code}
 \end{minipage}
 

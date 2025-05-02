@@ -54,12 +54,12 @@
 \doival{10.1017/xxxxx}
 
 \lefttitle{T. Altenkirch, N. Burke and P. Wadler}
-\righttitle{Substitution Without Copy and Paste}
+\righttitle{Substitution without copy and paste}
 
 \totalpg{\pageref{lastpage01}}
-\jnlDoiYr{2022}
+\jnlDoiYr{2025}
 
-\title{Substitution Without Copy and Paste}
+\title{Substitution without copy and paste}
 
 \begin{authgrp}
 \author{Thorsten Altenkirch}
@@ -67,7 +67,7 @@
         (\email{thorsten.altenkirch@@nottingham.ac.uk})}
 \author{Nathaniel Burke}
 \affiliation{Imperial College London, London, UK\\
-        (\email{thorsten.altenkirch@@nottingham.ac.uk})}
+        (\email{nathanielrburke3@@gmail.com})}
 \author{Philip Wadler}
 \affiliation{University of Edinburgh, Edinburgh, UK\\
         (\email{wadler@@inf.ed.ac.uk})}
@@ -516,6 +516,10 @@ we believe that the construction here can be useful to others.
 % Association for Computing Machinery,
 % 2024. https://doi.org/10.1145/3678000.3678201.
 
+\section*{Conflicts of Interest}
+
+% I assume?
+None.
 
 \bibliography{./local}
 

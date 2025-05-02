@@ -57,7 +57,7 @@ mutual
 \end{code}
 %endif
 \noindent
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}{0.5\textwidth}
 \begin{code}
   data Sort : Set where
     V    : Sort
