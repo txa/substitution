@@ -1,5 +1,6 @@
 -- Lean supports inferring lexicographic termination for individual definition,
--- but unfortunately this does not seem to work for 'mutual' blocks
+-- but unfortunately this does not seem to work for 'mutual' blocks (which
+-- appear to at minimum require manually specifying 'termination_by' metrics)
 def ack : Nat → Nat → Nat
   | .zero  , n       => .succ n
   | .succ m, .zero   => ack m 1
@@ -84,7 +85,7 @@ def tmslen : Tms q Δ Γ → Nat
   | .ε     => 0
   | δ -, x => .succ (tmslen δ + tmlen x)
 
--- See 'WithTactics.lean' for a version where Lean can infer all the
+-- See AutoDecreasing.lean' for a version where Lean can infer all the
 -- 'decreasing_by' proofs (it turns out we only need to annotate 'V' and 'T' as
 -- @[reducible]!)
 mutual

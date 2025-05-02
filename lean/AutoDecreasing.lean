@@ -1,3 +1,7 @@
+-- Like 'ManualDecreasing.lean' but adds '@[reducible]' annotations such that
+-- all the 'decreasing_by' proofs are automatically inferrable!
+--
+-- Perhaps one day Lean will be able to infer the 'termination_by' metrics.
 structure sort where
   n   : Nat
   prf : n < 2

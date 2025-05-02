@@ -498,9 +498,12 @@ differing implementations of |_^_|.
 
 \begin{code}
   is-cwf .CwF.ƛ[] {A = A} {t = x} {δ = ys} =           
-    ƛ x [ ys ^ A ]                ≡⟨ cong (λ ρ → ƛ x [ ρ ^ A ]) (sym ∘id) ⟩         
-    ƛ x [ (ys ∘ id) ^ A ]         ≡⟨ cong (λ ρ → ƛ x [ ρ , ` zero ]) (sym ⁺-nat∘) ⟩  
-    ƛ x [ ys ∘ id ⁺ A , ` zero ]  ≡⟨ cong (λ ρ → ƛ x [ ρ , ` zero ]) (sym (∘⊑ {ys = id ⁺ _})) ⟩
+    ƛ x [ ys ^ A ]                
+    ≡⟨ cong (λ ρ → ƛ x [ ρ ^ A ]) (sym ∘id) ⟩         
+    ƛ x [ (ys ∘ id) ^ A ]         
+    ≡⟨ cong (λ ρ → ƛ x [ ρ , ` zero ]) (sym ⁺-nat∘) ⟩  
+    ƛ x [ ys ∘ id ⁺ A , ` zero ]  
+    ≡⟨ cong (λ ρ → ƛ x [ ρ , ` zero ]) (sym (∘⊑ {ys = id ⁺ _})) ⟩
     ƛ x [ ys ∘ tm*⊑ v⊑t (id ⁺ A) , ` zero ] ∎
 \end{code}
 

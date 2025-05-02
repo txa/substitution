@@ -1,5 +1,9 @@
 -- Like 'AutoDecreasing.lean' but just using a boolean for the 'Sort'
 -- instead of anything fancier.
+
+-- Unlike 'AutoDecreasing.lean', I wouldn't expect 'termination_by' metrics to
+-- ever be automatically inferrable for this version (unless ordering of
+-- constructors is taken as a heuristic I suppose).
 inductive sort where
   | V
   | T
