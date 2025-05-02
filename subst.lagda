@@ -93,8 +93,6 @@ This means we can pattern match over |Sort| just with |V| and |T|,
 while ensuring |V| is visibly (to Agda's termination checker) structurally 
 smaller than |T|.
 
-\pagebreak
-
 \noindent
 We can now define terms and variables in one go (|x, y, z|):
 \begin{code}
@@ -290,8 +288,6 @@ id = id-poly
 -- id′ {Γ = Γ ▷ A} _ = id ^ A
 \end{code}
 %endif
-
-\pagebreak
 
 However, |suc| is more subtle since the case for |T| depends on its
 fold over substitutions:

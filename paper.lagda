@@ -1,15 +1,19 @@
-\documentclass[a4paper,UKenglish,cleveref, autoref, thm-restate]{lipics-v2021}
+\documentclass{jfp}
+% \documentclass[a4paper,UKenglish,cleveref, autoref, thm-restate]{lipics-v2021}
 % \documentclass[sigplan,10pt,natbib]{acmart}
 %\documentclass[sigplan,10pt,natbib,anonymous,review]{acmart}
 
-\setlength{\abovedisplayskip}{2pt}
-\setlength{\belowdisplayskip}{2pt}
-\setlength{\abovedisplayshortskip}{2pt}
-\setlength{\belowdisplayshortskip}{2pt}
+\usepackage{graphicx}
+\usepackage{caption}
+
+% \setlength{\abovedisplayskip}{2pt}
+% \setlength{\belowdisplayskip}{2pt}
+% \setlength{\abovedisplayshortskip}{2pt}
+% \setlength{\belowdisplayshortskip}{2pt}
 \usepackage{etoolbox}
-\makeatletter
-\patchcmd{\hscode}{\par}{\vspace{-15pt}\par}{}{}
-\makeatother
+% \makeatletter
+% \patchcmd{\hscode}{\par}{\vspace{-15pt}\par}{}{}
+% \makeatother
 
 
 % \settopmatter{printfolios=true,printccs=false,printacmref=false}
@@ -24,7 +28,7 @@
 %include agda.fmt
 %include lib.fmt
 
-\renewcommand{\hscodestyle}{\setlength{\baselineskip}{0.3\baselineskip}}
+% \renewcommand{\hscodestyle}{\setlength{\baselineskip}{0.3\baselineskip}}
 
 %include is-full.lagda
 
@@ -41,9 +45,35 @@
 \newcommand*\bigcdot@@[2]{\mathbin{\vcenter{\hbox{\scalebox{#2}{$\m@@th#1\cdot$}}}}}
 \makeatother
 
-\bibliographystyle{./plainurl}
+\bibliographystyle{./jfplike}
 
 \title{Substitution without copy and paste}
+
+\begin{document}
+
+\journaltitle{JFP}
+\cpr{Cambridge University Press}
+\doival{10.1017/xxxxx}
+
+\lefttitle{Substitution Without Copy and Paste}
+\righttitle{Journal of Functional Programming}
+
+\totalpg{\pageref{lastpage01}}
+\jnlDoiYr{2022}
+
+\title{Substitution Without Copy and Paste}
+
+\begin{authgrp}
+\author{Thorsten Altenkirch}
+\affiliation{University of Nottingham, UK\\
+        (\email{thorsten.altenkirch@@nottingham.ac.uk})}
+\author{Nathaniel Burke}
+\affiliation{Imperial College London, UK\\
+        (\email{thorsten.altenkirch@@nottingham.ac.uk})}
+\author{Philip Wadler}
+\affiliation{University of Edinburgh, UK\\
+        (\email{wadler@@inf.ed.ac.uk})}
+\end{authgrp}
 
 % \author{Thorsten Altenkirch}
 % \affiliation{%
@@ -70,23 +100,21 @@
 % \email{wadler@@inf.ed.ac.uk}
 
 %TODO Add ORCIDs?
-\author{Thorsten Altenkirch}{University of Nottingham, Nottingham, United Kingdom}{thorsten.altenkirch@@nottingham.ac.uk}{}{}
-\author{Nathaniel Burke}{Imperial College London, London, United Kingdom}{nathaniel.burke21@@imperial.ac.uk}{}{}
-\author{Philip Wadler}{University of Edinburgh, Edinburgh, United Kingdom}{wadler@@inf.ed.ac.uk}{}{}
+% \author{Thorsten Altenkirch}{University of Nottingham, Nottingham, United Kingdom}{thorsten.altenkirch@@nottingham.ac.uk}{}{}
+% \author{Nathaniel Burke}{Imperial College London, London, United Kingdom}{nathaniel.burke21@@imperial.ac.uk}{}{}
+% \author{Philip Wadler}{University of Edinburgh, Edinburgh, United Kingdom}{wadler@@inf.ed.ac.uk}{}{}
 
-\authorrunning{T. Altenkirch, N. Burke and P. Wadler}
-\Copyright{Thorsten Altenkirch, Nathaniel Burke and Philip Wadler}
+% \authorrunning{T. Altenkirch, N. Burke and P. Wadler}
+% \Copyright{Thorsten Altenkirch, Nathaniel Burke and Philip Wadler}
  
 % TODO Maybe tweak/add more keywords
-\ccsdesc{Theory of computation~Type theory}
-\keywords{Substitution, Metatheory, Agda}
+% \ccsdesc{Theory of computation~Type theory}
+% \keywords{Substitution, Metatheory, Agda}
 
-\begin{document}
+% \begin{document}
 
-\AtBeginEnvironment{hscode}{\setlength{\parskip}{0pt} \vspace{-1.5ex}}
-\AtEndEnvironment{hscode}{\vspace{-1.5ex}}
-
-\maketitle
+% \AtBeginEnvironment{hscode}{\setlength{\parskip}{0pt} \vspace{-1.5ex}}
+% \AtEndEnvironment{hscode}{\vspace{-1.5ex}}
 
 \begin{abstract}
 When defining substitution recursively for a language with binders
@@ -100,6 +128,8 @@ We use our setup to also show that the recursive definition of
 substitution gives rise to a simply typed category with families (CwF)
 and indeed that it is isomorphic to the initial simply typed CwF.
 \end{abstract}
+
+\maketitle[F]
 
 \section{Introduction}
 \label{sec:introduction}
@@ -488,10 +518,6 @@ we believe that the construction here can be useful to others.
 % Association for Computing Machinery,
 % 2024. https://doi.org/10.1145/3678000.3678201.
 
-
-
-
-\pagebreak
 
 \bibliography{./local}
 

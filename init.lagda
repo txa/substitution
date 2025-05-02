@@ -434,7 +434,7 @@ Similarly to substitutions, we must fix the sort of our terms to |T|
 identity substitution to a variable |i| produces the distinct term |` i|).
 %if False
 \begin{code}
-  is-cwf .CwF.Ty           = Ty
+  is-cwf .CwF.Ty    = Ty
   is-cwf .CwF._⊢_   = _⊢[ T ]_
   is-cwf .CwF._[_]  = _[_]
 \end{code}
