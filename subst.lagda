@@ -366,7 +366,8 @@ to be tracked and termination to be correctly inferred by Agda.
 We present the call graph diagramatically (inlining |_^_|), 
 in the style of \cite{keller2010hereditary}.
 
-\begin{minipage}{0.65\textwidth}
+\noindent
+\begin{minipage}{0.675\textwidth}
 \begin{tikzcd}[scaleedge cd=1.1, sep=large]
 & |suc[ q₄ ] t₄q₄Γ₄|
 \arrow[dd, bend left, "\substack{|r₃ < q₄|}"]
@@ -386,7 +387,7 @@ in the style of \cite{keller2010hereditary}.
 \end{tikzcd}
 \captionof{figure}{Call graph of substitution operations}
 \end{minipage}
-\begin{minipage}{0.25\textwidth}
+\begin{minipage}{0.3\textwidth}
 \renewcommand{\arraystretch}{1.2}
 \begin{center}
 \begin{tabular}{ ||c||c||c|| }

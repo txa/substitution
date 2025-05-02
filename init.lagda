@@ -245,14 +245,14 @@ $\lambda$-calculus; we add the type constructors, the term
 constructors and the corresponding naturality laws:
 
 \noindent
-\begin{minipage}{0.5\textwidth}
+\begin{minipage}{0.525\textwidth}
 \begin{spec}
   o    : Ty
   _⇒_  : Ty → Ty → Ty
   _·_  : Γ ⊢ A ⇒ B → Γ ⊢ A → Γ ⊢ B
 \end{spec}
 \end{minipage}
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}{0.4\textwidth}
 \begin{spec}
   ƛ_   : Γ ▷ A ⊢ B → Γ ⊢ A ⇒ B  
   ·[]  : (t · u) [ δ ] ≡ (t [ δ ]) · (u [ δ ])
@@ -441,7 +441,7 @@ identity substitution to a variable |i| produces the distinct term |` i|).
 \end{code}
 %endif
 
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}{0.5\textwidth}
 \begin{code}
   is-cwf .CwF.[id] {t = t}  =                   
     t [ tm*⊑ v⊑t id ]  ≡⟨ t[⊑] {t = t} ⟩  
@@ -449,7 +449,7 @@ identity substitution to a variable |i| produces the distinct term |` i|).
     t                  ∎
 \end{code}
 \end{minipage}
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}{0.4\textwidth}
 \begin{spec}
   is-cwf .CwF._⊢_   = _⊢[ T ]_
 
@@ -967,7 +967,7 @@ compl-𝕄 : Motive
 \end{code}
 
 \noindent
-\begin{minipage}{0.55\textwidth}
+\begin{minipage}{0.6\textwidth}
 \begin{code}
 compl-𝕄 .Tmᴹ _ _ tᴵ   = ⌜ norm tᴵ ⌝ ≡ tᴵ
 compl-𝕄 .Tmsᴹ _ _ δᴵ  = ⌜ norm* δᴵ ⌝* ≡ δᴵ
@@ -1028,7 +1028,8 @@ implementing |⌜id⌝| to keep Agda's termination checker happy.
 \end{code}
 %endif
 
-\begin{minipage}{0.45\textwidth}
+\noindent
+\begin{minipage}{0.5\textwidth}
 \begin{spec}
 ⌜[]⌝  : ⌜ x [ ys ] ⌝ ≡ ⌜ x ⌝ [ ⌜ ys ⌝* ]ᴵ
 ⌜^⌝   : ⌜ xs ^ A ⌝* ≡ ⌜ xs ⌝* ^ᴵ A
@@ -1055,7 +1056,8 @@ implementing |⌜id⌝| to keep Agda's termination checker happy.
 To complete these proofs, we also need $\beta$-laws for our initial CwF
 substitutions, so we derive these now.
 
-\begin{minipage}{0.4\textwidth}
+\noindent
+\begin{minipage}{0.475\textwidth}
 \noindent
 \begin{code}
 zero[]ᴵ : zeroᴵ [ δᴵ ,ᴵ tᴵ ]ᴵ ≡ tᴵ
@@ -1066,7 +1068,7 @@ zero[]ᴵ {δᴵ = δᴵ} {tᴵ = tᴵ} =
   tᴵ                       ∎
 \end{code}
 \end{minipage}
-\begin{minipage}{0.55\textwidth}
+\begin{minipage}{0.45\textwidth}
 \noindent
 \begin{spec}
 suc[]ᴵ : sucᴵ tᴵ B [ δᴵ ,ᴵ uᴵ ]ᴵ ≡ tᴵ [ δᴵ ]ᴵ
@@ -1167,9 +1169,10 @@ cases to cover, so for brevity we elide the proofs of |⌜[]⌝| and |⌜suc⌝|
 \end{code}
 
 \noindent
-\begin{minipage}{0.5\textwidth}
+\begin{minipage}{0.45\textwidth}
 \begin{code}
-⌜⁺⌝ {xs = ε}               = sym •-ηᴵ
+⌜⁺⌝ {xs = ε}               = 
+  sym •-ηᴵ
 ⌜⁺⌝ {xs = xs , x} {A = A}  = 
   ⌜ xs ⁺ A ⌝* ,ᴵ ⌜ suc[ _ ] x A ⌝
   ≡⟨ cong₂ _,ᴵ_ ⌜⁺⌝ (⌜suc⌝ {x = x}) ⟩
@@ -1180,7 +1183,8 @@ cases to cover, so for brevity we elide the proofs of |⌜[]⌝| and |⌜suc⌝|
 \end{minipage}
 \begin{minipage}{0.45\textwidth}
 \begin{code}
-⌜id⌝′ {Γ = •}      _ = sym •-ηᴵ
+⌜id⌝′ {Γ = •}      _ = 
+  sym •-ηᴵ
 ⌜id⌝′ {Γ = Γ ▷ A}  _ = 
   ⌜ id ⁺ A ⌝* ,ᴵ zeroᴵ  ≡⟨ cong (_,ᴵ zeroᴵ) ⌜⁺⌝ ⟩
   ⌜ id ⌝* ^ᴵ A          ≡⟨ cong (_^ᴵ A) ⌜id⌝ ⟩
@@ -1236,7 +1240,7 @@ compl-𝕞 : Methods compl-𝕄
 %endif
 
 \noindent
-\begin{minipage}{0.35\textwidth}
+\begin{minipage}{0.335\textwidth}
 \begin{code}
 compl-𝕞 .idᴹ = 
   ⌜ tm*⊑ v⊑t id ⌝*  ≡⟨ ⌜⊑⌝* ⟩
