@@ -176,7 +176,7 @@ record CwF-simple : Set₁ where
 For the contents, we begin with the category of contexts, using the 
 same naming conventions as introduced previously:
 
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}{0.5\textwidth}
 \begin{spec}
   Con  : Set
   _⊩_  : Con → Con → Set
@@ -212,7 +212,7 @@ The category of contexts has a terminal object (the empty context), and
 context extension resembles categorical products but mixing contexts
 and types:
 
-\begin{minipage}{0.5\textwidth}
+\begin{minipage}{0.55\textwidth}
 \begin{spec}
   •   : Con
   ε   : Γ ⊩ •
@@ -223,7 +223,7 @@ and types:
   π₁   : Γ ⊩ (Δ ▷ A) → Γ ⊢ A
 \end{spec} 
 \end{minipage}
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}{0.4\textwidth}
 \begin{spec}
   •-η : δ ≡ ε
   

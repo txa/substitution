@@ -223,19 +223,22 @@ _^_ : Γ ⊩[ q ] Δ → ∀ A → Γ ▷ A ⊩[ q ] Δ ▷ A
 \end{code}
 %endif
 
-\noindent
-\begin{minipage}{0.62\textwidth}
 \begin{code}
 _[_] : Γ ⊢[ q ] A → Δ ⊩[ r ] Γ → Δ ⊢[ q ⊔ r ] A
-zero       [ xs , x ]  = x
-(suc i _)  [ xs , x ]  = i [ xs ]
 \end{code}
-\end{minipage}
-\begin{minipage}{0.3\textwidth}
+
+\noindent
+\begin{minipage}{0.55\textwidth}
 \begin{code}
 (` i)      [ xs ]      = tm⊑  ⊑t  (i [ xs ])
 (t · u)    [ xs ]      = (t [ xs ]) · (u [ xs ])
 (ƛ t)      [ xs ]      = ƛ (t [ xs ^ _ ]) 
+\end{code}
+\end{minipage}
+\begin{minipage}{0.3\textwidth}
+\begin{code}
+zero       [ xs , x ]  = x
+(suc i _)  [ xs , x ]  = i [ xs ]
 \end{code}
 \end{minipage}
 
@@ -295,7 +298,7 @@ _⁺_ : Γ ⊩[ q ] Δ → (A : Ty) → Γ ▷ A ⊩[ q ] Δ
 %endif
 
 \noindent
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}{0.5\textwidth}
 \begin{code}
 suc[_]  :  ∀ q → Γ ⊢[ q ] B → ∀ A 
         →  Γ ▷ A ⊢[ q ] B

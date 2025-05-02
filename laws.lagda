@@ -262,34 +262,48 @@ tm[] {q = T} = refl
 
 We are now ready to prove |[∘]| by structural induction:
 
-\noindent
-\begin{minipage}{0.5\textwidth}
 \begin{code}
-[∘] {x = zero}     {xs = xs , x}       = 
-   refl
-[∘] {x = suc i _}  {xs = xs , x}       = 
-   [∘] {x = i}
-[∘] {x = ` x}      {xs = xs}{ys = ys}  = 
-   tm⊑ ⊑t (x [ xs ∘ ys ])
-    ≡⟨ cong (tm⊑ ⊑t) ([∘] {x = x}) ⟩
-   tm⊑ ⊑t (x [ xs ] [ ys ])
-    ≡⟨ tm[] {x = x [ xs ]} ⟩        
-   (tm⊑ ⊑t (x [ xs ])) [ ys ] ∎
+[∘] {x = zero}     {xs = xs , x}         = refl
+[∘] {x = suc i _}  {xs = xs , x}         = [∘] {x = i}
+[∘] {x = ` x}      {xs = xs}  {ys = ys}  = 
+   tm⊑ ⊑t (x [ xs ∘ ys ])      ≡⟨ cong (tm⊑ ⊑t) ([∘] {x = x}) ⟩
+   tm⊑ ⊑t (x [ xs ] [ ys ])    ≡⟨ tm[] {x = x [ xs ]} ⟩        
+   (tm⊑ ⊑t (x [ xs ])) [ ys ]  ∎
+[∘] {x = t · u}                           = cong₂ _·_ ([∘] {x = t}) ([∘] {x = u})
+[∘] {x = ƛ t}      {xs = xs}  {ys = ys}   = cong ƛ_ (
+   t [ (xs ∘ ys) ^ _ ]         ≡⟨ cong (λ zs → t [ zs ]) ^∘  ⟩
+   t [ (xs ^ _) ∘ (ys ^ _)  ]  ≡⟨ [∘] {x = t} ⟩           
+   (t [ xs ^ _ ]) [ ys ^ _ ]   ∎)
 \end{code}
-\end{minipage}
-\begin{minipage}{0.35\textwidth}
-\begin{code}
-[∘] {x = t · u}                  =
-   cong₂ _·_ ([∘] {x = t}) ([∘] {x = u})
-[∘] {x = ƛ t}{xs = xs}{ys = ys}  =
-   cong ƛ_ (
-     t [ (xs ∘ ys) ^ _ ]
-     ≡⟨ cong (λ zs → t [ zs ]) ^∘  ⟩
-     t [ (xs ^ _) ∘ (ys ^ _)  ]
-     ≡⟨ [∘] {x = t} ⟩           
-     (t [ xs ^ _ ]) [ ys ^ _ ] ∎)
-\end{code}
-\end{minipage}
+
+% \noindent
+% \begin{minipage}{0.5\textwidth}
+% \begin{code}
+% [∘] {x = zero}     {xs = xs , x}       = 
+%    refl
+% [∘] {x = suc i _}  {xs = xs , x}       = 
+%    [∘] {x = i}
+% [∘] {x = ` x}      {xs = xs}{ys = ys}  = 
+%    tm⊑ ⊑t (x [ xs ∘ ys ])
+%     ≡⟨ cong (tm⊑ ⊑t) ([∘] {x = x}) ⟩
+%    tm⊑ ⊑t (x [ xs ] [ ys ])
+%     ≡⟨ tm[] {x = x [ xs ]} ⟩        
+%    (tm⊑ ⊑t (x [ xs ])) [ ys ] ∎
+% \end{code}
+% \end{minipage}
+% \begin{minipage}{0.35\textwidth}
+% \begin{code}
+% [∘] {x = t · u}                  =
+%    cong₂ _·_ ([∘] {x = t}) ([∘] {x = u})
+% [∘] {x = ƛ t}{xs = xs}{ys = ys}  =
+%    cong ƛ_ (
+%      t [ (xs ∘ ys) ^ _ ]
+%      ≡⟨ cong (λ zs → t [ zs ]) ^∘  ⟩
+%      t [ (xs ^ _) ∘ (ys ^ _)  ]
+%      ≡⟨ [∘] {x = t} ⟩           
+%      (t [ xs ^ _ ]) [ ys ^ _ ] ∎)
+% \end{code}
+% \end{minipage}
 
 Associativity |∘∘ : xs ∘ (ys ∘ zs) ≡ (xs ∘ ys) ∘ zs| can be proven merely by a 
 fold of |[∘]| over substitutions.
