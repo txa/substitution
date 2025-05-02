@@ -200,11 +200,7 @@ $\sqcup\mathrm{v}$, $\sqcup\mathrm{t}$) into rewrite rules.
 This introduces new definitional equalities, i.e.
 |q ⊔ (r ⊔ s) = (q ⊔ r) ⊔ s| is now used by the type
 checker\footnote{Effectively, this feature allows a selective use of 
-extensional Type Theory. We enable Agda's confluence checking with
-|--local-confluence-check| as a sanity-check that our rewrites
-are reasonable (Agda can also check confluence globally, but this requires
-manually resolving critical pairs with extra rewrite rules, which
-becomes somewhat tedious).}.
+extensional Type Theory.}.
 
 The order on sorts gives rise to a functor, witnessed by
 |tm⊑ : q ⊑ s → Γ ⊢[ q ] A → Γ ⊢[ s ] A|, where |tm⊑ rfl x  = x| and
