@@ -305,8 +305,9 @@ We are now ready to prove |[∘]| by structural induction:
 % \end{code}
 % \end{minipage}
 
-Associativity |∘∘ : xs ∘ (ys ∘ zs) ≡ (xs ∘ ys) ∘ zs| can be proven merely by a 
-fold of |[∘]| over substitutions.
+\noindent
+Associativity |∘∘ : xs ∘ (ys ∘ zs) ≡ (xs ∘ ys) ∘ zs| can be proven by folding 
+|[∘]| over substitutions.
 %if False
 \begin{code}
 ∘∘ : xs ∘ (ys ∘ zs) ≡ (xs ∘ ys) ∘ zs

@@ -443,7 +443,7 @@ former's |Fixpoint| command merely supports structural recursion on a
 single argument and the latter has only raw elimination principles as
 primitive. Luckily, both of these proof assistants layer on additional
 commands/tactics to support more natural use of non-primitive 
-induction, making our approach at least somewhat 
+induction, making our approach somewhat 
 transferable\footnote{Indeed, Lean can be convinced that our substitution 
 operations
 terminate after specifying measures similar to those in section 

@@ -237,12 +237,17 @@ and types:
   π₁∘  : π₁ (θ ∘ δ) ≡ (π₁ θ) [ δ ]  
 \end{spec}
 \end{minipage}\\
+%if jfpstyle
 We can define the morphism part of the context extension functor as
 before:
 \begin{spec}
   _^_ : Γ ⊩ Δ → ∀ A → Γ ▷ A ⊩ Δ ▷ A
   δ ^ A = (δ ∘ (π₀ id)) , π₁ id
 \end{spec}
+%else
+We can define the morphism part of the context extension functor as
+before, |δ ^ A = (δ ∘ (π₀ id)) , π₁ id|.
+%endif
 We need to add the specific components for simply typed
 $\lambda$-calculus; we add the type constructors, the term
 constructors and the corresponding naturality laws:
@@ -536,8 +541,8 @@ An important first step is to actually define the initial CwF (and its
 eliminator). We use postulates and rewrite rules instead of a Cubical 
 Agda higher inductive type (HIT) because of technical limitations mentioned 
 previously.
-We also reuse our existing datatypes for contexts and types for convenience
-(note terms do not occur inside types in STLC).
+We can reuse our existing datatypes for contexts and types because in STLC 
+there are no non-trivial equations on these components.
 
 %if False
 \begin{code}
@@ -559,9 +564,7 @@ x ≡[ refl ]≡ y = x ≡ y
 
 To avoid name clashes between our existing syntax and the initial CwF 
 constructors, we annotate every |ICwF| constructor with |ᴵ|. e.g.
-|_⊢ᴵ_ : Con → Ty → Set|, |idᴵ  : Γ ⊩ᴵ Γ| etc. Note we reuse the definitions
-of contexts and types as in STLC there are no non-trivial equations on these
-components.
+|_⊢ᴵ_ : Con → Ty → Set|, |idᴵ  : Γ ⊩ᴵ Γ| etc.
 
 %if False
 \begin{code}
@@ -1270,6 +1273,8 @@ cases to cover, so for brevity we elide the proofs of |⌜[]⌝| and |⌜suc⌝|
 
 We also prove preservation of substitution composition 
 |⌜∘⌝ : ⌜ xs ∘ ys ⌝* ≡ ⌜ xs ⌝* ∘ᴵ ⌜ ys ⌝*| in similar fashion, folding |⌜[]⌝|.
+The main cases of |compl-𝕞 : Methods compl-𝕄| can now be proved by just applying 
+the preservation lemmas and inductive hypotheses, e.g:
 
 %if False
 \begin{code}
@@ -1283,9 +1288,6 @@ We also prove preservation of substitution composition
   (⌜ xs ⌝* ,ᴵ ⌜ x ⌝) ∘ᴵ ⌜ ys ⌝* ∎
 \end{code}
 %endif
-
-The main cases of |compl-𝕞 : Methods compl-𝕄| can now be proved by just applying the 
-preservation lemmas and inductive hypotheses, e.g:
 
 %if False
 \begin{code}
