@@ -71,16 +71,16 @@
 \doival{10.1017/xxxxx}
 
 \lefttitle{T. Altenkirch, N. Burke and P. Wadler}
-\righttitle{Substitution without copy and paste}
+\righttitle{Substitution Without Copy and Paste}
 
 \totalpg{\pageref{lastpage01}}
 \jnlDoiYr{2025}
 %else
-\def\titlerunning{Substitution without copy and paste}
+\def\titlerunning{Substitution Without Copy and Paste}
 \def\authorrunning{T. Altenkirch, N. Burke \& P. Wadler}
 %endif
 
-\title{Substitution without copy and paste}
+\title{Substitution Without Copy and Paste}
 
 %if jfpstyle
 \begin{authgrp}
