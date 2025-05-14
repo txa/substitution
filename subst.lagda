@@ -223,6 +223,7 @@ _^_ : Γ ⊩[ q ] Δ → ∀ A → Γ ▷ A ⊩[ q ] Δ ▷ A
 \end{code}
 %endif
 
+%if jfpstyle
 \begin{code}
 _[_] : Γ ⊢[ q ] A → Δ ⊩[ r ] Γ → Δ ⊢[ q ⊔ r ] A
 \end{code}
@@ -241,6 +242,23 @@ zero       [ xs , x ]  = x
 (suc i _)  [ xs , x ]  = i [ xs ]
 \end{code}
 \end{minipage}
+%else
+\noindent
+\begin{minipage}{0.55\textwidth}
+\begin{spec}
+_[_] : Γ ⊢[ q ] A → Δ ⊩[ r ] Γ → Δ ⊢[ q ⊔ r ] A
+zero       [ xs , x ]  = x
+(suc i _)  [ xs , x ]  = i [ xs ]
+\end{spec}
+\end{minipage}
+\begin{minipage}{0.3\textwidth}
+\begin{spec}
+(` i)      [ xs ]      = tm⊑  ⊑t  (i [ xs ])
+(t · u)    [ xs ]      = (t [ xs ]) · (u [ xs ])
+(ƛ t)      [ xs ]      = ƛ (t [ xs ^ _ ]) 
+\end{spec}
+\end{minipage}
+%endif
 
 We use |_⊔_| here to take care of the fact that substitution will only return a 
 variable if both inputs are variables / renamings. We

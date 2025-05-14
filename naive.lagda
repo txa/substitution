@@ -43,7 +43,11 @@ variable
 $\lambda$-terms (|t, u, v|):
 
 \noindent
+%if jfpstyle
 \begin{minipage}{0.45\textwidth}
+%else
+\begin{minipage}{0.4\textwidth}
+%endif
 \begin{code}
 data _∋_ : Con → Ty → Set where 
   zero  :  Γ ▷ A ∋ A
@@ -52,7 +56,11 @@ data _∋_ : Con → Ty → Set where
 \end{code}
 \end{minipage}
 \hfill
+%if jfpstyle
 \begin{minipage}{0.5\textwidth}
+%else
+\begin{minipage}{0.55\textwidth}
+%endif
 \begin{code}
 data _⊢_ : Con → Ty → Set where 
   `_   :  Γ ∋ A → Γ ⊢ A
@@ -80,7 +88,11 @@ _^_ : Γ ⊩ Δ → (A : Ty) → Γ ▷ A ⊩ Δ ▷ A
 \end{code}
 %endif
 
+%if jfpstyle
 \begin{minipage}{0.5\textwidth}
+%else
+\begin{minipage}{0.45\textwidth}
+%endif
 \begin{code}
 _v[_] : Γ ∋ A → Δ ⊩ Γ → Δ ⊢ A
 zero       v[ ts , t ] = t
@@ -174,7 +186,11 @@ data _⊩v_ : Con → Con → Set where
 \end{code}
 \noindent
 \justifying
+%if jfpstyle
 \begin{minipage}{0.45\textwidth}
+%else
+\begin{minipage}{0.4\textwidth}
+%endif
 \begin{code}
 _v[_]v : Γ ∋ A → Δ ⊩v Γ → Δ ∋ A
 zero       v[ is , i ]v  = i
@@ -189,6 +205,7 @@ is ^v A                  = is ⁺v A , zero
 \end{code}
 \end{minipage}
 \hfill
+%if jfpstyle
 \begin{minipage}{0.45\textwidth}
 \begin{code}
 _[_]v : Γ ⊢ A → Δ ⊩v Γ → Δ ⊢ A
@@ -203,6 +220,21 @@ idv {Γ = Γ ▷ A}  = idv ^v A
 
 suc-tm t A       = t [ idv ⁺v A ]v
 \end{code}
+%else
+\begin{minipage}{0.5\textwidth}
+\begin{spec}
+_[_]v : Γ ⊢ A → Δ ⊩v Γ → Δ ⊢ A
+(` i)   [ is ]v  =  ` (i v[ is ]v)
+(t · u) [ is ]v  =  (t [ is ]v) · (u [ is ]v)
+(ƛ t)   [ is ]v  =  ƛ (t [ is ^v _ ]v)
+
+idv : Γ ⊩v Γ
+idv {Γ = •}      = ε
+idv {Γ = Γ ▷ A}  = idv ^v A
+
+suc-tm t A       = t [ idv ⁺v A ]v
+\end{spec}
+%endif
 \end{minipage}
 
 This may not seem too bad: to ensure structural termination we just have to

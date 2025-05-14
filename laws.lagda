@@ -378,6 +378,7 @@ zero[] {q = T} = refl
 Finally, we have all the ingredients to prove the second functor law |^∘|:
 \footnote{Actually, we also need that zero commutes with |tm⊑|: that is for any
 |q⊑r : q ⊑ r| we have that |tm⊑zero q⊑r : zero[ r ] ≡ tm⊑ q⊑r zero[ q ]|.}
+%if jfpstyle
 \begin{code}
 ^∘ {r = r}{s = s}{xs = xs}{ys = ys} {A = A} = 
     (xs ∘ ys) ^ A                  ≡⟨⟩
@@ -389,4 +390,15 @@ Finally, we have all the ingredients to prove the second functor law |^∘|:
     (xs ⁺ A) ∘  (ys ^ A) , zero[ r ] [ ys ^ A ]  ≡⟨⟩  
     (xs ^ A) ∘ (ys ^ A)                          ∎
 \end{code}
- 
+%else
+\begin{spec}
+^∘ {r = r}{s = s}{xs = xs}{ys = ys} {A = A} = 
+    (xs ∘ ys) ^ A                  ≡⟨⟩
+    (xs ∘ ys) ⁺ A , zero[ r ⊔ s ]  ≡⟨ cong₂ _,_ (sym (⁺-nat∘ {xs = xs})) refl ⟩
+    xs ∘ (ys ⁺ A) , zero[ r ⊔ s ]  ≡⟨ cong₂ _,_ refl (tm⊑zero (⊑⊔r {r = s}{q = r})) ⟩        
+    xs ∘ (ys ⁺ A) , tm⊑ (⊑⊔r {q = r}) zero[ s ]  
+      ≡⟨ cong₂ _,_ (sym (⁺∘ {xs = xs})) (sym (zero[] {q = r}{x = zero[ s ]}))  ⟩    
+    (xs ⁺ A) ∘  (ys ^ A) , zero[ r ] [ ys ^ A ]  ≡⟨⟩  
+    (xs ^ A) ∘ (ys ^ A)                          ∎
+\end{spec}
+%endif

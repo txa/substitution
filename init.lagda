@@ -212,6 +212,9 @@ The category of contexts has a terminal object (the empty context), and
 context extension resembles categorical products but mixing contexts
 and types:
 
+%if not jfstyle
+\noindent
+%endif
 \begin{minipage}{0.55\textwidth}
 \begin{spec}
   •   : Con
@@ -346,14 +349,22 @@ We first extend |tm⊑| to renamings/substitutions with a fold:
 |tm*⊑| coercions can be lifted outside of our substitution operators:
 
 \noindent
+%if jfpstyle
 \begin{minipage}{0.45\textwidth}
+%else
+\begin{minipage}{0.4\textwidth}
+%endif
 \begin{spec}
   ⊑∘   : tm*⊑ v⊑t xs ∘ ys   ≡ xs ∘ ys
   ∘⊑   : xs ∘ tm*⊑ v⊑t ys   ≡ xs ∘ ys
   t[⊑] : t [ tm*⊑ v⊑t ys ]  ≡ t [ ys ]
 \end{spec}
 \end{minipage}
+%if jfpstyle
 \begin{minipage}{0.5\textwidth}
+%else
+\begin{minipage}{0.55\textwidth}
+%endif
 \begin{spec}
   ⊑⁺   : tm*⊑ ⊑t xs ⁺ A     ≡ tm*⊑ v⊑t (xs ⁺ A)
   ⊑^   : tm*⊑ v⊑t xs ^ A    ≡ tm*⊑ v⊑t (xs ^ A)
@@ -369,10 +380,9 @@ ways of weakening variables.
 
 \begin{code}
   suc[id⁺] : i [ id ⁺ A ] ≡ suc i A
-  suc[id⁺] {i = i} {A = A} =
-    i [ id ⁺ A ]      ≡⟨ ⁺-nat[]v {i = i} ⟩ 
-    suc (i [ id ]) A  ≡⟨ cong (λ j → suc j A) [id] ⟩
-    suc i A ∎
+  suc[id⁺] {i = i} {A = A} =  i [ id ⁺ A ]      ≡⟨ ⁺-nat[]v {i = i} ⟩                       
+                              suc (i [ id ]) A  ≡⟨ cong (λ j → suc j A) [id] ⟩
+                              suc i A ∎
 \end{code}
 
 %if False
@@ -496,8 +506,9 @@ differing implementations of |_^_|.
 \end{code}
 %endif
 
+%if jfpstyle
 \begin{code}
-  is-cwf .CwF.ƛ[] {A = A} {t = x} {δ = ys} =           
+  is-cwf .CwF.ƛ[] {A = A} {t = x} {δ = ys} =  
     ƛ x [ ys ^ A ]                
     ≡⟨ cong (λ ρ → ƛ x [ ρ ^ A ]) (sym ∘id) ⟩         
     ƛ x [ (ys ∘ id) ^ A ]         
@@ -506,6 +517,15 @@ differing implementations of |_^_|.
     ≡⟨ cong (λ ρ → ƛ x [ ρ , ` zero ]) (sym (∘⊑ {ys = id ⁺ _})) ⟩
     ƛ x [ ys ∘ tm*⊑ v⊑t (id ⁺ A) , ` zero ] ∎
 \end{code}
+%else
+\begin{spec}
+  is-cwf .CwF.ƛ[] {A = A} {t = x} {δ = ys} =           
+    ƛ x [ ys ^ A ]                ≡⟨ cong (λ ρ → ƛ x [ ρ ^ A ]) (sym ∘id) ⟩         
+    ƛ x [ (ys ∘ id) ^ A ]         ≡⟨ cong (λ ρ → ƛ x [ ρ , ` zero ]) (sym ⁺-nat∘) ⟩  
+    ƛ x [ ys ∘ id ⁺ A , ` zero ]  ≡⟨ cong (λ ρ → ƛ x [ ρ , ` zero ]) (sym (∘⊑ {ys = id ⁺ _})) ⟩
+    ƛ x [ ys ∘ tm*⊑ v⊑t (id ⁺ A) , ` zero ] ∎
+\end{spec}
+%endif
 
 We have shown our recursive substitution syntax satisfies the CwF laws, but we
 want to go a step further and show initiality: that our syntax is
@@ -609,16 +629,21 @@ sucᴵ x A = x [ π₀ᴵ idᴵ ]ᴵ
 
 % TODO: Is this the correct paper to cite? i.e. was this the first paper to use
 % use this convention or was it taken from somewhere else?
-We state the eliminator for the initial CwF in terms of |Motive : Set₁| and 
+We state the eliminator for the initial CwF assuming appropriate |Motive : Set₁| and 
 |Methods : Motive → Set₁| records as in \cite{altenkirch2016tt_in_tt}.
 Again to avoid name clashes, we annotate fields of these records (corresponding
 to how each type/constructor is eliminated) with |ᴹ|.
 
+%if jfpstyle
 \begin{spec}
 module _ {𝕄} (𝕞 : Methods 𝕄) where
 \end{spec}
+%endif
 
+%if jfpstyle
 \vspace{-1ex}
+%endif
+\noindent
 \begin{minipage}{0.35\textwidth}
 \begin{spec}
   elim-con  : ∀ Γ → Conᴹ Γ
@@ -968,15 +993,20 @@ means there are many more cases. We start with the motive:
 \begin{code}
 compl-𝕄 : Motive
 \end{code}
-
 \noindent
 \begin{minipage}{0.6\textwidth}
+%if not jfpstyle
+\vspace{-2ex}
+%endif
 \begin{code}
 compl-𝕄 .Tmᴹ _ _ tᴵ   = ⌜ norm tᴵ ⌝ ≡ tᴵ
 compl-𝕄 .Tmsᴹ _ _ δᴵ  = ⌜ norm* δᴵ ⌝* ≡ δᴵ
 \end{code}
 \end{minipage}
 \begin{minipage}{0.35\textwidth}
+%if not jfpstyle
+\vspace{-2ex}
+%endif
 \begin{code}
 compl-𝕄 .Conᴹ _  = ⊤
 compl-𝕄 .Tyᴹ  _  = ⊤
@@ -1172,6 +1202,7 @@ cases to cover, so for brevity we elide the proofs of |⌜[]⌝| and |⌜suc⌝|
 \end{code}
 
 \noindent
+%if jfpstyle
 \begin{minipage}{0.45\textwidth}
 \begin{code}
 ⌜⁺⌝ {xs = ε}               = 
@@ -1196,6 +1227,30 @@ cases to cover, so for brevity we elide the proofs of |⌜[]⌝| and |⌜suc⌝|
   idᴵ                   ∎
 \end{code}
 \end{minipage}
+%else
+\begin{minipage}{0.45\textwidth}
+\begin{code}
+⌜⁺⌝ {xs = ε}               = sym •-ηᴵ
+⌜⁺⌝ {xs = xs , x} {A = A}  = 
+  ⌜ xs ⁺ A ⌝* ,ᴵ ⌜ suc[ _ ] x A ⌝
+  ≡⟨ cong₂ _,ᴵ_ ⌜⁺⌝ (⌜suc⌝ {x = x}) ⟩
+  (⌜ xs ⌝* ∘ᴵ wkᴵ) ,ᴵ (⌜ x ⌝ [ wkᴵ ]ᴵ)
+  ≡⟨ sym ,∘ᴵ ⟩
+  (⌜ xs ⌝* ,ᴵ ⌜ x ⌝) ∘ᴵ wkᴵ ∎
+\end{code}
+\end{minipage}
+\begin{minipage}{0.45\textwidth}
+\begin{code}
+⌜id⌝′ {Γ = •}      _ = sym •-ηᴵ
+⌜id⌝′ {Γ = Γ ▷ A}  _ = 
+  ⌜ id ⁺ A ⌝* ,ᴵ zeroᴵ  ≡⟨ cong (_,ᴵ zeroᴵ) ⌜⁺⌝ ⟩
+  ⌜ id ⌝* ^ᴵ A          ≡⟨ cong (_^ᴵ A) ⌜id⌝ ⟩
+  idᴵ ^ᴵ A              ≡⟨ cong (_,ᴵ zeroᴵ) id∘ᴵ ⟩
+  wkᴵ ,ᴵ zeroᴵ          ≡⟨ ▷-ηᴵ ⟩
+  idᴵ                   ∎
+\end{code}
+\end{minipage}
+%endif
 
 %if False
 \begin{code}
