@@ -149,8 +149,10 @@ Philip Wadler
 
 % \begin{document}
 
-% \AtBeginEnvironment{hscode}{\setlength{\parskip}{0pt} \vspace{-1.5ex}}
-% \AtEndEnvironment{hscode}{\vspace{-1.5ex}}
+%if not jfpstyle
+\AtBeginEnvironment{hscode}{\setlength{\parskip}{0pt} \vspace{-1.5ex}}
+\AtEndEnvironment{hscode}{\vspace{-1.5ex}}
+%endif
 
 %if jfpstyle
 \maketitle[T]

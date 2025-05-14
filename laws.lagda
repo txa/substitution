@@ -146,10 +146,10 @@ be of type |Sort| to satisfy Agda here. More discussion on this trick
 can be found at Agda issue
 \href{https://github.com/agda/agda/issues/7693}{\#7693}, but in summary:
 \begin{itemize} 
-   \item \vspace{-2ex} Agda considers all base constructors (constructors with no parameters) 
+   \item \vspace{-1ex} Agda considers all base constructors (constructors with no parameters) 
    to be of minimal size structurally, so their presence can track size
    preservation of other base-constructor arguments across function calls.
-   \item \vspace{-2ex} It turns out that
+   \item \vspace{-1ex} It turns out that
    a strict decrease in |Sort| is not necessary everywhere for termination: 
    note that the context also gets structurally smaller in the call to |_⁺_| 
    from |id|.

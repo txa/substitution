@@ -190,6 +190,7 @@ data _⊩v_ : Con → Con → Set where
 \begin{minipage}{0.45\textwidth}
 %else
 \begin{minipage}{0.4\textwidth}
+% \vspace{-2ex}
 %endif
 \begin{code}
 _v[_]v : Γ ∋ A → Δ ⊩v Γ → Δ ∋ A
@@ -222,6 +223,7 @@ suc-tm t A       = t [ idv ⁺v A ]v
 \end{code}
 %else
 \begin{minipage}{0.5\textwidth}
+% \vspace{-2ex}
 \begin{spec}
 _[_]v : Γ ⊢ A → Δ ⊩v Γ → Δ ⊢ A
 (` i)   [ is ]v  =  ` (i v[ is ]v)

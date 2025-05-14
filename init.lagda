@@ -996,7 +996,7 @@ compl-𝕄 : Motive
 \noindent
 \begin{minipage}{0.6\textwidth}
 %if not jfpstyle
-\vspace{-2ex}
+% \vspace{-2ex}
 %endif
 \begin{code}
 compl-𝕄 .Tmᴹ _ _ tᴵ   = ⌜ norm tᴵ ⌝ ≡ tᴵ
@@ -1005,7 +1005,7 @@ compl-𝕄 .Tmsᴹ _ _ δᴵ  = ⌜ norm* δᴵ ⌝* ≡ δᴵ
 \end{minipage}
 \begin{minipage}{0.35\textwidth}
 %if not jfpstyle
-\vspace{-2ex}
+% \vspace{-2ex}
 %endif
 \begin{code}
 compl-𝕄 .Conᴹ _  = ⊤
