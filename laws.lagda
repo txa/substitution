@@ -146,10 +146,10 @@ be of type |Sort| to satisfy Agda here. More discussion on this trick
 can be found at Agda issue
 \href{https://github.com/agda/agda/issues/7693}{\#7693}, but in summary:
 \begin{itemize} 
-   \item \vspace{-2ex} Agda considers all base constructors (constructors with no parameters) 
+   \item \vspace{-1ex} Agda considers all base constructors (constructors with no parameters) 
    to be of minimal size structurally, so their presence can track size
    preservation of other base-constructor arguments across function calls.
-   \item \vspace{-2ex} It turns out that
+   \item \vspace{-1ex} It turns out that
    a strict decrease in |Sort| is not necessary everywhere for termination: 
    note that the context also gets structurally smaller in the call to |_⁺_| 
    from |id|.
@@ -305,8 +305,9 @@ We are now ready to prove |[∘]| by structural induction:
 % \end{code}
 % \end{minipage}
 
-Associativity |∘∘ : xs ∘ (ys ∘ zs) ≡ (xs ∘ ys) ∘ zs| can be proven merely by a 
-fold of |[∘]| over substitutions.
+\noindent
+Associativity |∘∘ : xs ∘ (ys ∘ zs) ≡ (xs ∘ ys) ∘ zs| can be proven by folding 
+|[∘]| over substitutions.
 %if False
 \begin{code}
 ∘∘ : xs ∘ (ys ∘ zs) ≡ (xs ∘ ys) ∘ zs
@@ -378,6 +379,7 @@ zero[] {q = T} = refl
 Finally, we have all the ingredients to prove the second functor law |^∘|:
 \footnote{Actually, we also need that zero commutes with |tm⊑|: that is for any
 |q⊑r : q ⊑ r| we have that |tm⊑zero q⊑r : zero[ r ] ≡ tm⊑ q⊑r zero[ q ]|.}
+%if jfpstyle
 \begin{code}
 ^∘ {r = r}{s = s}{xs = xs}{ys = ys} {A = A} = 
     (xs ∘ ys) ^ A                  ≡⟨⟩
@@ -389,4 +391,15 @@ Finally, we have all the ingredients to prove the second functor law |^∘|:
     (xs ⁺ A) ∘  (ys ^ A) , zero[ r ] [ ys ^ A ]  ≡⟨⟩  
     (xs ^ A) ∘ (ys ^ A)                          ∎
 \end{code}
- 
+%else
+\begin{spec}
+^∘ {r = r}{s = s}{xs = xs}{ys = ys} {A = A} = 
+    (xs ∘ ys) ^ A                  ≡⟨⟩
+    (xs ∘ ys) ⁺ A , zero[ r ⊔ s ]  ≡⟨ cong₂ _,_ (sym (⁺-nat∘ {xs = xs})) refl ⟩
+    xs ∘ (ys ⁺ A) , zero[ r ⊔ s ]  ≡⟨ cong₂ _,_ refl (tm⊑zero (⊑⊔r {r = s}{q = r})) ⟩        
+    xs ∘ (ys ⁺ A) , tm⊑ (⊑⊔r {q = r}) zero[ s ]  
+      ≡⟨ cong₂ _,_ (sym (⁺∘ {xs = xs})) (sym (zero[] {q = r}{x = zero[ s ]}))  ⟩    
+    (xs ⁺ A) ∘  (ys ^ A) , zero[ r ] [ ys ^ A ]  ≡⟨⟩  
+    (xs ^ A) ∘ (ys ^ A)                          ∎
+\end{spec}
+%endif
