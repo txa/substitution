@@ -1,10 +1,24 @@
+%include is-jfp.lagda
+
+%if jfpstyle
 \documentclass{jfp}
+%else
+\documentclass[submission,copyright,creativecommons]{eptcs}
+\providecommand{\event}{LFMTP 2025}
+%endif
+
 % \documentclass[a4paper,UKenglish,cleveref, autoref, thm-restate]{lipics-v2021}
 % \documentclass[sigplan,10pt,natbib]{acmart}
 %\documentclass[sigplan,10pt,natbib,anonymous,review]{acmart}
 
+%if not jfpstyle
+\usepackage{underscore}
+\usepackage[T1]{fontenc}
+%endif
+
 \usepackage{graphicx}
 \usepackage{caption}
+\usepackage{amsmath}
 
 % \setlength{\abovedisplayskip}{2pt}
 % \setlength{\belowdisplayskip}{2pt}
@@ -30,8 +44,6 @@
 
 % \renewcommand{\hscodestyle}{\setlength{\baselineskip}{0.3\baselineskip}}
 
-%include is-full.lagda
-
 % From https://tex.stackexchange.com/questions/325297/how-to-scale-a-tikzcd-diagram
 \tikzcdset{scale cd/.style={every label/.append style={scale=#1},
     cells={nodes={scale=#1}}}}
@@ -45,10 +57,15 @@
 \newcommand*\bigcdot@@[2]{\mathbin{\vcenter{\hbox{\scalebox{#2}{$\m@@th#1\cdot$}}}}}
 \makeatother
 
+%if jfpstyle
 \bibliographystyle{./jfplike}
+%else
+\bibliographystyle{./eptcs}
+%endif
 
 \begin{document}
 
+%if jfpstyle
 \journaltitle{JFP}
 \cpr{Cambridge University Press}
 \doival{10.1017/xxxxx}
@@ -58,20 +75,41 @@
 
 \totalpg{\pageref{lastpage01}}
 \jnlDoiYr{2025}
+%else
+\def\titlerunning{Substitution without copy and paste}
+\def\authorrunning{T. Altenkirch, N. Burke \& P. Wadler}
+%endif
 
 \title{Substitution without copy and paste}
 
+%if jfpstyle
 \begin{authgrp}
 \author{Thorsten Altenkirch}
 \affiliation{University of Nottingham, Nottingham, UK\\
         (\email{thorsten.altenkirch@@nottingham.ac.uk})}
 \author{Nathaniel Burke}
 \affiliation{Imperial College London, London, UK\\
+% I am going to lose access to my Imperial email address when I graduate so
+% I think giving a gmail probably makes more sense...
         (\email{nathanielrburke3@@gmail.com})}
 \author{Philip Wadler}
 \affiliation{University of Edinburgh, Edinburgh, UK\\
         (\email{wadler@@inf.ed.ac.uk})}
 \end{authgrp}
+%else
+\author{Thorsten Altenkirch
+\institute{University of Nottingham\\Nottingham, UK}
+\email{thorsten.altenkirch@@nottingham.ac.uk}
+\and
+Nathaniel Burke
+\institute{Imperial College London\\London, UK}
+\email{nathanielrburke3@@gmail.com}
+\and 
+Philip Wadler
+\institute{University of Edinburgh\\Edinburgh, UK}
+\email{wadler@@inf.ed.ac.uk}
+}
+%endif
 
 % \author{Thorsten Altenkirch}
 % \affiliation{%
@@ -114,6 +152,12 @@
 % \AtBeginEnvironment{hscode}{\setlength{\parskip}{0pt} \vspace{-1.5ex}}
 % \AtEndEnvironment{hscode}{\vspace{-1.5ex}}
 
+%if jfpstyle
+\maketitle[T]
+%else
+\maketitle
+%endif
+
 \begin{abstract}
 When defining substitution recursively for a language with binders
 like the simply typed $\lambda$-calculus, we need to define
@@ -126,8 +170,6 @@ We use our setup to also show that the recursive definition of
 substitution gives rise to a simply typed category with families (CwF)
 and indeed that it is isomorphic to the initial simply typed CwF.
 \end{abstract}
-
-\maketitle[T]
 
 \section{Introduction}
 \label{sec:introduction}
@@ -516,13 +558,17 @@ we believe that the construction here can be useful to others.
 % Association for Computing Machinery,
 % 2024. https://doi.org/10.1145/3678000.3678201.
 
+%if jfpstyle
 \section*{Conflicts of Interest}
 
 % I assume?
 None.
+%endif
 
 \bibliography{./local}
 
+%if jfpstyle
 \label{lastpage01}
+%endif
 
 \end{document}
