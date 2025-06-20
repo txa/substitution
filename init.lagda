@@ -633,7 +633,7 @@ sucᴵ x A = x [ π₀ᴵ idᴵ ]ᴵ
 % TODO: Is this the correct paper to cite? i.e. was this the first paper to use
 % use this convention or was it taken from somewhere else?
 We state the eliminator for the initial CwF assuming appropriate |Motive : Set₁| and 
-|Methods : Motive → Set₁| records as in \cite{altenkirch2016tt_in_tt}.
+|Methods : Motive → Set₁| records as in \cite{altenkirch2016tt}.
 Again to avoid name clashes, we annotate fields of these records (corresponding
 to how each type/constructor is eliminated) with |ᴹ|.
 

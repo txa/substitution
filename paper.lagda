@@ -324,7 +324,7 @@ substitutions are the \emph{substitution normal forms}.
 \label{sec:related-work}
 
 De Bruijn introduced his eponymous indices and
-also the notion of simultaneous substitution in \cite{de_bruijn_lambda_1972}. 
+also the notion of simultaneous substitution in \cite{bruijn1972lambda}. 
 We are here using a
 typed version of de Bruijn indices, e.g. see \cite{alti:csl99} where
 the problem of showing termination of a simple definition of
@@ -504,7 +504,7 @@ This has the unfortunate property that there is now more than one way to
 write terms that used to be identical. For instance, the terms
 |● ↑ ↑ · ● ↑ · ●| and |(● ↑ · ●) ↑ · ●| are equivalent, where |● ↑ ↑|
 corresponds to the variable with de Bruijn index two. A development
-along these lines is explored in \cite{wadler_explicit_2024}.
+along these lines is explored in \cite{wadler2024explicit}.
 
 % It
 % leads to a compact development, but one where the
