@@ -342,8 +342,8 @@ into
 \cite{allais2017type} from a monadic perspective. Indeed this example
 is one of the motivations for relative monads
 \cite{altenkirch2015monads}. In the monadic approach, we represent substitutions 
-as functions;,
-however it is not clear how to extend this to dependent types without
+as functions;
+however, it is not clear how to extend this to dependent types without
 ``very dependent'' \cite{hickey1996formal, altenkirch2023munchhausen} types.
 
 % We avoid the monadic perspective which here for two reasons: first we want
@@ -387,9 +387,9 @@ We extensively use |variable| declarations to introduce implicit
 quantification (we summarize the variable conventions in passing in
 the text). We also use $\forall{}$-prefix so we can elide types of function
 parameters where they can be inferred, i.e. instead of |{Γ : Con} → ..| we just 
-write |∀ {Γ} → ..|. Implicit variables, which are indicated by using |{..}| 
-instead of |(..)| in dependent function types, can be instantiated using the 
-syntax |f {x = y}|.
+write |∀ {Γ} → ..|. Implicit variables are indicated by using |{..}| 
+instead of |(..)| in dependent function types. These can be instantiated using 
+the  syntax |f {x = y}|.
 
 Agda syntax is very flexible, allowing mixfix syntax declarations using `|_|'s 
 to indicate where the parameters go.
