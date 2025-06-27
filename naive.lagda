@@ -210,10 +210,10 @@ is ^v A                  = is ⁺v A , zero
 \begin{minipage}{0.45\textwidth}
 \begin{code}
 _[_]v : Γ ⊢ A → Δ ⊩v Γ → Δ ⊢ A
-(` i)   [ is ]v  =  ` (i v[ is ]v)
-(t · u) [ is ]v  =  
+(` i)    [ is ]v  =  ` (i v[ is ]v)
+(t · u)  [ is ]v  =  
   (t [ is ]v) · (u [ is ]v)
-(ƛ t)   [ is ]v  =  ƛ (t [ is ^v _ ]v)
+(ƛ t)    [ is ]v  =  ƛ (t [ is ^v _ ]v)
 
 idv : Γ ⊩v Γ
 idv {Γ = •}      = ε
@@ -226,9 +226,9 @@ suc-tm t A       = t [ idv ⁺v A ]v
 % \vspace{-2ex}
 \begin{spec}
 _[_]v : Γ ⊢ A → Δ ⊩v Γ → Δ ⊢ A
-(` i)   [ is ]v  =  ` (i v[ is ]v)
-(t · u) [ is ]v  =  (t [ is ]v) · (u [ is ]v)
-(ƛ t)   [ is ]v  =  ƛ (t [ is ^v _ ]v)
+(` i)    [ is ]v  =  ` (i v[ is ]v)
+(t · u)  [ is ]v  =  (t [ is ]v) · (u [ is ]v)
+(ƛ t)    [ is ]v  =  ƛ (t [ is ^v _ ]v)
 
 idv : Γ ⊩v Γ
 idv {Γ = •}      = ε

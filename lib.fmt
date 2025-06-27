@@ -12,7 +12,7 @@
 
 %format ≃ = "\simeq"
 
-%format Set₁ = "\mathrm{Set}_1"
+%format Set₁ = "\Varid{Set}_1"
 
 %format ⊤ = "\top"
 %format ⊥ = "\bot"
@@ -102,33 +102,33 @@
 
 %format _∨ᶜ_ = "\_\vee^c\_"
 %format ∨ᶜ = "\vee^c"
-%format inj₁ᶜ = "\mathrm{inj}_1^c"
-%format inj₂ᶜ = "\mathrm{inj}_2^c" 
-%format caseᶜ = "\mathrm{case}^c"
-%format tndᶜ = "\mathrm{tnd}^c"
+%format inj₁ᶜ = "\Varid{inj}_1^c"
+%format inj₂ᶜ = "\Varid{inj}_2^c" 
+%format caseᶜ = "\Varid{case}^c"
+%format tndᶜ = "\Varid{tnd}^c"
 
-%format μT = "\mu\mathrm{T}"
-%format νT = "\nu\mathrm{T}"
+%format μT = "\mu\Varid{T}"
+%format νT = "\nu\Varid{T}"
 
 %format Σ[ = "{\Sigma}["
 %format φ = "\phi"
 %format ψ = "\psi"
-%format Σ-eq = "{\Sigma}\mathrm{-eq}"
-%format Π-eq = "{\Sigma}\mathrm{-eq}"
+%format Σ-eq = "{\Sigma}\Varid{-eq}"
+%format Π-eq = "{\Sigma}\Varid{-eq}"
 
 %format ∃ᶜ = "\exists^c"
 %format ∃ᶜ[ = "\exists^c["
-%format exᶜ-i = "\mathrm{ex}^c\mathrm{-i}"
-%format exᶜ-e = "\mathrm{ex}^c\mathrm{-e}"
+%format exᶜ-i = "\Varid{ex}^c\Varid{-i}"
+%format exᶜ-e = "\Varid{ex}^c\Varid{-e}"
 %format _≡ᶜ_ = "\_\equiv^c\_"
 %format ≡ᶜ = "\equiv^c"
-%format reflᶜ = "\mathrm{refl}^c"
-%format substᶜ = "\mathrm{subst}^c"
+%format reflᶜ = "\Varid{refl}^c"
+%format substᶜ = "\Varid{subst}^c"
 
 %format _⊩_  = "\_\Vdash\_"
 %format ⊩  = "\Vdash"
-%format _⊩v_  = "\_\Vdash\!{\mathrm{v}}\_"
-%format ⊩v  = "\Vdash\!{\mathrm{v}}"
+%format _⊩v_  = "\_\Vdash\!{\Varid{v}}\_"
+%format ⊩v  = "\Vdash\!{\Varid{v}}"
 
 %%format ƛ = "\text{\textcrlambda}"
 %%format ƛ_ = "\text{\textcrlambda}\_"
@@ -168,15 +168,15 @@
 %format ^_ = ^ "\_"
 %format _^_ = "\_\uparrow\_"
 
-%format ^v = "\uparrow\!{\mathrm{v}}"
-%format _^v_ = "\_\uparrow\!{\mathrm{v}}\_"
+%format ^v = "\uparrow\!{\Varid{v}}"
+%format _^v_ = "\_\uparrow\!{\Varid{v}}\_"
 
 %format ε = "\varepsilon"
 
 %format ⁺ = "^{+}"
 %format _⁺_ = "\_^{+}\_"
-%format _⁺v_ = "\_" "^{+}\!{\mathrm{v}}" "\_"
-%format ⁺v = "^{+}\!{\mathrm{v}}"
+%format _⁺v_ = "\_" "^{+}\!{\Varid{v}}" "\_"
+%format ⁺v = "^{+}\!{\Varid{v}}"
 %format _⁺_, = "\_^{+}\_,"
 
 %format _,_  = "\_" , "\_"
@@ -218,10 +218,10 @@
 %format q⊑r = q "\!\sqsubseteq\!" r
 %format tm⊑zero = tm "\!\sqsubseteq\!" zero
 
-%format ⊑q⊔ = "\sqsubseteq\!\mathrm{q}\!\sqcup"
+%format ⊑q⊔ = "\sqsubseteq\!\Varid{q}\!\sqcup"
 %format ⊑⊔r = "\sqsubseteq\!\sqcup" r
 
-%format tm*⊑ = tm "\mathrm{*}\!\sqsubseteq"
+%format tm*⊑ = tm "\Varid{*}\!\sqsubseteq"
 %format q⊑s = q "\!\sqsubseteq\!" s
 
 %format ⊑∘ = "\sqsubseteq\!\circ"
@@ -243,10 +243,10 @@
 %format compl-𝕄 = compl- 𝕄
 %format compl-𝕞 = compl- 𝕞
 
-%format norm*     = norm "\mathrm{*}"
-%format elim-cwf*  = elim-cwf "\mathrm{*}"
-%format rec-cwf*   = rec-cwf "\mathrm{*}"
-%format elim-cwf*- = elim-cwf "\mathrm{*}" -
+%format norm*     = norm "\Varid{*}"
+%format elim-cwf*  = elim-cwf "\Varid{*}"
+%format rec-cwf*   = rec-cwf "\Varid{*}"
+%format elim-cwf*- = elim-cwf "\Varid{*}" -
 
 %format elim-cwf*-idβ = elim-cwf*- id β
 %format elim-cwf*-∘β  = elim-cwf*- ∘ β
@@ -260,7 +260,7 @@
 
 %format ⌜    = "\ulcorner"
 %format ⌝    = "\urcorner"
-%format ⌝*   = ⌝ "\mathrm{*}"
+%format ⌝*   = ⌝ "\Varid{*}"
 %format ⌜_⌝  = ⌜ "\_" ⌝ 
 %format ⌜_⌝* = ⌜ "\_" ⌝*
 
@@ -277,7 +277,7 @@
 %format ⌜⊑⌝*  = ⌜ ⊑ ⌝*
 %format ⌜∘⌝   = ⌜ ∘ ⌝
 
-%format .CwF. = "\mathrm{.CwF.}"
+%format .CwF. = "\Varid{.CwF.}"
 %format .CwF._∘_  = .CwF. _∘_
 %format .CwF._⊢_  = .CwF. _⊢_
 %format .CwF._⊩_  = .CwF. _⊩_
@@ -301,7 +301,7 @@
 %format .CwF.·[]  = .CwF. ·[]
 %format .CwF.ƛ[]  = .CwF. ƛ[]
 
-%format ᴵ     = "^{\mathrm{I}}"
+%format ᴵ     = "^{\Varid{I}}"
 %format ⊢ᴵ    = ⊢ ᴵ
 %format _⊢ᴵ_  = "\_" ⊢ᴵ "\_"
 %format ⊩ᴵ    = ⊩ ᴵ
@@ -354,7 +354,7 @@
 %format ,ᴵ_     = ,_     ᴵ
 %format _^ᴵ     = _^     ᴵ
 
-%format ᴹ = "^{\mathrm{M}}"
+%format ᴹ = "^{\Varid{M}}"
 %format Conᴹ  = Con ᴹ
 %format Tyᴹ   = Ty ᴹ
 %format Tmᴹ   = Tm ᴹ
@@ -411,36 +411,36 @@
 %format ·[]ᴹ  = ·[] ᴹ
 %format ƛ[]ᴹ  = ƛ[] ᴹ
 
-%format .Conᴹ  = "\mathrm{.}" Conᴹ
-%format .Tyᴹ   = "\mathrm{.}" Tyᴹ
-%format .Tmᴹ   = "\mathrm{.}" Tmᴹ
-%format .Tmsᴹ  = "\mathrm{.}" Tmsᴹ
-%format .idᴹ   = "\mathrm{.}" idᴹ
-%format ._∘ᴹ_  = "\mathrm{.}" _∘ᴹ_
-%format .id∘ᴹ  = "\mathrm{.}" id∘ᴹ
-%format .∘idᴹ  = "\mathrm{.}" ∘idᴹ
-%format .∘∘ᴹ   = "\mathrm{.}" ∘∘ᴹ
-%format ._[_]ᴹ = "\mathrm{.}" _[_]ᴹ
-%format .[∘]ᴹ  = "\mathrm{.}" [∘]ᴹ
-%format .•ᴹ    = "\mathrm{.}" •ᴹ
-%format .εᴹ    = "\mathrm{.}" εᴹ
-%format .•-ηᴹ  = "\mathrm{.}" •-ηᴹ
-%format ._▷ᴹ_  = "\mathrm{.}" _▷ᴹ_
-%format ._,ᴹ_  = "\mathrm{.}" _,ᴹ_
-%format .π₀ᴹ   = "\mathrm{.}" π₀ᴹ
-%format .π₁ᴹ   = "\mathrm{.}" π₁ᴹ
-%format .▷-β₀ᴹ = "\mathrm{.}" ▷-β₀ᴹ
-%format .▷-β₁ᴹ = "\mathrm{.}" ▷-β₁ᴹ
-%format .▷-ηᴹ  = "\mathrm{.}" ▷-ηᴹ
-%format .π₀∘ᴹ  = "\mathrm{.}" π₀∘ᴹ
-%format .π₁∘ᴹ  = "\mathrm{.}" π₁∘ᴹ
-%format .oᴹ    = "\mathrm{.}" oᴹ
-%format ._⇒ᴹ_  = "\mathrm{.}" _⇒ᴹ_
-%format ._·ᴹ_  = "\mathrm{.}" _·ᴹ_
-%format .ƛᴹ_   = "\mathrm{.}" ƛᴹ_
-%format .·[]ᴹ  = "\mathrm{.}" ·[]ᴹ
-%format .ƛ[]ᴹ  = "\mathrm{.}" ƛ[]ᴹ
-%format .[id]ᴹ = "\mathrm{.}" [id]ᴹ
+%format .Conᴹ  = "\Varid{.}" Conᴹ
+%format .Tyᴹ   = "\Varid{.}" Tyᴹ
+%format .Tmᴹ   = "\Varid{.}" Tmᴹ
+%format .Tmsᴹ  = "\Varid{.}" Tmsᴹ
+%format .idᴹ   = "\Varid{.}" idᴹ
+%format ._∘ᴹ_  = "\Varid{.}" _∘ᴹ_
+%format .id∘ᴹ  = "\Varid{.}" id∘ᴹ
+%format .∘idᴹ  = "\Varid{.}" ∘idᴹ
+%format .∘∘ᴹ   = "\Varid{.}" ∘∘ᴹ
+%format ._[_]ᴹ = "\Varid{.}" _[_]ᴹ
+%format .[∘]ᴹ  = "\Varid{.}" [∘]ᴹ
+%format .•ᴹ    = "\Varid{.}" •ᴹ
+%format .εᴹ    = "\Varid{.}" εᴹ
+%format .•-ηᴹ  = "\Varid{.}" •-ηᴹ
+%format ._▷ᴹ_  = "\Varid{.}" _▷ᴹ_
+%format ._,ᴹ_  = "\Varid{.}" _,ᴹ_
+%format .π₀ᴹ   = "\Varid{.}" π₀ᴹ
+%format .π₁ᴹ   = "\Varid{.}" π₁ᴹ
+%format .▷-β₀ᴹ = "\Varid{.}" ▷-β₀ᴹ
+%format .▷-β₁ᴹ = "\Varid{.}" ▷-β₁ᴹ
+%format .▷-ηᴹ  = "\Varid{.}" ▷-ηᴹ
+%format .π₀∘ᴹ  = "\Varid{.}" π₀∘ᴹ
+%format .π₁∘ᴹ  = "\Varid{.}" π₁∘ᴹ
+%format .oᴹ    = "\Varid{.}" oᴹ
+%format ._⇒ᴹ_  = "\Varid{.}" _⇒ᴹ_
+%format ._·ᴹ_  = "\Varid{.}" _·ᴹ_
+%format .ƛᴹ_   = "\Varid{.}" ƛᴹ_
+%format .·[]ᴹ  = "\Varid{.}" ·[]ᴹ
+%format .ƛ[]ᴹ  = "\Varid{.}" ƛ[]ᴹ
+%format .[id]ᴹ = "\Varid{.}" [id]ᴹ
 
 %format Con≡   = Con "\!" ≡
 %format Ty≡    = Ty "\!" ≡

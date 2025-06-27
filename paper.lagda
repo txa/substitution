@@ -238,7 +238,7 @@ was the category of simply-typed $\lambda$-terms and
 substitutions, and proving the expected category laws
 seemed a suitable exercise.
 We attempted to mechanise the
-solution in Agda, and hit a setback: multiple proofs had to be
+solution in Agda \cite{agda}, and hit a setback: multiple proofs had to be
 repeated multiple times. A guideline of
 good software engineering is to \textbf{not write code
 by copy and paste}, and this applies doubly to
@@ -277,9 +277,9 @@ This results in several similar operations:
 %The operations on terms depend on the operations on variables.
 \noindent The duplication gets worse when we prove properties
 of substitution such as the functor law,
-\begin{center}
-|x [ xs ∘ ys ] ≡ x [ xs ] [ ys ]|.
-\end{center}
+\begin{spec}
+x [ xs ∘ ys ] ≡ x [ xs ] [ ys ]
+\end{spec}
 All components |x|, |xs|, |ys| can be either variables/renamings
 or terms/substitutions, so we must prove eight combinations;
 and the repetition extends to the intermediary lemmas. 
@@ -364,34 +364,34 @@ but with renamings and substitutions defined separately, and relevant
 substitution lemmas repeated for all required combinations.
 
 
-\subsection{Using Agda}
-\label{sec:using-agda}
-
-For details of Agda see the online documentation
-\cite{agda}. We use inductive definitions with
-structurally recursive programs/proofs.
-Agda's termination checker \cite{alti:jfp02} investigates all
-possible recursive paths to find a lexical termination ordering.
-We make heavy use of mutual recursion.
-
-Agda permits turning propositional equations into rewrite rules.
-We exploit this to make the statement of some theorems more readable
-(avoiding manual transports with |subst|), but this is not essential.
-
-Implicit arguments are indicated by using |{..}| instead of |(..)|,
-and instantiated using the syntax |f {x = ..}|.
+% \subsection{Using Agda}
+% \label{sec:using-agda}
+% 
+% For details of Agda see the online documentation
+% \cite{agda}. We use inductive definitions with
+% structurally recursive programs/proofs.
+% Agda's termination checker \cite{alti:jfp02} investigates all
+% possible recursive paths to find a lexical termination ordering.
+% We make heavy use of mutual recursion.
+% 
+% Agda permits turning propositional equations into rewrite rules.
+% We exploit this to make the statement of some theorems more readable
+% (avoiding manual transports with |subst|), but this is not essential.
+% 
+% Implicit arguments are indicated by using |{..}| instead of |(..)|,
+% and instantiated using the syntax |f {x = ..}|.
 %TODO PLW: I think the explanation of implicit's is too compact to be helpful.
-Agda supports |variable| declarations to introduce implicit quantification.
+% Agda supports |variable| declarations to introduce implicit quantification.
 % Instead of |{Γ : Con} → ..| we write |∀ {Γ} → ..|.
 %TODO PLW: deleted above line as too mystifying.
 
-Agda allows mixfix notation using `|_|'s  to indicate where parameters go.
+% Agda allows mixfix notation using `|_|'s  to indicate where parameters go.
 % The standard library's definitions for equational derivations exploit this flexibility.
 %TODO PLW: deleted above line as too mystifying.
 
-This document is a literate Agda file. Different chapters are in different modules to
-avoid name clashes, e.g. preliminary definitions from Section~\ref{sec:naive-approach}
-are redefined later.
+% This document is a literate Agda file. Different chapters are in different modules to
+% avoid name clashes, e.g. preliminary definitions from Section~\ref{sec:naive-approach}
+% are redefined later.
 
 %include naive.lagda
 %include subst.lagda
