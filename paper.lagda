@@ -310,7 +310,7 @@ We also formulate our specification
 with a quotient-inductive-inductive type, or QIIT (a mutual 
 inductive type with equations)
 using explicit substitutions
-(where substitution is itself a term).
+(where substitution is itself a term former).
 In our specification 
 the substitution laws correspond to the equations of a simply-typed
 category with families (CwF)---a variant of a CwF
@@ -349,17 +349,17 @@ however, it is not clear how to extend this to dependent types without
 % dependent types where it is not clear how the monadic approach can be applied
 % without using very dependent types.
 
-There are a number of publications on formalising substitution laws.
+There are a number of publications on mechanising substitution.
 Stark~\emph{et al}~\cite{stark2019autosubst} develop a Rocq library which automatically derives
 substitution lemmas, but the proofs are repeated for renamings and
 substitutions. Their equational theory is similar to the simply
 typed CwFs in Section \ref{sec:initiality}.
 % TODO PLW: why is 'autosubst 2' cited, but not the original autosubst?
 Saffrich~\cite{saffrich2024abstractions} uses Agda with an \emph{extrinsic}
-formulation (separating preterms from types), and applies
+formulation (with preterms and typing separate), and applies
 \cite{allais2017type} to factor the construction using kits.
 In contrast, Saffrich~\cite{saffrich2024intrinsically} uses Agda with
-an \emph{intrinsic} formulation (as here, integrating terms with types),
+an \emph{intrinsic} formulation (as here, indexing terms by types),
 but with renamings and substitutions defined separately, and relevant 
 substitution lemmas repeated for all required combinations.
 
@@ -375,8 +375,8 @@ possible recursive paths to find a lexical termination ordering.
 We make heavy use of mutual recursion.
 
 Agda permits turning propositional equations into rewrite rules.
-We exploit this to make the statement of some theorems more readable by
-avoiding manual transports with |subst|, but is not essential.
+We exploit this to make the statement of some theorems more readable
+(avoiding manual transports with |subst|), but this is not essential.
 
 Implicit arguments are indicated by using |{..}| instead of |(..)|,
 and instantiated using the syntax |f {x = ..}|.
