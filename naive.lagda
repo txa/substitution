@@ -15,7 +15,8 @@ infix   8  _[_]v
 \section{The naive approach}
 \label{sec:naive-approach}
 
-First, we review the copy-and-paste approach. Define types (|A, B, C|) and contexts (|Γ, Δ, Θ|):
+First, we review the copy-and-paste approach. 
+We define types (|A, B, C|) and contexts (|Γ, Δ, Θ|):
 
 \begin{minipage}{0.45\textwidth}
 \begin{code}
@@ -38,7 +39,7 @@ variable
   Γ Δ Θ : Con  
 \end{code}
 %endif
-\\Introduce intrinsically typed de Bruijn variables (|i, j, k|) and
+\\and introduce intrinsically typed de Bruijn variables (|i, j, k|) and
 $\lambda$-terms (|t, u, v|):
 
 \noindent
@@ -70,8 +71,8 @@ data _⊢_ : Con → Ty → Set where
 
 The constructor |`_| embeds variables in
 $\lambda$-terms. Write applications as |t · u|.
-Following de~Bruijn, lambda abstraction |ƛ_| doesn't bind a name explicitly,
-and variables count the number of binders between them and their binding site. 
+Following de~Bruijn, lambda abstraction |ƛ_| doesn't bind a name explicitly.
+Instead, variables count the number of binders between them and their binding site. 
 Substitutions (|ts, us, vs|) are sequences of terms:
 \begin{code}
 data _⊩_ : Con → Con → Set where
@@ -79,7 +80,7 @@ data _⊩_ : Con → Con → Set where
   _,_  : Γ ⊩ Δ → Γ ⊢ A → Γ ⊩ Δ ▷ A  
 \end{code}
 % To define the categorical structure (|_∘_|, |id|) we first must define substitution for terms and variables:
-Now define substitution for terms and variables:
+We define the action of substitution for terms and variables:
 %if False
 \begin{code}
 _^_ : Γ ⊩ Δ → (A : Ty) → Γ ▷ A ⊩ Δ ▷ A
@@ -107,8 +108,8 @@ _[_] : Γ ⊢ A → Δ ⊩ Γ → Δ ⊢ A
 \end{minipage}\\
 We encounter a problem with the case for binders |ƛ_|. We are given a
 substitution |ts : Δ ⊩ Γ| but the body lives in the extended context
-|t : Γ , A ⊢ B|. We exploit the fact that context extension
-|_▷_| is functorial, |_^_ : Γ ⊩ Δ → (A : Ty) → Γ ▷ A ⊩ Δ ▷ A|.
+|t : Γ , A ⊢ B|. We exploit functoriality of context extension (|_▷_|),
+|_^_ : Γ ⊩ Δ → (A : Ty) → Γ ▷ A ⊩ Δ ▷ A|.
 Using |_^_|, we define |(ƛ t) [ ts ] =  ƛ (t [ ts ^ _ ])|.
 
 %if false
@@ -120,8 +121,8 @@ _[_] : Γ ⊢ A → Δ ⊩ Γ → Δ ⊢ A
 \end{code}
 %endif
 
-Now we have to define |_^_|. This is easy (isn't it?), but we
-need weakening on substitutions:
+Now, we must define |_^_|. This is easy (isn't it?), but we
+need weakening of substitutions (|_⁺_|):
 
 \noindent
 \begin{minipage}{0.4\textwidth}
@@ -143,7 +144,7 @@ ts ^ A = ts ⁺ A , ` zero
 %endif
 
 \noindent
-Now we need to define |_⁺_|, which is nothing but a fold of weakening
+|_⁺_| is nothing but a fold of weakening
 of terms:\\
 %if false
 \begin{code}
