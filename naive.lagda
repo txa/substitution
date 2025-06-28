@@ -15,8 +15,7 @@ infix   8  _[_]v
 \section{The naive approach}
 \label{sec:naive-approach}
 
-Let us first review the naive approach which leads to the
-copy-and-paste proof. We define types (|A, B, C|) and contexts (|Γ, Δ, Θ|):
+First, we review the copy-and-paste approach. Define types (|A, B, C|) and contexts (|Γ, Δ, Θ|):
 
 \begin{minipage}{0.45\textwidth}
 \begin{code}
@@ -39,7 +38,7 @@ variable
   Γ Δ Θ : Con  
 \end{code}
 %endif
-\\Next we introduce intrinsically typed de Bruijn variables (|i, j, k|) and
+\\Introduce intrinsically typed de Bruijn variables (|i, j, k|) and
 $\lambda$-terms (|t, u, v|):
 
 \noindent
@@ -69,19 +68,18 @@ data _⊢_ : Con → Ty → Set where
 \end{code}
 \end{minipage}
 
-Here the constructor |`_| embeds variables in
-$\lambda$-terms. We write applications as |t · u|. Since we use de
-Bruijn variables, lambda abstraction |ƛ_| doesn't bind a name explicitly
-(instead, variables count the number of binders between them and their 
-actual binding site). 
-We also define substitutions as sequences of terms:
+The constructor |`_| embeds variables in
+$\lambda$-terms. Write applications as |t · u|.
+Following de~Bruijn, lambda abstraction |ƛ_| doesn't bind a name explicitly,
+and variables count the number of binders between them and their binding site. 
+Substitutions (|ts, us, vs|) are sequences of terms:
 \begin{code}
 data _⊩_ : Con → Con → Set where
   ε    : Γ ⊩ •
   _,_  : Γ ⊩ Δ → Γ ⊢ A → Γ ⊩ Δ ▷ A  
 \end{code}
-Now to define the categorical structure (|_∘_|, |id|) we first need to define
-substitution for terms and variables:
+% To define the categorical structure (|_∘_|, |id|) we first must define substitution for terms and variables:
+Now define substitution for terms and variables:
 %if False
 \begin{code}
 _^_ : Γ ⊩ Δ → (A : Ty) → Γ ▷ A ⊩ Δ ▷ A
@@ -106,13 +104,12 @@ _[_] : Γ ⊢ A → Δ ⊩ Γ → Δ ⊢ A
 (t · u)  [ ts ] = (t [ ts ]) · (u [ ts ])
 (ƛ t)    [ ts ] = ƛ ?
 \end{spec}
-\end{minipage}
-
-As usual, we encounter a problem with the case for binders |ƛ_|. We are given a
-substitution |ts : Δ ⊩ Γ| but the body |t| lives in the extended context
-|t : Γ , A ⊢ B|. We need to exploit the fact that context extension
+\end{minipage}\\
+We encounter a problem with the case for binders |ƛ_|. We are given a
+substitution |ts : Δ ⊩ Γ| but the body lives in the extended context
+|t : Γ , A ⊢ B|. We exploit the fact that context extension
 |_▷_| is functorial, |_^_ : Γ ⊩ Δ → (A : Ty) → Γ ▷ A ⊩ Δ ▷ A|.
-Using |_^_| we can define |(ƛ t)   [ ts ]       =  ƛ (t [ ts ^ _ ])|.
+Using |_^_|, we define |(ƛ t) [ ts ] =  ƛ (t [ ts ^ _ ])|.
 
 %if false
 \begin{code}
@@ -123,7 +120,7 @@ _[_] : Γ ⊢ A → Δ ⊩ Γ → Δ ⊢ A
 \end{code}
 %endif
 
-However, now we have to define |_^_|. This is easy (isn't it?) but we
+Now we have to define |_^_|. This is easy (isn't it?), but we
 need weakening on substitutions:
 
 \noindent
@@ -147,8 +144,7 @@ ts ^ A = ts ⁺ A , ` zero
 
 \noindent
 Now we need to define |_⁺_|, which is nothing but a fold of weakening
-of terms:
-
+of terms:\\
 %if false
 \begin{code}
 suc-tm : Γ ⊢ B → (A : Ty) → Γ ▷ A ⊢ B
@@ -169,14 +165,14 @@ suc-tm : Γ ⊢ B → (A : Ty) → Γ ▷ A ⊢ B
 But how can we define |suc-tm| when we only have weakening for variables? If we
 already had identity |id : Γ ⊩ Γ| and substitution we could write:
 |suc-tm t A = t [ id ⁺ A ] |, 
-but this is certainly not structurally recursive (and hence is rejected
+but this is not structurally recursive (and is rejected
 by Agda's termination checker).
 
-To fix this, we use the fact that |id| is a renaming, i.e. it is 
-a substitution
-only containing variables, and we can easily define |_⁺v_| for
-renamings. This leads to a structurally recursive definition, but we
-have to repeat the substitution definition for renamings.
+To fix this, we use that |id| is a renaming, i.e.
+a substitution only containing variables,
+and defining |_⁺v_| for renamings is easy.
+This leads to a structurally recursive definition,
+though with some repetition.
 
 \centering
 \begin{code}
@@ -237,17 +233,14 @@ idv {Γ = Γ ▷ A}  = idv ^v A
 suc-tm t A       = t [ idv ⁺v A ]v
 \end{spec}
 %endif
-\end{minipage}
-
-This may not seem too bad: to ensure structural termination we just have to
-duplicate a few definitions, but it gets much worse when proving the
-laws. For example, to prove associativity, we first need to prove functoriality 
-of substitution: |[∘] : t [ us ∘ vs ] ≡ t [ us ] [ vs ]|.
+\end{minipage}\\
+This may not seem too bad, but it gets worse when proving the laws.
+Let |_∘_| be composition of substitutions.
+To prove associativity, we first need to prove functoriality,
+|[∘] : t [ us ∘ vs ] ≡ t [ us ] [ vs ]|.
 Since |t, us, vs| can be variables/renamings or terms/substitutions,
-there are in principle eight combinations. 
-Each time, we must to prove a number of lemmas again in a different setting.
+there are eight combinations. 
+For each, we must prove a number of lemmas again in a different setting.
 
-In the rest of the paper we describe a technique for factoring these definitions
-and the proofs, only relying on the Agda termination checker to validate that
-the recursion is structurally terminating.
- 
+The rest of the paper shows how to factor these definitions
+and proofs, using only structural recursion.
