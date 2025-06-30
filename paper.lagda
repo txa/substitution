@@ -526,13 +526,11 @@ We see the current construction as a warmup for the
 definition of substitution for dependent type theory
 This is harder,
 because then the typing of the constructors actually depends on the
-substitution laws. Such a M\"unchhausian \cite{altenkirch2023munchhausen} 
-construction should be possible in Agda (the reference is to Baron Münchhausen, who allegedly 
-pulled himself 
-out of a swamp by his own hair).
+substitution laws. Such a M{\"u}nchhausian \cite{altenkirch2023munchhausen} 
+construction should be possible in Agda.
 % PLW: deleted the following as redundant
 % We call definitions in type theory whose typing depends on equations about 
-% themselves \emph{M\"unchhausian}.
+% themselves \emph{M{\"u}nchhausian}.
 However, the theoretical underpinning of
 inductive-inductive-recursive definitions is mostly unexplored, with
 the exception of \cite{kaposi2023towards}.

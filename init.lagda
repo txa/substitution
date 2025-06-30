@@ -212,7 +212,7 @@ The category of contexts has a terminal object (the empty context), and
 context extension resembles categorical products but mixing contexts
 and types:
 
-%if not jfstyle
+%if not jfpstyle
 \noindent
 %endif
 \begin{minipage}{0.55\textwidth}

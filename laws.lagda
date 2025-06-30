@@ -129,7 +129,7 @@ Similarly to |id|, Agda will not accept a direct implementation of |id∘| as
 structurally recursive. Unfortunately, adapting the law to deal with a
 |Sort|-polymorphic |id| complicates matters: when |xs| is a renaming 
 (i.e. at sort |V|)
-composed with an identity substition (i.e. at sort |T|), its sort must be lifted
+composed with an identity substitution (i.e. at sort |T|), its sort must be lifted
 on
 the RHS (e.g. by extending the |tm⊑| functor to lists of terms) to
 obey |_⊔_|. 
