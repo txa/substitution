@@ -42,14 +42,15 @@ define a type |Sort| (|q, r, s|):
 data Sort : Set where
    V T : Sort  
  \end{spec}
-but this is not exactly what we want; ideally, Agda should know that
-the sort of variables |V| is \emph{smaller} than the sort of terms
-|T| (following intuition that variable weakening is trivial, but to 
-weaken a term we must construct a renaming). 
-Agda's termination checker only knows about the structural
-orderings, but with the following definition, we
-can make |V| structurally smaller than |T>V V isV|, while maintaining that 
-|Sort| has only two elements.
+But this is not quite what we want.
+Agda's termination checker uses structural orderings.
+Following our intuition that variable weakening is trivial but
+term weakening requires renaming, we want to make the sort
+of variables |V| structurally smaller than the sort of terms |T|.
+
+With the following definition, we
+make |V| structurally smaller than |T>V V isV|,
+while maintaining that |Sort| has only two elements.
 
 %if false
 \begin{code}
@@ -57,14 +58,14 @@ mutual
 \end{code}
 %endif
 \noindent
-\begin{minipage}{0.5\textwidth}
+\begin{minipage}{0.55\textwidth}
 \begin{code}
   data Sort : Set where
     V    : Sort
     T>V  : (s : Sort) → IsV s → Sort
 \end{code}
 \end{minipage}
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}{0.4\textwidth}
 \begin{code}
   data IsV : Sort → Set where
     isV : IsV V
@@ -77,24 +78,20 @@ variable
 \end{code}
 %endif
 
-Here the predicate |isV| only holds for |V|. This particular encoding makes
+\noindent
+The predicate |isV| only holds for |V|. This encoding makes
 use of Agda's support for inductive-inductive datatypes (IITs), but a
 pair of a natural number |n| and a proof |n ≤ 1| would also work, i.e.
 |Sort = Σ ℕ (_≤ 1)|.
-
-We can now define |T = T>V V isV : Sort| but, even better, we can tell Agda that
-this is a derived pattern with |pattern T = T>V V isV|.
-%if False
+We make |T : Sort| an abbreviation for |T>V V isV| with a pattern declaration.
 \begin{code}
 pattern T = T>V V isV
 \end{code}
-%endif
-This means we can pattern match over |Sort| just with |V| and |T|,
-while ensuring |V| is visibly (to Agda's termination checker) structurally 
+Now we can pattern match over |Sort| with |V| and |T|,
+while Agda's termination checker treats |V| as structurally 
 smaller than |T|.
 
-\noindent
-We can now define terms and variables in one go (|x, y, z|):
+It is now possible to define terms and variables (|x, y, z|) in one go:
 \begin{code}
 data _⊢[_]_ : Con → Sort → Ty → Set where
   zero  : Γ ▷ A ⊢[ V ] A
@@ -103,12 +100,10 @@ data _⊢[_]_ : Con → Sort → Ty → Set where
   _·_   : Γ ⊢[ T ] A ⇒ B → Γ ⊢[ T ] A → Γ ⊢[ T ] B
   ƛ_    : Γ ▷ A ⊢[ T ] B → Γ ⊢[ T ] A ⇒ B
 \end{code}
-
-While almost identical to the previous definition (|Γ ⊢[ V ] A| corresponds to
-|Γ ∋ A| and |Γ  ⊢[ T ]  A| to |Γ ⊢ A|)
-we can now
-parametrize all definitions and theorems explicitly. As a first step,
-we can generalize renamings and substitutions (|xs, ys, zs|):
+This recapitulates our previous definition, where
+|Γ ⊢[ V ] A| corresponds to |Γ ∋ A| and |Γ  ⊢[ T ]  A| to |Γ ⊢ A|.
+Now we can parametrize our previous development.
+As a first step, we generalize renamings and substitutions (|xs, ys, zs|):
 \begin{code}
 data _⊩[_]_ : Con → Sort → Con → Set where
   ε    : Γ ⊩[ q ] •
@@ -124,29 +119,32 @@ variable
 \end{code}
 %endif
 
-To account for the non-uniform behaviour of substitution and
-composition (the result is |V| only if both inputs are |V|) we define
-a least upper bound on |Sort|. We also need this order as a relation.
+We model the structural order on sorts as
+an explicit relation with a least upper bound.
+The latter will help with substitution and composition,
+where the result is |V| only if both inputs are |V|.
 
 \noindent
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}{0.55\textwidth}
+\begin{code}
+data _⊑_ : Sort → Sort → Set where
+  rfl : s ⊑ s
+  v⊑t : V ⊑ T
+\end{code}
+\end{minipage}
+\begin{minipage}{0.4\textwidth}
 \begin{code}
 _⊔_ : Sort → Sort → Sort
 V ⊔ r  =  r
 T ⊔ r  =  T
 \end{code}
 \end{minipage}
-\begin{minipage}{0.45\textwidth}
-\begin{code}
-data _⊑_ : Sort → Sort → Set where
-  rfl : s ⊑ s
-  v⊑t : V ⊑ T
-\end{code}
-\end{minipage}\\
+
+\noindent
 This is just boolean algebra. We need a number of laws:
 
 \noindent
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}{0.55\textwidth}
 \begin{code}
 ⊑t : s ⊑ T
 v⊑ : V ⊑ s
@@ -154,15 +152,17 @@ v⊑ : V ⊑ s
 ⊑⊔r : r ⊑ (q ⊔ r)
 \end{code}
 \end{minipage}
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}{0.4\textwidth}
 \begin{code}
 ⊔⊔ : q ⊔ (r ⊔ s) ≡ (q ⊔ r) ⊔ s
 ⊔v : q ⊔ V ≡ q
 ⊔t : q ⊔ T ≡ T
 \end{code}
-\end{minipage}\\
-which are easy to prove by case analysis, e.g. |⊑t {V} = v⊑t| and 
-|⊑t {T} = rfl|.
+\end{minipage}
+
+\noindent
+These are easy to prove by case analysis,
+e.g. |⊑t {V} = v⊑t| and |⊑t {T} = rfl|.
 %if False
 \begin{code}
 ⊑t {V} = v⊑t
@@ -187,95 +187,64 @@ v⊑ {T} = v⊑t
 ⊔t {T} = refl
 \end{code}
 %endif
-To improve readability we turn the equations ($\sqcup\sqcup$, 
-$\sqcup\mathrm{v}$, $\sqcup\mathrm{t}$) into rewrite rules.
-% \begin{spec}
-% {-# \Keyword{REWRITE} $\sqcup\!\sqcup \; \sqcup\mathrm{v} \;$ #-}
-% \end{spec}
-%if False
+Further, we turn the equations
+(|⊔⊔|, |⊔v|, |⊔t|) into rewrite rules.
 \begin{code}
 {-# REWRITE ⊔⊔ ⊔v ⊔t #-} 
 \end{code}
-%endif
-This introduces new definitional equalities, i.e.
-|q ⊔ (r ⊔ s) = (q ⊔ r) ⊔ s| is now used by the type
-checker\footnote{Effectively, this feature allows a selective use of 
-extensional Type Theory.}.
+This introduces new definitional equalities, allowing the
+type checker to exploit that |_⊔_| is associative
+and the other two laws (effectively, this feature allows a selective use of 
+extensional Type Theory).
 
-The order on sorts gives rise to a functor, witnessed by
-|tm⊑ : q ⊑ s → Γ ⊢[ q ] A → Γ ⊢[ s ] A|, where |tm⊑ rfl x  = x| and
-|tm⊑ v⊑t  i = ` i|.
-
-%if False
-\begin{code}
-tm⊑ : q ⊑ s → Γ ⊢[ q ] A → Γ ⊢[ s ] A
-tm⊑ rfl x  = x
-tm⊑ v⊑t  i = ` i
-\end{code}
-%endif
-
-By making functoriality of context extension parametric, 
-|_^_ : Γ ⊩[ q ] Δ → ∀ A → Γ ▷ A ⊩[ q ] Δ ▷ A|, we are ready to define 
-substitution and renaming in one operation:
-%if False
+Functoriality of context extension is now parametric
 \begin{code}
 _^_ : Γ ⊩[ q ] Δ → ∀ A → Γ ▷ A ⊩[ q ] Δ ▷ A
 \end{code}
-%endif
-
-%if jfpstyle
+We'll derive this later. Meanwhile,
+the order on sorts gives rise to another functor.
 \begin{code}
-_[_] : Γ ⊢[ q ] A → Δ ⊩[ r ] Γ → Δ ⊢[ q ⊔ r ] A
+tm⊑ : q ⊑ s → Γ ⊢[ q ] A → Γ ⊢[ s ] A
+tm⊑ rfl x  = x
+tm⊑ v⊑t i  = ` i
 \end{code}
+Now we can define substitution and renaming in one go:
 
 \noindent
 \begin{minipage}{0.55\textwidth}
+\begin{code}
+_[_] : Γ ⊢[ q ] A → Δ ⊩[ r ] Γ → Δ ⊢[ q ⊔ r ] A
+zero       [ xs , x ]  = x
+(suc i _)  [ xs , x ]  = i [ xs ]
+\end{code}
+\end{minipage}
+\begin{minipage}{0.4\textwidth}
 \begin{code}
 (` i)      [ xs ]      = tm⊑  ⊑t  (i [ xs ])
 (t · u)    [ xs ]      = (t [ xs ]) · (u [ xs ])
 (ƛ t)      [ xs ]      = ƛ (t [ xs ^ _ ]) 
 \end{code}
 \end{minipage}
-\begin{minipage}{0.3\textwidth}
-\begin{code}
-zero       [ xs , x ]  = x
-(suc i _)  [ xs , x ]  = i [ xs ]
-\end{code}
-\end{minipage}
-%else
+
+\noindent
+Here |_⊔_| ensures substitution returns a variable
+only if both inputs are variables/renamings.
+We use |tm⊑| because |i [ xs ]| will be a variable if
+|xs| is a renaming, but |(` i) [ xs ]| is always a term.
+
+We define |id| using |_^_|, recursing over contexts.
+To define |_^_| itself, we need parametric versions of |zero| and |suc|.
+Defining |zero| is easy.
+
 \noindent
 \begin{minipage}{0.55\textwidth}
-\begin{spec}
-_[_] : Γ ⊢[ q ] A → Δ ⊩[ r ] Γ → Δ ⊢[ q ⊔ r ] A
-zero       [ xs , x ]  = x
-(suc i _)  [ xs , x ]  = i [ xs ]
-\end{spec}
-\end{minipage}
-\begin{minipage}{0.3\textwidth}
-\begin{spec}
-(` i)      [ xs ]      = tm⊑  ⊑t  (i [ xs ])
-(t · u)    [ xs ]      = (t [ xs ]) · (u [ xs ])
-(ƛ t)      [ xs ]      = ƛ (t [ xs ^ _ ]) 
-\end{spec}
-\end{minipage}
-%endif
-
-We use |_⊔_| here to take care of the fact that substitution will only return a 
-variable if both inputs are variables / renamings. We
-need to use |tm⊑| to take care of the two cases when substituting for
-a variable. 
-
-We can also implement |id| using |_^_| (by folding contexts), but to define 
-|_^_| itself, we need parametric versions of |zero| and |suc|. |zero| is easy:
-
-\begin{minipage}{0.45\textwidth}
 \begin{spec}
 id : Γ ⊩[ V ] Γ
 id {Γ = •}      =  ε
 id {Γ = Γ ▷ A}  =  id ^ A
 \end{spec}
 \end{minipage}
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}{0.4\textwidth}
 \begin{code}
 zero[_] : ∀ q → Γ ▷ A ⊢[ q ] A
 zero[ V ]      =  zero
@@ -306,17 +275,16 @@ id = id-poly
 \end{code}
 %endif
 
-However, |suc| is more subtle since the case for |T| depends on its
-fold over substitutions:
+However, |suc| is more subtle since the case for |T| depends on
+weakening over substitutions:
 
 %if false
 \begin{code}
 _⁺_ : Γ ⊩[ q ] Δ → (A : Ty) → Γ ▷ A ⊩[ q ] Δ
 \end{code}
 %endif
-
 \noindent
-\begin{minipage}{0.5\textwidth}
+\begin{minipage}{0.55\textwidth}
 \begin{code}
 suc[_]  :  ∀ q → Γ ⊢[ q ] B → ∀ A 
         →  Γ ▷ A ⊢[ q ] B
@@ -324,7 +292,7 @@ suc[ V ] i  A  = suc i A
 suc[ T ] t  A  = t [ id ⁺  A ]
 \end{code}
 \end{minipage}
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}{0.4\textwidth}
 \begin{spec}
 _⁺_  :  Γ ⊩[ q ] Δ → ∀ A 
      →  Γ ▷ A ⊩[ q ] Δ
@@ -338,54 +306,45 @@ _⁺_  :  Γ ⊩[ q ] Δ → ∀ A
 (xs , x) ⁺ A = xs ⁺ A , suc[ _ ] x A 
 \end{code}
 %endif
-And finally we can define |xs ^ A =  xs ⁺ A , zero[ _ ]|.
-%if False
+And finally we can define |_^_| and |_∘_|.
+
+\noindent
+\begin{minipage}{0.4\textwidth}
 \begin{code}
-xs ^ A                 =  xs ⁺ A , zero[ _ ]
+xs ^ A =  xs ⁺ A , zero[ _ ]
 \end{code}
-%endif
+\end{minipage}
+\begin{minipage}{0.55\textwidth}
+\begin{code}
+_∘_ : Γ ⊩[ q ] Θ → Δ ⊩[ r ] Γ → Δ ⊩[ q ⊔ r ] Θ
+ε ∘ ys         = ε
+(xs , x) ∘ ys  = (xs ∘ ys) , x [ ys ]
+\end{code}
+\end{minipage}
+
+
 
 \subsection{Termination}
 \label{sec:termination}
 
-Unfortunately (as of Agda 2.7.0.1\footnote{
-At the cost of some elegance and performance, it is possible to extend Agda's 
-termination checker such that these definitions are accepted directly
-(\href{https://github.com/agda/agda/pull/7695}{\#7695}).}), 
-we now hit a termination error.
-
-%if False
+Unfortunately (as of Agda 2.7.0.1) we now hit a termination error.
 \begin{spec}
 Termination checking failed for the following functions:
   _^_, _[_], id, _⁺_, suc[_]
 \end{spec}
-%endif
+The cause turns out to be |id|.
+Termination here hinges on weakening for terms
+(|suc[ T ] t A|) applying a renaming rather than a full substitution.
+Note that if instead we had |id : Γ ⊩[ T ] Γ|, or if
+weakening for variables (|suc[ V ] i A|) was implemented by |i [ id ⁺ A ]|,
+our operations would still be type-correct but would genuinely loop,
+so perhaps Agda is right to be careful.
 
-The cause turns out to be |id|. Termination here hinges on weakening for terms
-(|suc[ T ] t A|) building
-and applying a renaming (i.e. a sequence of variables, for which weakening is
-trivial) rather than a full substitution. Note that if |id| produced
-`|Γ ⊩[ T ] Γ|'s, or if we implemented 
-weakening for variables (|suc[ V ] i A|) with |i [ id ⁺ A ]|, our operations
-would still be
-type-correct, but would genuinely loop, so perhaps Agda is right to be
-careful.
-
-Of course, we have specialised weakening for variables, so we now must ask 
-why Agda still doesn't accept our program. The limitation is ultimately a 
-technical one: Agda only looks at the direct arguments to function calls when 
+Why doesn't Agda accept our program? The limitation is ultimately
+technical: Agda only looks at direct arguments to function calls when 
 building the call graph from which it identifies termination order 
 \cite{alti:jfp02}. Because |id| is not passed a sort, the sort cannot be 
 considered as decreasing in the case of term weakening (|suc[ T ] t A|).
-
-Luckily, there is an easy solution here: making |id| |Sort|-polymorphic and
-instantiating with |V| at the call-sites
-adds new rows/columns (corresponding to the |Sort| argument) to the call
-matrices
-involving |id|, enabling the decrease
-to be tracked and termination to be correctly inferred by Agda.
-We present the call graph diagrammatically (inlining |_^_|), 
-in the style of \cite{keller2010hereditary}.
 
 \noindent
 \begin{minipage}{0.675\textwidth}
@@ -407,6 +366,7 @@ in the style of \cite{keller2010hereditary}.
 \arrow[in=300, out=240, loop, swap, "\substack{|r₁′ = r₁| \\ |t₁′ < t₁|}"]
 \end{tikzcd}
 \captionof{figure}{Call graph of substitution operations}
+\label{figure:termination}
 \end{minipage}
 \begin{minipage}{0.3\textwidth}
 \renewcommand{\arraystretch}{1.2}
@@ -430,20 +390,45 @@ Function & Measure \\
 \end{minipage}
 \\[2.0ex]
 
+Luckily, there is an easy solution: making |id| polymorphic in its |Sort|
+and instantiating with |V| at the call-sites
+enables the decrease
+to be tracked and termination to be correctly inferred by Agda.
+We present the call graph diagrammatically (inlining |_^_|), 
+in the style of \cite{keller2010hereditary} (Figure~\ref{figure:termination}).
+
 To justify termination, we note that along all cycles in the graph,
-either the 
-|Sort| strictly decreases
-in size, or the size of the |Sort| is preserved and some other argument
-(the context, substitution or term) gets smaller. Following this, we can
+either the |Sort| strictly decreases,
+or the |Sort| is preserved and some other argument
+(the context, substitution, or term) decreases. Following this, we can
 assign lexicographically-decreasing measures to each of the functions
 (\textsf{Table \ref{table:termination}}).
 
 In practice, we will generally require identity renamings, rather than
-substitutions, 
-and so we shall continue
-as if the original |id| definition worked (recovering |V|-only |id| from the
-|Sort|-polymorphic one is easy after all: we merely need to instantiate
-|{q = V}|).
+substitutions. We define |Sort|-polymorphic |id-poly|, and then define
+our original |id| by instantiating it at |V| and ensuring it is always
+inlined.
+
+\noindent
+\begin{minipage}{0.45\textwidth}
+\begin{spec}
+id-poly : Γ ⊩[ q ] Γ 
+id-poly {Γ = •} = ε
+id-poly {Γ = Γ ▷ A} = id-poly ^ A
+\end{spec}
+\end{minipage}
+\begin{minipage}{0.5\textwidth}
+\begin{spec}
+id : Γ ⊩[ V ] Γ 
+id = id-poly
+{-# INLINE id #-}
+\end{spec}
+\end{minipage}
+
+(All this fuss with |Sort|-polymorphic |id| may be unnecessary.
+At a cost in performance, it is possible to extend Agda's 
+termination checker so that our original definitions are accepted directly.
+See \href{https://github.com/agda/agda/pull/7695}{\#7695}.)
 
 % Dummy argument explanation (unnecessary)
 
@@ -519,13 +504,3 @@ as if the original |id| definition worked (recovering |V|-only |id| from the
 % we will use |id : Γ ⊩[ V ] Γ| without assumptions about how it is 
 % implemented.}
 
-Finally, we define composition, |_∘_ : Γ ⊩[ q ] Θ → Δ ⊩[ r ] Γ → Δ ⊩[ q ⊔ r ] Θ|
-by folding substitution.
-
-%if False
-\begin{code}
-_∘_ : Γ ⊩[ q ] Θ → Δ ⊩[ r ] Γ → Δ ⊩[ q ⊔ r ] Θ
-ε ∘ ys         = ε
-(xs , x) ∘ ys  = (xs ∘ ys) , x [ ys ]
-\end{code}
-%endif

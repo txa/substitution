@@ -18,6 +18,7 @@ infix   8  _[_]v
 First, we review the copy-and-paste approach. 
 We define types (|A, B, C|) and contexts (|Γ, Δ, Θ|):
 
+\noindent
 \begin{minipage}{0.45\textwidth}
 \begin{code}
 data Ty : Set where
@@ -25,7 +26,7 @@ data Ty : Set where
   _⇒_  : Ty → Ty → Ty
 \end{code}
 \end{minipage}
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}{0.5\textwidth}
 \begin{code}
 data Con : Set where
   •    : Con
@@ -39,14 +40,16 @@ variable
   Γ Δ Θ : Con  
 \end{code}
 %endif
-\\and introduce intrinsically typed de Bruijn variables (|i, j, k|) and
+
+\noindent
+Next we introduce intrinsically typed de Bruijn variables (|i, j, k|) and
 $\lambda$-terms (|t, u, v|):
 
 \noindent
 %if jfpstyle
 \begin{minipage}{0.45\textwidth}
 %else
-\begin{minipage}{0.4\textwidth}
+\begin{minipage}{0.45\textwidth}
 %endif
 \begin{code}
 data _∋_ : Con → Ty → Set where 
@@ -55,11 +58,11 @@ data _∋_ : Con → Ty → Set where
         →  Γ ▷ B ∋ A
 \end{code}
 \end{minipage}
-\hfill
+%\hfill
 %if jfpstyle
 \begin{minipage}{0.5\textwidth}
 %else
-\begin{minipage}{0.55\textwidth}
+\begin{minipage}{0.5\textwidth}
 %endif
 \begin{code}
 data _⊢_ : Con → Ty → Set where 
@@ -69,6 +72,7 @@ data _⊢_ : Con → Ty → Set where
 \end{code}
 \end{minipage}
 
+\noindent
 The constructor |`_| embeds variables in
 $\lambda$-terms. Write applications as |t · u|.
 Following de~Bruijn, lambda abstraction |ƛ_| doesn't bind a name explicitly.
@@ -79,14 +83,16 @@ data _⊩_ : Con → Con → Set where
   ε    : Γ ⊩ •
   _,_  : Γ ⊩ Δ → Γ ⊢ A → Γ ⊩ Δ ▷ A  
 \end{code}
-% To define the categorical structure (|_∘_|, |id|) we first must define substitution for terms and variables:
-We define the action of substitution on terms and variables:
+% To define the categorical structure (|_∘_|, |id|) we first must
+% define substitution for terms and variables:
+We define the action of substitution for terms and variables:
+
 %if False
 \begin{code}
 _^_ : Γ ⊩ Δ → (A : Ty) → Γ ▷ A ⊩ Δ ▷ A
 \end{code}
 %endif
-
+\noindent
 %if jfpstyle
 \begin{minipage}{0.5\textwidth}
 %else
@@ -98,14 +104,16 @@ zero       v[ ts , t ] = t
 (suc i _)  v[ ts , t ] = i v[ ts ]
 \end{code}
 \end{minipage}
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}{0.5\textwidth}
 \begin{spec}
 _[_] : Γ ⊢ A → Δ ⊩ Γ → Δ ⊢ A
 (` i)    [ ts ] = i v[ ts ]
 (t · u)  [ ts ] = (t [ ts ]) · (u [ ts ])
 (ƛ t)    [ ts ] = ƛ ?
 \end{spec}
-\end{minipage}\\
+\end{minipage}
+
+\noindent
 We encounter a problem with the case for binders |ƛ_|. We are given a
 substitution |ts : Δ ⊩ Γ| but the body lives in the extended context
 |t : Γ , A ⊢ B|. We exploit functoriality of context extension (|_▷_|),
@@ -125,12 +133,12 @@ Now, we must define |_^_|. This is easy (isn't it?), but we
 need weakening of substitutions (|_⁺_|):
 
 \noindent
-\begin{minipage}{0.4\textwidth}
+\begin{minipage}{0.45\textwidth}
 \begin{spec}
 ts ^ A = ts ⁺ A , ` zero 
 \end{spec}
 \end{minipage}
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}{0.5\textwidth}
 \begin{spec}
 _⁺_ : Γ ⊩ Δ → (A : Ty) → Γ ▷ A ⊩ Δ
 \end{spec}
@@ -144,25 +152,27 @@ ts ^ A = ts ⁺ A , ` zero
 %endif
 
 \noindent
-|_⁺_| is nothing but a fold of weakening
-of terms:\\
+The latter applies weakening |suc-tm| to each term:
+
 %if false
 \begin{code}
 suc-tm : Γ ⊢ B → (A : Ty) → Γ ▷ A ⊢ B
 \end{code}
 %endif
 \noindent
-\begin{minipage}{0.4\textwidth}
+\begin{minipage}{0.45\textwidth}
 \begin{code}
 ε         ⁺ A  = ε
 (ts , t)  ⁺ A  = ts ⁺ A , suc-tm t A  
 \end{code}
 \end{minipage}
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}{0.5\textwidth}
 \begin{spec}
 suc-tm : Γ ⊢ B → (A : Ty) → Γ ▷ A ⊢ B
 \end{spec}
-\end{minipage}\\
+\end{minipage}
+
+\noindent
 But how can we define |suc-tm| when we only have weakening for variables? If we
 already had identity |id : Γ ⊩ Γ| and substitution we could write:
 |suc-tm t A = t [ id ⁺ A ] |, 
@@ -175,18 +185,19 @@ and defining |_⁺v_| for renamings is easy.
 This leads to a structurally recursive definition,
 though with some repetition.
 
-\centering
+%\centering
+\noindent
 \begin{code}
 data _⊩v_ : Con → Con → Set where
   ε   : Γ ⊩v •
   _,_ : Γ ⊩v Δ → Γ ∋ A → Γ ⊩v Δ ▷ A
 \end{code}
 \noindent
-\justifying
+%\justifying
 %if jfpstyle
 \begin{minipage}{0.45\textwidth}
 %else
-\begin{minipage}{0.4\textwidth}
+\begin{minipage}{0.5\textwidth}
 % \vspace{-2ex}
 %endif
 \begin{code}
@@ -204,7 +215,7 @@ is ^v A                  = is ⁺v A , zero
 \end{minipage}
 \hfill
 %if jfpstyle
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}{0.5\textwidth}
 \begin{code}
 _[_]v : Γ ⊢ A → Δ ⊩v Γ → Δ ⊢ A
 (` i)    [ is ]v  =  ` (i v[ is ]v)
@@ -219,7 +230,7 @@ idv {Γ = Γ ▷ A}  = idv ^v A
 suc-tm t A       = t [ idv ⁺v A ]v
 \end{code}
 %else
-\begin{minipage}{0.5\textwidth}
+\begin{minipage}{0.45\textwidth}
 % \vspace{-2ex}
 \begin{spec}
 _[_]v : Γ ⊢ A → Δ ⊩v Γ → Δ ⊢ A
@@ -234,7 +245,9 @@ idv {Γ = Γ ▷ A}  = idv ^v A
 suc-tm t A       = t [ idv ⁺v A ]v
 \end{spec}
 %endif
-\end{minipage}\\
+\end{minipage}
+
+\noindent
 This may not seem too bad, but it gets worse when proving the laws.
 Let |_∘_| be composition of substitutions.
 To prove associativity, we first need to prove functoriality,
