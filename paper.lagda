@@ -401,12 +401,17 @@ substitution lemmas repeated for all required combinations.
 \section{Conclusions and further work}
 \label{sec:concl-furth-work}
 
-The subject of the paper is a problem we expect everybody (including
-ourselves) would have thought trivial.
-As it turns out, it isn't, and 
-we spent quite some time 
-going down alleys that didn't work, 
-and getting to grips with the subtleties of Agda's termination checking.
+The subject of the paper is a problem which we expect many 
+people (including ourselves) 
+would have thought trivial.
+Theorem provers have made significant progress since the first POPLMark 
+challenge \cite{aydemir2005poplmark} (which indeed focused on problems 
+relating to binding and substitution), motivating a shifted focus
+(onto logical relations proofs) in
+newer benchmarks \cite{abel2019poplmark}. 
+As it turns out, mechanising substitution
+elegantly still requires some care, and we spent quite some time getting to 
+grips with the subtleties of Agda's termination checking.
 
 % With hindsight, the main idea seems rather
 % obvious: introduce sorts as a datatype with the structure of a boolean
