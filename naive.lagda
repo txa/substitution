@@ -248,4 +248,4 @@ substitution
 stark2019autosubst, saffrich2024intrinsically}.
 
 The rest of the paper shows how to factor these definitions
-and proofs, using only structural recursion.
+and proofs, using only (lexicographic) structural recursion.

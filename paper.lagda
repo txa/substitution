@@ -359,7 +359,7 @@ Sch{\"{a}}fer and Stark~\emph{et al}~
 \cite{schafer2015autosubst, stark2019autosubst} develop a Rocq library which 
 automatically derives
 substitution lemmas, but the proofs are repeated for renamings and
-substitutions (similarly to
+substitutions (as in
 Section \ref{sec:naive-approach}). 
 Their equational theory is also similar to 
 the simply
