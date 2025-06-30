@@ -39,8 +39,13 @@
 \usepackage{tikz-cd}
 \let\Bbbk\relax % to avoid conflict
 %include lhs2TeX.fmt
-%include agda.fmt
-%include lib.fmt
+%%include agda.fmt
+%%include lib.fmt
+
+\usepackage[utf8]{inputenc}
+% \usepackage{newunicodechar}
+\newcommand{\Varid}[1]{#1}
+\usepackage{fontspec}
 
 % \renewcommand{\hscodestyle}{\setlength{\baselineskip}{0.3\baselineskip}}
 
@@ -62,6 +67,10 @@
 %else
 \bibliographystyle{./eptcs}
 %endif
+
+
+\setmonofont{JuliaMono}
+
 
 \begin{document}
 

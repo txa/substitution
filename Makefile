@@ -7,10 +7,10 @@ default: paper.pdf
 # 	lhs2TeX  --agda $< > $@
 
 paper.tex : paper.lagda is-jfp.lagda naive.lagda subst.lagda laws.lagda init.lagda lib.fmt
-	lhs2TeX --agda $< > $@
+	lhs2TeX --verb --agda $< > $@
 
 %.pdf : %.tex local.bib
-	latexmk -pdf $<
+	latexmk -pdf -pdflatex="xelatex" $<
 #	latexmk -pdf -pdflatex="xelatex" paper.tex
 
 supplement.zip : README.txt naive.lagda subst.lagda laws.lagda init.lagda
