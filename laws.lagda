@@ -111,11 +111,11 @@ Let's state the functor law but postpone the proof until the next section:
 [∘] : x [ xs ∘ ys ] ≡ x [ xs ] [ ys ]
 \end{code}
 %endif
-Even writing this signature requires associativity of |_⊔_|,
+Even stating this signature requires (definitional) associativity of |_⊔_|,
 since the left hand side has type |Δ ⊢[ q ⊔ (r ⊔ s) ] A|
 while the right hand side has type |Δ ⊢[ (q ⊔ r) ⊔ s ] A|.
-Fortunately, the rewrite we declared enforces the required associativity.
-(Alternatively we would have to insert a transport using |subst|.)
+Fortunately, we obtain this via the $\sqcup\sqcup$ rewrite rule, but
+alternatively we would have to insert a transport using |subst|.
 
 Of course, we must also state the left-identity law |id∘ : id ∘ xs ≡ xs|. 
 %if False

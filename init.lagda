@@ -74,10 +74,10 @@ definition of substitution gives rise to a simply typed CwF (Section
 \ref{sec:cwf-recurs-subst}). We can define the initial CwF as a
 quotient inductive-inductive type (QIIT).
 We postulate the existence of this QIIT in Agda, with
-the associated $\beta$-laws implemented with rewriting rules. 
-(An alternative is to use a Cubical Agda HIT,
+the associated $\beta$-laws implemented with rewrite rules
+(alternatively, we could use a truncated Cubical Agda HIT,
 but Cubical Agda still lacks essential automation,
-e.g. it does not integrate no-confusion properties into pattern matching.)
+e.g. it does not integrate no-confusion properties into pattern matching).
 By initiality, there is an evaluation
 functor from the initial CwF to the recursively defined CwF (defined
 in Section \ref{sec:cwf-recurs-subst}). On the
@@ -817,7 +817,7 @@ and then implement e.g. |rec-cwf = elim-cwf  cwf-to-methods|.
 
 The one extra ingredient we need to make this work out neatly is to introduce
 a new reduction for |cong|, |cong (λ _ → x) p ≡ refl|, via an Agda rewrite
-rule.
+rule (this identity also holds natively in Cubical).
 %if False
 \begin{code}
 cong-const : ∀ {A : Set ℓ₁} {B : Set ℓ₂} {x : A} 
@@ -830,8 +830,6 @@ cong-const {p = refl} = refl
 %endif
 This enables the no-longer-dependent |_≡[_]≡_|s to collapse to |_≡_|s 
 automatically.
-(Alternatively, |cong-cong| holds natively in Cubical.)
-
 
 %if False
 \begin{code}
@@ -1362,14 +1360,16 @@ the sledgehammer of set truncation (which prevents eliminating the initial
 CwF into any non-set).
 
 As we are working in vanilla Agda, we'll take a simpler approach, and rely on 
-dependent UIP,
-|duip : ∀ {p : x ≡ y} {q : z ≡ w} → p ≡[ r ]≡ q|,
+dependent uniqueness of identity proofs (UIP)
+\begin{spec}
+duip : ∀ {p : x ≡ y} {q : z ≡ w} → p ≡[ r ]≡ q
+\end{spec}
 which enables, e.g., |compl-𝕞 .id∘ᴹ  = duip|.
-(Note that proving this form of UIP relies 
+Note that proving this form of UIP relies 
 on type constructor injectivity, specifically, injectivity of |_≡_|. 
-We could use a weaker version taking an additional proof of |x ≡ z|, 
+We could use a weaker version, taking an additional proof of |x ≡ z|, 
 but this would be clunkier to use as Agda has no hope of inferring such a
-proof by unification.)
+proof by unification.
 
 %if False
 \begin{code}
@@ -1389,8 +1389,7 @@ compl-𝕞 .ƛ[]ᴹ  = duip
 \end{code}
 %endif
 
-\noindent
-And completeness is just one call to the eliminator away.
+Completeness is now just one call to the eliminator away.
 
 \begin{code}
 compl : ⌜ norm tᴵ ⌝ ≡ tᴵ

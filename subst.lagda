@@ -188,13 +188,13 @@ v⊑ {T} = v⊑t
 \end{code}
 %endif
 Further, we turn the equations
-(|⊔⊔|, |⊔v|, |⊔t|) into rewrite rules.
-\begin{code}
-{-# REWRITE ⊔⊔ ⊔v ⊔t #-} 
-\end{code}
+($\sqcup\sqcup$, $\sqcup\Varid{v}$, $\sqcup\Varid{t}$) into rewrite rules.
+% \begin{code}
+% {-# REWRITE ⊔⊔ ⊔v ⊔t #-} 
+% \end{code}
 This introduces new definitional equalities, allowing the
-type checker to exploit that |_⊔_| is associative
-and the other two laws (effectively, this feature allows a selective use of 
+type checker to directly exploit e.g. associativity of |_⊔_| 
+(effectively, this feature allows a selective use of 
 extensional Type Theory).
 
 Functoriality of context extension is now parametric
