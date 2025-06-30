@@ -968,8 +968,8 @@ prove that |norm| and |⌜_⌝| are mutual inverses - i.e. stability
 We start with stability, as it is considerably easier. There are just a couple
 details worth mentioning:
 \begin{itemize}
-  \item To deal with variables in the |`_| case, we phrase the lemma in a 
-  slightly more general way, taking expressions of any sort and coercing them up 
+  \item To deal with variables in the |`_| case, we slightly generalise the
+  inductive hypothesis, taking expressions of any sort and coercing them up 
   to sort |T| on the RHS.
   \item The case for variables relies on a bit of coercion manipulation and our 
   earlier lemma equating |i [ id ⁺ B ]| and |suc i B|.

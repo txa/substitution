@@ -541,7 +541,7 @@ in the sense of HoTT.
 
 Hence an apparently trivial
 problem isn't so easy after all, and it is a stepping stone to more
-exciting open questions. But before you can run you need to walk and
+exciting open questions. But before you can run, you need to walk and
 we believe that the construction here can be useful to others.
 
 % PLW: We should be sure to cite the following as related work.
