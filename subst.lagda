@@ -141,22 +141,22 @@ T ⊔ r  =  T
 \end{minipage}
 
 \noindent
-This is just boolean algebra. We need a number of laws:
+This is just Boolean algebra. We need a number of laws:
 
 \noindent
 \begin{minipage}{0.55\textwidth}
 \begin{code}
-⊑t : s ⊑ T
-v⊑ : V ⊑ s
-⊑q⊔ : q ⊑ (q ⊔ r)
-⊑⊔r : r ⊑ (q ⊔ r)
+⊑t   : s ⊑ T
+v⊑   : V ⊑ s
+⊑q⊔  : q ⊑ (q ⊔ r)
+⊑⊔r  : r ⊑ (q ⊔ r)
 \end{code}
 \end{minipage}
 \begin{minipage}{0.4\textwidth}
 \begin{code}
-⊔⊔ : q ⊔ (r ⊔ s) ≡ (q ⊔ r) ⊔ s
-⊔v : q ⊔ V ≡ q
-⊔t : q ⊔ T ≡ T
+⊔⊔  : q ⊔ (r ⊔ s) ≡ (q ⊔ r) ⊔ s
+⊔v  : q ⊔ V ≡ q
+⊔t  : q ⊔ T ≡ T
 \end{code}
 \end{minipage}
 
