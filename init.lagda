@@ -68,9 +68,9 @@ Instead we add the term formers for application
 
 
 We start with a precise definition of a simply typed CwF with the
-additional structure to model simply typed $\lambda$-calculus (section
+additional structure to model simply typed $\lambda$-calculus (Section
 \ref{sec:simply-typed-cwfs}) and then we show that the recursive
-definition of substitution gives rise to a simply typed CwF (section
+definition of substitution gives rise to a simply typed CwF (Section
 \ref{sec:cwf-recurs-subst}). We can define the initial CwF as a
 quotient inductive-inductive type (QIIT). To simplify our development, rather 
 than 
@@ -81,13 +81,13 @@ we postulate the existence of this QIIT in Agda (with
 the associated $\beta$-laws implemented with rewriting rules). 
 By initiality, there is an evaluation
 functor from the initial CwF to the recursively defined CwF (defined
-in section \ref{sec:cwf-recurs-subst}). On the
+in Section \ref{sec:cwf-recurs-subst}). On the
 other hand, we can embed the recursive CwF into the initial CwF;
 this corresponds to the embedding of normal forms into
 $\lambda$-terms, only that here we talk about \emph{substitution normal
 forms}. We then show that these two structure maps are inverse to each
 other and
-hence that the recursively defined CwF is indeed initial (section
+hence that the recursively defined CwF is indeed initial (Section
 \ref{sec:proving-initiality}). The two identities correspond to
 completeness and stability in the language of normalisation functions.  
 
@@ -212,7 +212,7 @@ The category of contexts has a terminal object (the empty context), and
 context extension resembles categorical products but mixing contexts
 and types:
 
-%if not jfstyle
+%if not jfpstyle
 \noindent
 %endif
 \begin{minipage}{0.55\textwidth}
@@ -275,10 +275,10 @@ We are building towards a proof of initiality for our recursive substitution
 syntax, but shall start by showing that our recursive substitution syntax obeys 
 the specified CwF laws, specifically that |CwF-simple| can be instantiated with 
 |_⊢[_]_|/|_⊩[_]_|. This will be more-or-less enough to implement the 
-``normalisation'' direction of our initial CwF |≃| recursive substition syntax 
+``normalisation'' direction of our initial CwF |≃| recursive substitution syntax 
 isomorphism.
 
-Most of the work to prove these laws was already done in section
+Most of the work to prove these laws was already done in Section
 \ref{sec:proving-laws} but there are a couple tricky details with fitting
 into the exact structure the |CwF-simple| record requires.
 

@@ -333,14 +333,19 @@ simpler and scales better, avoiding well-founded recursion.
 Andreas Abel used a similar technique to ours to implement \cite{alti:csl99},
 in an unpublished Agda proof \cite{abel:subst11}.
 
-The duplication between renamings and substitutions is factored into 
-\emph{kits} in \cite{mcbride2006type}. The structure of the proofs is explained in
-\cite{allais2017type} from a monadic perspective. Indeed this example
-is one of the motivations for relative monads
-\cite{altenkirch2015monads}. In the monadic approach, we represent substitutions 
-as functions;
-however, it is not clear how to extend this to dependent types without
-``very dependent'' \cite{hickey1996formal, altenkirch2023munchhausen} types.
+The duplication between renaming and substitution operations is factored into 
+\emph{kits} in \cite{mcbride2006type}. In \cite{allais2017type}, it was
+further shown
+how to extend this factoring to the proofs (using a ``fusion framework'').
+We argue that, in languages supporting lexicographic recursion, 
+our technique is simpler.
+These works also embrace the monadic perspective (encoding substitutions as
+functions from variables to terms - indeed this is
+one of the motivations for relative monads \cite{altenkirch2015monads}). 
+However, it is not clear how to extend this approach to dependently typed
+languages without
+``very dependent'' \cite{hickey1996formal, altenkirch2023munchhausen}
+function types.
 % TODO PLW: I don't know what "monadic perspective" means here.
 
 % We avoid the monadic perspective which here for two reasons: first we want
@@ -349,10 +354,15 @@ however, it is not clear how to extend this to dependent types without
 % dependent types where it is not clear how the monadic approach can be applied
 % without using very dependent types.
 
-There are a number of publications on mechanising substitution.
-Stark~\emph{et al}~\cite{stark2019autosubst} develop a Rocq library which automatically derives
+There are a number of other publications on mechanising substitution.
+Sch{\"{a}}fer and Stark~\emph{et al}~ 
+\cite{schafer2015autosubst, stark2019autosubst} develop a Rocq library which 
+automatically derives
 substitution lemmas, but the proofs are repeated for renamings and
-substitutions. Their equational theory is similar to the simply
+substitutions (as in
+Section \ref{sec:naive-approach}). 
+Their equational theory is also similar to 
+the simply
 typed CwFs in Section \ref{sec:initiality}.
 % TODO PLW: why is 'autosubst 2' cited, but not the original autosubst?
 Saffrich~\cite{saffrich2024abstractions} uses Agda with an \emph{extrinsic}
@@ -401,12 +411,18 @@ substitution lemmas repeated for all required combinations.
 \section{Conclusions and further work}
 \label{sec:concl-furth-work}
 
-The subject of the paper is a problem we expect everybody (including
-ourselves) would have thought trivial.
-As it turns out, it isn't, and 
-we spent quite some time 
-going down alleys that didn't work, 
-and getting to grips with the subtleties of Agda's termination checking.
+The subject of the paper is a problem which we expect many 
+people (including ourselves) 
+would have thought trivial.
+Theorem provers have made significant progress since the first POPLMark 
+challenge \cite{aydemir2005poplmark} (which indeed focused on problems 
+relating to binding and substitution), motivating a shifted focus
+(onto logical relations proofs) in
+newer benchmarks \cite{abel2019poplmark}. 
+As it turns out, elegantly mechanising substitution
+still requires some care, and we spent quite some time going
+down alleys that didn't work (whilst getting to 
+grips with the subtleties of Agda's termination checking).
 
 % With hindsight, the main idea seems rather
 % obvious: introduce sorts as a datatype with the structure of a boolean
@@ -510,13 +526,11 @@ We see the current construction as a warmup for the
 definition of substitution for dependent type theory
 This is harder,
 because then the typing of the constructors actually depends on the
-substitution laws. Such a M\"unchhausian \cite{altenkirch2023munchhausen} 
-construction should be possible in Agda (the reference is to Baron Münchhausen, who allegedly 
-pulled himself 
-out of a swamp by his own hair).
+substitution laws. Such a M{\"u}nchhausian \cite{altenkirch2023munchhausen} 
+construction should be possible in Agda.
 % PLW: deleted the following as redundant
 % We call definitions in type theory whose typing depends on equations about 
-% themselves \emph{M\"unchhausian}.
+% themselves \emph{M{\"u}nchhausian}.
 However, the theoretical underpinning of
 inductive-inductive-recursive definitions is mostly unexplored, with
 the exception of \cite{kaposi2023towards}.

@@ -80,7 +80,7 @@ data _⊩_ : Con → Con → Set where
   _,_  : Γ ⊩ Δ → Γ ⊢ A → Γ ⊩ Δ ▷ A  
 \end{code}
 % To define the categorical structure (|_∘_|, |id|) we first must define substitution for terms and variables:
-We define the action of substitution for terms and variables:
+We define the action of substitution on terms and variables:
 %if False
 \begin{code}
 _^_ : Γ ⊩ Δ → (A : Ty) → Γ ▷ A ⊩ Δ ▷ A
@@ -242,6 +242,10 @@ To prove associativity, we first need to prove functoriality,
 Since |t, us, vs| can be variables/renamings or terms/substitutions,
 there are eight combinations. 
 For each, we must prove a number of lemmas again in a different setting.
+This repetition is emblematic of many prior attempts to mechanise
+substitution
+\cite{adams2004formal, benton2012strongly, schafer2015autosubst, 
+stark2019autosubst, saffrich2024intrinsically}.
 
 The rest of the paper shows how to factor these definitions
-and proofs, using only structural recursion.
+and proofs, using only (lexicographic) structural recursion.
