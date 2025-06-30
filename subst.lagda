@@ -408,23 +408,32 @@ assign lexicographically-decreasing measures to each of the functions
 (\textsf{Table \ref{table:termination}}).
 
 In practice, we will generally require identity renamings, rather than
-substitutions. We define |Sort|-polymorphic |id-poly|, and then define
-our original |id| by instantiating it at |V|.
+substitutions. We define |Sort|-polymorphic |id-poly|, and then recover
+our original |id| by instantiating it at |V| (we also use an |INLINE| pragma
+to ensure that |id| and |id-poly {q = V}| appear identical to Agda's termination
+checker).
 
-\noindent
-\begin{minipage}{0.45\textwidth}
 \begin{spec}
 id-poly : Γ ⊩[ q ] Γ 
-id-poly {Γ = •} = ε
-id-poly {Γ = Γ ▷ A} = id-poly ^ A
-\end{spec}
-\end{minipage}
-\begin{minipage}{0.5\textwidth}
-\begin{spec}
+
 id : Γ ⊩[ V ] Γ 
 id = id-poly
 \end{spec}
-\end{minipage}
+
+% \noindent
+% \begin{minipage}{0.45\textwidth}
+% \begin{spec}
+% id-poly : Γ ⊩[ q ] Γ 
+% id-poly {Γ = •} = ε
+% id-poly {Γ = Γ ▷ A} = id-poly ^ A
+% \end{spec}
+% \end{minipage}
+% \begin{minipage}{0.5\textwidth}
+% \begin{spec}
+% id : Γ ⊩[ V ] Γ 
+% id = id-poly
+% \end{spec}
+% \end{minipage}
 
 (All this fuss with |Sort|-polymorphic |id| may be unnecessary.
 At a cost in performance, it is possible to extend Agda's 

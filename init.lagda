@@ -75,8 +75,8 @@ definition of substitution gives rise to a simply typed CwF (Section
 quotient inductive-inductive type (QIIT). To simplify our development, rather 
 than 
 using a Cubical Agda 
-HIT\footnote{Cubical Agda still lacks some essential automation,
-  e.g. integrating no-confusion properties into pattern matching.},
+HIT (Cubical Agda still lacks some essential automation, e.g.
+integrating no-confusion properties into pattern matching),
 we postulate the existence of this QIIT in Agda (with
 the associated $\beta$-laws implemented with rewriting rules). 
 By initiality, there is an evaluation
@@ -89,7 +89,8 @@ forms}. We then show that these two structure maps are inverse to each
 other and
 hence that the recursively defined CwF is indeed initial (Section
 \ref{sec:proving-initiality}). The two identities correspond to
-completeness and stability in the language of normalisation functions.  
+\emph{completeness} and \emph{stability} in the language of normalisation 
+functions.  
 
 \subsection{Simply Typed CwFs}
 \label{sec:simply-typed-cwfs}
@@ -817,9 +818,8 @@ fields,
 and then implement e.g. |rec-cwf = elim-cwf  cwf-to-methods|.
 
 The one extra ingredient we need to make this work out neatly is to introduce
-a new reduction for |cong|, |cong (λ _ → x) p ≡ refl|\footnote{
-This definitional identity also holds natively in Cubical.}, via an Agda rewrite
-rule.
+a new reduction for |cong|, |cong (λ _ → x) p ≡ refl|, via an Agda rewrite
+rule (this definitional identity also holds natively in Cubical).
 %if False
 \begin{code}
 cong-const : ∀ {A : Set ℓ₁} {B : Set ℓ₂} {x : A} 

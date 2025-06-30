@@ -36,9 +36,6 @@ The main lemma is the identity law for the substitution functor
 %endif
 To prove the successor case, we need naturality of |suc[ q ]| applied to a 
 variable, which can be shown by simple induction over said variable:
-\footnote{We are using the naming conventions introduced in sections
-  \ref{sec:naive-approach} and \ref{sec:fact-with-sorts}, e.g.
-  |i : Γ ∋ A|.}
 % ⁺-nat[]v : {i : Γ  ⊢[ V ] B}{xs : Δ ⊩[ q ] Γ}
 %   → i [ xs ⁺ A ] ≡ suc[ q ] (i [ xs ]) A
 \begin{code}
@@ -112,12 +109,12 @@ Let's state the functor law but postpone the proof until the next section:
 \end{code}
 %endif
 This implicitly relies on the
-definitional  equality\footnote{We rely on Agda's 
-rewrite rules here.
-Alternatively we would have to insert a transport using |subst|.}
-|⊔⊔ : q ⊔ (r ⊔ s) = (q ⊔ r) ⊔ s| because the left hand side has the type
+definitional equality
+|⊔⊔ : q ⊔ (r ⊔ s) = (q ⊔ r) ⊔ s| (as achieved via our rewrite rule)
+because the left hand side has the type
 |Δ ⊢[  q ⊔ (r ⊔ s) ] A| while the right hand side has type
-|Δ ⊢[ (q ⊔ r) ⊔ s ] A|.
+|Δ ⊢[ (q ⊔ r) ⊔ s ] A|. Otherwise, we would have to insert a transport
+with |subst|.
 
 Of course, we must also state the left-identity law |id∘ : id ∘ xs ≡ xs|. 
 %if False
@@ -376,9 +373,11 @@ zero[] {q = T} = refl
 %endif 
 
 \noindent
+
+We also need that zero commutes with |tm⊑|: that is for any
+|q⊑r : q ⊑ r| we have that |tm⊑zero q⊑r : zero[ r ] ≡ tm⊑ q⊑r zero[ q ]|.
+
 Finally, we have all the ingredients to prove the second functor law |^∘|:
-\footnote{Actually, we also need that zero commutes with |tm⊑|: that is for any
-|q⊑r : q ⊑ r| we have that |tm⊑zero q⊑r : zero[ r ] ≡ tm⊑ q⊑r zero[ q ]|.}
 %if jfpstyle
 \begin{code}
 ^∘ {r = r}{s = s}{xs = xs}{ys = ys} {A = A} = 

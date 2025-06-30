@@ -13,6 +13,7 @@
 %format ≃ = "\simeq"
 
 %format Set₁ = "\Varid{Set}_1"
+%format INLINE = "\Keyword{INLINE}"
 
 %format ⊤ = "\top"
 %format ⊥ = "\bot"
