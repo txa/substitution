@@ -42,10 +42,10 @@ but since we are only interested in substitutions, we don't assume these.
 Instead we add the term formers for application
 (|_·_|) and lambda-abstraction |ƛ| as natural transformations.
 
-% For the categorically minded we can summarize:
-% \footnote{It is not necessary to know the categorical definition to
-%   understand the rest of the paper.}
-% a CwF is given by
+% For the categorically minded we can summarize.
+% (It is not necessary to know the categorical definition to
+%   understand the rest of the paper.)
+% A CwF is given by
 % \begin{itemize}
 % \item A category of contexts,
 % \item A presheaf to model types (i.e. a contravariant functor from the
@@ -72,13 +72,12 @@ additional structure to model simply typed $\lambda$-calculus (section
 \ref{sec:simply-typed-cwfs}) and then we show that the recursive
 definition of substitution gives rise to a simply typed CwF (section
 \ref{sec:cwf-recurs-subst}). We can define the initial CwF as a
-quotient inductive-inductive type (QIIT). To simplify our development, rather 
-than 
-using a Cubical Agda 
-HIT\footnote{Cubical Agda still lacks some essential automation,
-  e.g. integrating no-confusion properties into pattern matching.},
-we postulate the existence of this QIIT in Agda (with
-the associated $\beta$-laws implemented with rewriting rules). 
+quotient inductive-inductive type (QIIT).
+We postulate the existence of this QIIT in Agda, with
+the associated $\beta$-laws implemented with rewriting rules. 
+(An alternative is to use a Cubical Agda HIT,
+but Cubical Agda still lacks essential automation,
+e.g. it does not integrate no-confusion properties into pattern matching.)
 By initiality, there is an evaluation
 functor from the initial CwF to the recursively defined CwF (defined
 in section \ref{sec:cwf-recurs-subst}). On the
@@ -817,8 +816,7 @@ fields,
 and then implement e.g. |rec-cwf = elim-cwf  cwf-to-methods|.
 
 The one extra ingredient we need to make this work out neatly is to introduce
-a new reduction for |cong|, |cong (λ _ → x) p ≡ refl|\footnote{
-This definitional identity also holds natively in Cubical.}, via an Agda rewrite
+a new reduction for |cong|, |cong (λ _ → x) p ≡ refl|, via an Agda rewrite
 rule.
 %if False
 \begin{code}
@@ -832,6 +830,8 @@ cong-const {p = refl} = refl
 %endif
 This enables the no-longer-dependent |_≡[_]≡_|s to collapse to |_≡_|s 
 automatically.
+(Alternatively, |cong-cong| holds natively in Cubical.)
+
 
 %if False
 \begin{code}
@@ -1362,13 +1362,14 @@ the sledgehammer of set truncation (which prevents eliminating the initial
 CwF into any non-set).
 
 As we are working in vanilla Agda, we'll take a simpler approach, and rely on 
-UIP 
-(|duip : ∀ {p : x ≡ y} {q : z ≡ w} → p ≡[ r ]≡ q|\footnote{
-Note that proving this form of (dependent) UIP relies 
-on type constructor injectivity (specifically, injectivity of |_≡_|). 
+dependent UIP,
+|duip : ∀ {p : x ≡ y} {q : z ≡ w} → p ≡[ r ]≡ q|,
+which enables, e.g., |compl-𝕞 .id∘ᴹ  = duip|.
+(Note that proving this form of UIP relies 
+on type constructor injectivity, specifically, injectivity of |_≡_|. 
 We could use a weaker version taking an additional proof of |x ≡ z|, 
-but this would be clunkier to use; Agda has no hope of inferring such a
-proof by unification.}), enabling e.g. |compl-𝕞 .id∘ᴹ  = duip|.
+but this would be clunkier to use as Agda has no hope of inferring such a
+proof by unification.)
 
 %if False
 \begin{code}
