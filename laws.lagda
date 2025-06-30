@@ -36,9 +36,9 @@ The main lemma is the identity law for the substitution functor
 %endif
 To prove the successor case, we need naturality of |suc[ q ]| applied to a 
 variable, which can be shown by simple induction over said variable:
-\footnote{We are using the naming conventions introduced in sections
-  \ref{sec:naive-approach} and \ref{sec:fact-with-sorts}, e.g.
-  |i : Γ ∋ A|.}
+% \footnote{We are using the naming conventions introduced in sections
+%   \ref{sec:naive-approach} and \ref{sec:fact-with-sorts}, e.g.
+%   |i : Γ ∋ A|.}
 % ⁺-nat[]v : {i : Γ  ⊢[ V ] B}{xs : Δ ⊩[ q ] Γ}
 %   → i [ xs ⁺ A ] ≡ suc[ q ] (i [ xs ]) A
 \begin{code}
@@ -111,13 +111,11 @@ Let's state the functor law but postpone the proof until the next section:
 [∘] : x [ xs ∘ ys ] ≡ x [ xs ] [ ys ]
 \end{code}
 %endif
-This implicitly relies on the
-definitional  equality\footnote{We rely on Agda's 
-rewrite rules here.
-Alternatively we would have to insert a transport using |subst|.}
-|⊔⊔ : q ⊔ (r ⊔ s) = (q ⊔ r) ⊔ s| because the left hand side has the type
-|Δ ⊢[  q ⊔ (r ⊔ s) ] A| while the right hand side has type
-|Δ ⊢[ (q ⊔ r) ⊔ s ] A|.
+Even writing this signature requires associativity of |_⊔_|,
+since the left hand side has type |Δ ⊢[ q ⊔ (r ⊔ s) ] A|
+while the right hand side has type |Δ ⊢[ (q ⊔ r) ⊔ s ] A|.
+Fortunately, the rewrite we declared enforces the required associativity.
+(Alternatively we would have to insert a transport using |subst|.)
 
 Of course, we must also state the left-identity law |id∘ : id ∘ xs ≡ xs|. 
 %if False
@@ -141,20 +139,18 @@ to consider only |V|-sorted |id| here and worry about equations involving
 Therefore, we instead add a ``dummy'' |Sort| argument
 (i.e. |id∘′ : Sort → id ∘ xs ≡ xs|) to track the size
 decrease (such that we can eventually just use |id∘ = id∘′ V|).
-\footnote{Perhaps surprisingly, this ``dummy'' argument does not even need to
+
+(Perhaps surprisingly, this ``dummy'' argument does not even need to
 be of type |Sort| to satisfy Agda here. More discussion on this trick 
 can be found at Agda issue
 \href{https://github.com/agda/agda/issues/7693}{\#7693}, but in summary:
-\begin{itemize} 
-   \item \vspace{-1ex} Agda considers all base constructors (constructors with no parameters) 
+(i) Agda considers all base constructors (constructors with no parameters) 
    to be of minimal size structurally, so their presence can track size
    preservation of other base-constructor arguments across function calls.
-   \item \vspace{-1ex} It turns out that
+(ii) It turns out that
    a strict decrease in |Sort| is not necessary everywhere for termination: 
    note that the context also gets structurally smaller in the call to |_⁺_| 
-   from |id|.
-\end{itemize}
-}
+   from |id|.)
 
 %if False
 \begin{code}
@@ -366,6 +362,8 @@ It also turns out we need
 |zero[]  : zero[ q ] [ xs , x ] ≡ tm⊑ (⊑⊔r {q = q}) x|, the $\beta$-law for 
 |zero[_]|, which holds
 definitionally in the case for either |Sort|.
+And we need that zero commutes with |tm⊑|, that is, for any
+|q⊑r : q ⊑ r| we have that |tm⊑zero q⊑r : zero[ r ] ≡ tm⊑ q⊑r zero[ q ]|.
 
 %if False
 \begin{code}
@@ -375,10 +373,7 @@ zero[] {q = T} = refl
 \end{code}
 %endif 
 
-\noindent
 Finally, we have all the ingredients to prove the second functor law |^∘|:
-\footnote{Actually, we also need that zero commutes with |tm⊑|: that is for any
-|q⊑r : q ⊑ r| we have that |tm⊑zero q⊑r : zero[ r ] ≡ tm⊑ q⊑r zero[ q ]|.}
 %if jfpstyle
 \begin{code}
 ^∘ {r = r}{s = s}{xs = xs}{ys = ys} {A = A} = 
