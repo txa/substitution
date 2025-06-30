@@ -188,10 +188,13 @@ v⊑ {T} = v⊑t
 \end{code}
 %endif
 Further, we turn the equations
-(|⊔⊔|, |⊔v|, |⊔t|) into rewrite rules.
+% Manually translated into LaTeX here because kerning was being weird...
+($\sqcup\sqcup$, $\sqcup\Varid{v}$, $\sqcup\Varid{t}$) into rewrite rules.
+%if False
 \begin{code}
 {-# REWRITE ⊔⊔ ⊔v ⊔t #-} 
 \end{code}
+%endif
 This introduces new definitional equalities, allowing the
 type checker to exploit that |_⊔_| is associative
 and the other two laws (effectively, this feature allows a selective use of 
@@ -406,8 +409,7 @@ assign lexicographically-decreasing measures to each of the functions
 
 In practice, we will generally require identity renamings, rather than
 substitutions. We define |Sort|-polymorphic |id-poly|, and then define
-our original |id| by instantiating it at |V| and ensuring it is always
-inlined.
+our original |id| by instantiating it at |V|.
 
 \noindent
 \begin{minipage}{0.45\textwidth}
@@ -421,7 +423,6 @@ id-poly {Γ = Γ ▷ A} = id-poly ^ A
 \begin{spec}
 id : Γ ⊩[ V ] Γ 
 id = id-poly
-{-# INLINE id #-}
 \end{spec}
 \end{minipage}
 
