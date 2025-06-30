@@ -1051,11 +1051,11 @@ implementing |⌜id⌝| to keep Agda's termination checker happy.
 
 %if False
 \begin{code}
-⌜[]⌝  : ⌜ x [ ys ] ⌝ ≡ ⌜ x ⌝ [ ⌜ ys ⌝* ]ᴵ
-⌜^⌝   : ∀ {xs : Δ ⊩[ q ] Γ} → ⌜ xs ^ A ⌝* ≡ ⌜ xs ⌝* ^ᴵ A
-⌜⁺⌝   : ⌜ xs ⁺ A ⌝* ≡ ⌜ xs ⌝* ∘ᴵ wkᴵ
-⌜id⌝  : ⌜ id {Γ = Γ} ⌝* ≡ idᴵ
-⌜suc⌝ : ⌜ suc[ q ] x B ⌝ ≡ ⌜ x ⌝ [ wkᴵ ]ᴵ
+⌜[]⌝   : ⌜ x [ ys ] ⌝ ≡ ⌜ x ⌝ [ ⌜ ys ⌝* ]ᴵ
+⌜^⌝    : ∀ {xs : Δ ⊩[ q ] Γ} → ⌜ xs ^ A ⌝* ≡ ⌜ xs ⌝* ^ᴵ A
+⌜⁺⌝    : ⌜ xs ⁺ A ⌝* ≡ ⌜ xs ⌝* ∘ᴵ wkᴵ
+⌜id⌝   : ⌜ id {Γ = Γ} ⌝* ≡ idᴵ
+⌜suc⌝  : ⌜ suc[ q ] x B ⌝ ≡ ⌜ x ⌝ [ wkᴵ ]ᴵ
 
 ⌜id⌝′ : Sort → ⌜ id {Γ = Γ} ⌝* ≡ idᴵ
 ⌜id⌝ = ⌜id⌝′ V
@@ -1230,7 +1230,7 @@ cases to cover, so for brevity we elide the proofs of |⌜[]⌝| and |⌜suc⌝|
 \end{minipage}
 %else
 \begin{minipage}{0.45\textwidth}
-\begin{code}
+\begin{spec}
 ⌜⁺⌝ {xs = ε}               = sym •-ηᴵ
 ⌜⁺⌝ {xs = xs , x} {A = A}  = 
   ⌜ xs ⁺ A ⌝* ,ᴵ ⌜ suc[ _ ] x A ⌝
@@ -1238,10 +1238,10 @@ cases to cover, so for brevity we elide the proofs of |⌜[]⌝| and |⌜suc⌝|
   (⌜ xs ⌝* ∘ᴵ wkᴵ) ,ᴵ (⌜ x ⌝ [ wkᴵ ]ᴵ)
   ≡⟨ sym ,∘ᴵ ⟩
   (⌜ xs ⌝* ,ᴵ ⌜ x ⌝) ∘ᴵ wkᴵ ∎
-\end{code}
+\end{spec}
 \end{minipage}
 \begin{minipage}{0.45\textwidth}
-\begin{code}
+\begin{spec}
 ⌜id⌝′ {Γ = •}      _ = sym •-ηᴵ
 ⌜id⌝′ {Γ = Γ ▷ A}  _ = 
   ⌜ id ⁺ A ⌝* ,ᴵ zeroᴵ  ≡⟨ cong (_,ᴵ zeroᴵ) ⌜⁺⌝ ⟩
@@ -1249,7 +1249,7 @@ cases to cover, so for brevity we elide the proofs of |⌜[]⌝| and |⌜suc⌝|
   idᴵ ^ᴵ A              ≡⟨ cong (_,ᴵ zeroᴵ) id∘ᴵ ⟩
   wkᴵ ,ᴵ zeroᴵ          ≡⟨ ▷-ηᴵ ⟩
   idᴵ                   ∎
-\end{code}
+\end{spec}
 \end{minipage}
 %endif
 
