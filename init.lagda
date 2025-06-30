@@ -17,7 +17,7 @@ We can do more than just prove that we have a category. Indeed we
 can verify the laws of a simply typed category with families
 (CwF). CwFs are mostly known as models of dependent type theory, but
 they can be specialised to simple types \cite{castellan2021categories}. We 
-summarize the definition of a simply typed CwF as follows:
+summarise the definition of a simply typed CwF as follows:
 
 \vspace{-1ex}
 \begin{itemize}
@@ -42,7 +42,7 @@ but since we are only interested in substitutions, we don't assume these.
 Instead we add the term formers for application
 (|_·_|) and lambda-abstraction |ƛ| as natural transformations.
 
-% For the categorically minded we can summarize.
+% For the categorically minded we can summarise.
 % (It is not necessary to know the categorical definition to
 %   understand the rest of the paper.)
 % A CwF is given by

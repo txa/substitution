@@ -102,7 +102,7 @@ data _⊢[_]_ : Con → Sort → Ty → Set where
 \end{code}
 This recapitulates our previous definition, where
 |Γ ⊢[ V ] A| corresponds to |Γ ∋ A| and |Γ  ⊢[ T ]  A| to |Γ ⊢ A|.
-Now we can parametrize our previous development.
+Now we can parametrise our previous development.
 As a first step, we generalise renamings and substitutions (|xs, ys, zs|):
 \begin{code}
 data _⊩[_]_ : Con → Sort → Con → Set where
