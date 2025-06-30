@@ -333,13 +333,19 @@ simpler and scales better, avoiding well-founded recursion.
 Andreas Abel used a similar technique to ours to implement \cite{alti:csl99},
 in an unpublished Agda proof \cite{abel:subst11}.
 
-The duplication between renamings and substitutions is factored into 
-\emph{kits} in \cite{mcbride2006type}. The structure of the proofs is explained in
-\cite{allais2017type} from a monadic perspective. Indeed this example
+The duplication between renaming and substitution operations is factored into 
+\emph{kits} in \cite{mcbride2006type}. In \cite{allais2017type}, it was
+further shown
+how to extend this factoring to the proofs (via a ``fusion framework'').
+We argue that, in languages supporting lexicographic recursion, 
+our technique is simpler.
+
+These works also embrace the monadic perspective (encoding substitutions as
+functions from variables to terms).
+Indeed this example
 is one of the motivations for relative monads
-\cite{altenkirch2015monads}. In the monadic approach, we represent substitutions 
-as functions;
-however, it is not clear how to extend this to dependent types without
+\cite{altenkirch2015monads}. 
+However, it is not clear how to extend this to dependent types without
 ``very dependent'' \cite{hickey1996formal, altenkirch2023munchhausen} types.
 % TODO PLW: I don't know what "monadic perspective" means here.
 
@@ -349,10 +355,13 @@ however, it is not clear how to extend this to dependent types without
 % dependent types where it is not clear how the monadic approach can be applied
 % without using very dependent types.
 
-There are a number of publications on mechanising substitution.
-Stark~\emph{et al}~\cite{stark2019autosubst} develop a Rocq library which automatically derives
+There are a number of other publications on mechanising substitution.
+Stark~\emph{et al}~\cite{stark2019autosubst} develop a Rocq library which 
+automatically derives
 substitution lemmas, but the proofs are repeated for renamings and
-substitutions. Their equational theory is similar to the simply
+substitutions similarly to
+Section \ref{sec:naive-approach}. Their equational theory is also similar to 
+the simply
 typed CwFs in Section \ref{sec:initiality}.
 % TODO PLW: why is 'autosubst 2' cited, but not the original autosubst?
 Saffrich~\cite{saffrich2024abstractions} uses Agda with an \emph{extrinsic}
@@ -409,9 +418,10 @@ challenge \cite{aydemir2005poplmark} (which indeed focused on problems
 relating to binding and substitution), motivating a shifted focus
 (onto logical relations proofs) in
 newer benchmarks \cite{abel2019poplmark}. 
-As it turns out, mechanising substitution
-elegantly still requires some care, and we spent quite some time getting to 
-grips with the subtleties of Agda's termination checking.
+As it turns out, elegantly mechanising substitution
+still requires some care, and we spent quite some time going
+down alleys that didn't work (whilst getting to 
+grips with the subtleties of Agda's termination checking).
 
 % With hindsight, the main idea seems rather
 % obvious: introduce sorts as a datatype with the structure of a boolean

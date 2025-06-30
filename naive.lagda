@@ -80,7 +80,7 @@ data _⊩_ : Con → Con → Set where
   _,_  : Γ ⊩ Δ → Γ ⊢ A → Γ ⊩ Δ ▷ A  
 \end{code}
 % To define the categorical structure (|_∘_|, |id|) we first must define substitution for terms and variables:
-We define the action of substitution for terms and variables:
+We define the action of substitution on terms and variables:
 %if False
 \begin{code}
 _^_ : Γ ⊩ Δ → (A : Ty) → Γ ▷ A ⊩ Δ ▷ A
