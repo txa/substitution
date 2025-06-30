@@ -214,7 +214,7 @@ tm⊑ v⊑t  i = ` i
 \end{code}
 %endif
 
-By making functoriality of context extension parameteric, 
+By making functoriality of context extension parametric, 
 |_^_ : Γ ⊩[ q ] Δ → ∀ A → Γ ▷ A ⊩[ q ] Δ ▷ A|, we are ready to define 
 substitution and renaming in one operation:
 %if False
@@ -364,7 +364,7 @@ Termination checking failed for the following functions:
 The cause turns out to be |id|. Termination here hinges on weakening for terms
 (|suc[ T ] t A|) building
 and applying a renaming (i.e. a sequence of variables, for which weakening is
-trivial) rather than a full substutution. Note that if |id| produced
+trivial) rather than a full substitution. Note that if |id| produced
 `|Γ ⊩[ T ] Γ|'s, or if we implemented 
 weakening for variables (|suc[ V ] i A|) with |i [ id ⁺ A ]|, our operations
 would still be
@@ -384,7 +384,7 @@ adds new rows/columns (corresponding to the |Sort| argument) to the call
 matrices
 involving |id|, enabling the decrease
 to be tracked and termination to be correctly inferred by Agda.
-We present the call graph diagramatically (inlining |_^_|), 
+We present the call graph diagrammatically (inlining |_^_|), 
 in the style of \cite{keller2010hereditary}.
 
 \noindent
