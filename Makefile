@@ -16,6 +16,11 @@ paper.tex : paper.lagda is-jfp.lagda naive.lagda subst.lagda laws.lagda init.lag
 supplement.zip : README.txt naive.lagda subst.lagda laws.lagda init.lagda
 	zip supplement.zip README.txt naive.lagda subst.lagda laws.lagda init.lagda
 
+paper.bbl : paper.pdf
+
+eptcs.zip : README.txt paper.lagda naive.lagda subst.lagda laws.lagda init.lagda paper.tex eptcs.bst eptcs.cls local.bib paper.bbl
+	zip eptcs.zip README.txt naive.lagda subst.lagda laws.lagda init.lagda paper.tex eptcs.bst eptcs.cls local.bib paper.bbl
+
 clean:
 	rm paper.tex || true
 	rm *.aux || true
