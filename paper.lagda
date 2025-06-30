@@ -306,16 +306,14 @@ structurally smaller than |T| (see Section~\ref{sec:fact-with-sorts}).
 % pattern T = T>V V isV
 % \end{spec}
 
-We also formulate our specification
-with a quotient-inductive-inductive type, or QIIT (a mutual 
-inductive type with equations)
-using explicit substitutions
-(where substitution is itself a term former).
-In our specification 
+As a specification, we formulate an explicit substitution calculus as
+a quotient-inductive type, or QIT (a mutual 
+inductive type with equations). Here, substitution itself becomes a term former.
+In our specification,
 the substitution laws correspond to the equations of a simply-typed
 category with families (CwF)---a variant of a CwF
 where the types do not depend on a context.
-Our definition of leads to a simply typed CwF
+Our recursive substitution operations lead to a simply typed CwF
 isomorphic to the initial one, giving
 a normalisation result where $\lambda$-terms without explicit
 substitutions are \emph{substitution normal forms}.
@@ -326,21 +324,22 @@ substitutions are \emph{substitution normal forms}.
 De Bruijn introduced his eponymous indices and
 simultaneous substitution in \cite{bruijn1972lambda}. 
 Here we use typed de Bruijn indices as in \cite{alti:csl99},
-where they showed termination of 
-substitution using
+where termination of substitution was shown using
 well-founded recursion. Our approach is
-simpler and scales better, avoiding well-founded recursion.
+simpler and scales better, avoiding manual well-founded recursion.
 Andreas Abel used a similar technique to ours to implement \cite{alti:csl99},
+without well-founded recursion,
 in an unpublished Agda proof \cite{abel:subst11}.
 
 The duplication between renaming and substitution operations is factored into 
 \emph{kits} in \cite{mcbride2006type}. In \cite{allais2017type}, it was
 further shown
-how to extend this factoring to the proofs (using a ``fusion framework'').
+how to extend this factoring to the proofs (by developing a 
+``fusion framework'').
 We argue that, in languages supporting lexicographic recursion, 
 our technique is simpler.
-These works also embrace the monadic perspective (encoding substitutions as
-functions from variables to terms - indeed this is
+These works also embrace the monadic perspective. That is, encoding 
+substitutions as functions from variables to terms (indeed, this is
 one of the motivations for relative monads \cite{altenkirch2015monads}). 
 However, it is not clear how to extend this approach to dependently typed
 languages without
@@ -354,7 +353,7 @@ function types.
 % dependent types where it is not clear how the monadic approach can be applied
 % without using very dependent types.
 
-There are a number of other publications on mechanising substitution.
+There have been a number of other publications on mechanising substitution.
 Sch{\"{a}}fer and Stark~\emph{et al}~ 
 \cite{schafer2015autosubst, stark2019autosubst} develop a Rocq library which 
 automatically derives

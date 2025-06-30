@@ -1,9 +1,14 @@
 %format constructor = "\Keyword{constructor}"
+%format REWRITE = "\Keyword{REWRITE}"
+%format INLINE = "\Keyword{INLINE}"
 
 %format == = "=="
 %format → = "\rightarrow"
 %format ∀ = "\forall{}"
 %format λ = "\lambda" 
+
+%format PRAGMA_START = "\Varid{\{-\#}"
+%format PRAGMA_END   = "\Varid{\#-\}}"
 
 % Why not just "\circ"?
 

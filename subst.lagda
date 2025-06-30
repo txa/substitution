@@ -128,8 +128,8 @@ where the result is |V| only if both inputs are |V|.
 \begin{minipage}{0.55\textwidth}
 \begin{code}
 data _⊑_ : Sort → Sort → Set where
-  rfl : s ⊑ s
-  v⊑t : V ⊑ T
+  rfl  : s ⊑ s
+  v⊑t  : V ⊑ T
 \end{code}
 \end{minipage}
 \begin{minipage}{0.4\textwidth}
@@ -187,22 +187,26 @@ v⊑ {T} = v⊑t
 ⊔t {T} = refl
 \end{code}
 %endif
+
 Further, we turn the equations
-($\sqcup\sqcup$, $\sqcup\Varid{v}$, $\sqcup\Varid{t}$) into rewrite rules.
-% \begin{code}
-% {-# REWRITE ⊔⊔ ⊔v ⊔t #-} 
-% \end{code}
+($\sqcup\sqcup$, $\sqcup\Varid{v}$, $\sqcup\Varid{t}$) into rewrite rules with
+|PRAGMA_START REWRITE ⊔⊔ ⊔v ⊔t PRAGMA_END|
+%if False
+\begin{code}
+{-# REWRITE ⊔⊔ ⊔v ⊔t #-} 
+\end{code}
+%endif
 This introduces new definitional equalities, allowing the
 type checker to directly exploit e.g. associativity of |_⊔_| 
 (effectively, this feature allows a selective use of 
-extensional Type Theory).
+extensional type theory).
 
 Functoriality of context extension is now parametric
 \begin{code}
 _^_ : Γ ⊩[ q ] Δ → ∀ A → Γ ▷ A ⊩[ q ] Δ ▷ A
 \end{code}
 We'll derive this later. Meanwhile,
-the order on sorts gives rise to another functor.
+the order on sorts gives rise to another functorial action.
 \begin{code}
 tm⊑ : q ⊑ s → Γ ⊢[ q ] A → Γ ⊢[ s ] A
 tm⊑ rfl x  = x
@@ -230,7 +234,7 @@ zero       [ xs , x ]  = x
 Here |_⊔_| ensures substitution returns a variable
 only if both inputs are variables/renamings.
 We use |tm⊑| because |i [ xs ]| will be a variable if
-|xs| is a renaming, but |(` i) [ xs ]| is always a term.
+|xs| is a renaming, but |(` i) [ xs ]| must be a term.
 
 We define |id| using |_^_|, recursing over contexts.
 To define |_^_| itself, we need parametric versions of |zero| and |suc|.
@@ -405,23 +409,20 @@ assign lexicographically-decreasing measures to each of the functions
 (\textsf{Table \ref{table:termination}}).
 
 In practice, we will generally require identity renamings, rather than
-substitutions. We define |Sort|-polymorphic |id-poly|, and then define
-our original |id| by instantiating it at |V| and ensuring it is always
-inlined.
+substitutions. We define |Sort|-polymorphic |id-poly|, and then recover
+our original |id| by instantiating it at |V| (and using an |INLINE| pragma
+so Agda's termination checker cannot tell the difference).
 
-\noindent
-\begin{minipage}{0.45\textwidth}
+\begin{minipage}{0.4\textwidth}
 \begin{spec}
-id-poly : Γ ⊩[ q ] Γ 
-id-poly {Γ = •} = ε
-id-poly {Γ = Γ ▷ A} = id-poly ^ A
+id-poly  : Γ ⊩[ q ] Γ 
+id       : Γ ⊩[ V ] Γ 
 \end{spec}
 \end{minipage}
 \begin{minipage}{0.5\textwidth}
 \begin{spec}
-id : Γ ⊩[ V ] Γ 
-id = id-poly
-{-# INLINE id #-}
+id = id-poly {q = V}
+PRAGMA_START INLINE id PRAGMA_END
 \end{spec}
 \end{minipage}
 

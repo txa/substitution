@@ -255,7 +255,7 @@ To prove associativity, we first need to prove functoriality,
 Since |t, us, vs| can be variables/renamings or terms/substitutions,
 there are eight combinations. 
 For each, we must prove a number of lemmas again in a different setting.
-This repetition is emblematic of many prior attempts to mechanise
+This repetition is emblematic of many prior attempts at mechanising
 substitution
 \cite{adams2004formal, benton2012strongly, schafer2015autosubst, 
 stark2019autosubst, saffrich2024intrinsically}.
