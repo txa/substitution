@@ -322,13 +322,14 @@ substitutions are \emph{substitution normal forms}.
 \label{sec:related-work}
 
 De Bruijn introduced his eponymous indices and
-simultaneous substitution in \cite{bruijn1972lambda}. 
-Here we use typed de Bruijn indices as in \cite{alti:csl99},
-where termination of substitution was shown using
+simultaneous substitution in \cite{bruijn1972lambda}. Here, we use typed
+typed de Bruijn indices as in \cite{alti:csl99}.
+
+In \cite{alti:csl99}, termination of substitution was shown using
 well-founded recursion. Our approach is
-simpler and scales better, avoiding manual well-founded recursion.
+simpler and scales better.
 Andreas Abel used a similar technique to ours to implement \cite{alti:csl99},
-without well-founded recursion,
+without manual well-founded recursion,
 in an unpublished Agda proof \cite{abel:subst11}.
 
 The duplication between renaming and substitution operations is factored into 
@@ -336,7 +337,7 @@ The duplication between renaming and substitution operations is factored into
 further shown
 how to extend this factoring to the proofs (by developing a 
 ``fusion framework'').
-We argue that, in languages supporting lexicographic recursion, 
+In languages supporting lexicographic recursion, 
 our technique is simpler.
 These works also embrace the monadic perspective. That is, encoding 
 substitutions as functions from variables to terms (indeed, this is
