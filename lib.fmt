@@ -306,7 +306,7 @@
 %format .CwF.·[]  = .CwF. ·[]
 %format .CwF.ƛ[]  = .CwF. ƛ[]
 
-%format ᴵ     = "^{\Varid{I}}"
+%format ᴵ     = "^{\mathrm{I}}"
 %format ⊢ᴵ    = ⊢ ᴵ
 %format _⊢ᴵ_  = "\_" ⊢ᴵ "\_"
 %format ⊩ᴵ    = ⊩ ᴵ
@@ -359,7 +359,7 @@
 %format ,ᴵ_     = ,_     ᴵ
 %format _^ᴵ     = _^     ᴵ
 
-%format ᴹ = "^{\Varid{M}}"
+%format ᴹ = "^{\mathrm{M}}"
 %format Conᴹ  = Con ᴹ
 %format Tyᴹ   = Ty ᴹ
 %format Tmᴹ   = Tm ᴹ
