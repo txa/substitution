@@ -336,17 +336,16 @@ in an unpublished Agda proof \cite{abel:subst11}.
 The duplication between renaming and substitution operations is factored into 
 \emph{kits} in \cite{mcbride2006type}. In \cite{allais2017type}, it was
 further shown
-how to extend this factoring to the proofs (via a ``fusion framework'').
+how to extend this factoring to the proofs (using a ``fusion framework'').
 We argue that, in languages supporting lexicographic recursion, 
 our technique is simpler.
-
 These works also embrace the monadic perspective (encoding substitutions as
-functions from variables to terms).
-Indeed this example
-is one of the motivations for relative monads
-\cite{altenkirch2015monads}. 
-However, it is not clear how to extend this to dependent types without
-``very dependent'' \cite{hickey1996formal, altenkirch2023munchhausen} types.
+functions from variables to terms - indeed this is
+one of the motivations for relative monads \cite{altenkirch2015monads}). 
+However, it is not clear how to extend this approach to dependently typed
+languages without
+``very dependent'' \cite{hickey1996formal, altenkirch2023munchhausen}
+function types.
 % TODO PLW: I don't know what "monadic perspective" means here.
 
 % We avoid the monadic perspective which here for two reasons: first we want
@@ -356,11 +355,13 @@ However, it is not clear how to extend this to dependent types without
 % without using very dependent types.
 
 There are a number of other publications on mechanising substitution.
-Stark~\emph{et al}~\cite{stark2019autosubst} develop a Rocq library which 
+Sch{\"{a}}fer and Stark~\emph{et al}~ 
+\cite{schafer2015autosubst, stark2019autosubst} develop a Rocq library which 
 automatically derives
 substitution lemmas, but the proofs are repeated for renamings and
-substitutions similarly to
-Section \ref{sec:naive-approach}. Their equational theory is also similar to 
+substitutions (similarly to
+Section \ref{sec:naive-approach}). 
+Their equational theory is also similar to 
 the simply
 typed CwFs in Section \ref{sec:initiality}.
 % TODO PLW: why is 'autosubst 2' cited, but not the original autosubst?
