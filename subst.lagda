@@ -45,8 +45,8 @@ data Sort : Set where
 But this is not quite what we want.
 Agda's termination checker uses structural orderings.
 Following our intuition that variable weakening is trivial but
-term weakening requires renaming, we want to make the sort
-of variables |V| structurally smaller than the sort of terms |T|.
+term weakening requires renaming, we would like the sort
+of variables |V| to be structurally smaller than the sort of terms |T|.
 
 With the following definition, we
 make |V| structurally smaller than |T>V V isV|,
@@ -100,7 +100,8 @@ data _⊢[_]_ : Con → Sort → Ty → Set where
   _·_   : Γ ⊢[ T ] A ⇒ B → Γ ⊢[ T ] A → Γ ⊢[ T ] B
   ƛ_    : Γ ▷ A ⊢[ T ] B → Γ ⊢[ T ] A ⇒ B
 \end{code}
-This recapitulates our previous definition, where
+This recapitulates our previous definitions 
+(in Section \ref{sec:naive-approach}), where
 |Γ ⊢[ V ] A| corresponds to |Γ ∋ A| and |Γ  ⊢[ T ]  A| to |Γ ⊢ A|.
 Now we can parametrise our previous development.
 As a first step, we generalise renamings and substitutions (|xs, ys, zs|):
@@ -190,7 +191,7 @@ v⊑ {T} = v⊑t
 
 Further, we turn the equations
 ($\sqcup\sqcup$, $\sqcup\Varid{v}$, $\sqcup\Varid{t}$) into rewrite rules with
-|PRAGMA_START REWRITE ⊔⊔ ⊔v ⊔t PRAGMA_END|
+|PRAGMA_START REWRITE ⊔⊔ ⊔v ⊔t PRAGMA_END|.
 %if False
 \begin{code}
 {-# REWRITE ⊔⊔ ⊔v ⊔t #-} 
@@ -233,8 +234,9 @@ zero       [ xs , x ]  = x
 \noindent
 Here |_⊔_| ensures substitution returns a variable
 only if both inputs are variables/renamings.
-We use |tm⊑| because |i [ xs ]| will be a variable if
-|xs| is a renaming, but |(` i) [ xs ]| must be a term.
+We use |tm⊑| when substituting for variables because |i [ xs ]| 
+will return a variable if
+|xs| is a renaming, but |(` i) [ xs ]| must return a term.
 
 We define |id| using |_^_|, recursing over contexts.
 To define |_^_| itself, we need parametric versions of |zero| and |suc|.
@@ -344,7 +346,8 @@ weakening for variables (|suc[ V ] i A|) was implemented by |i [ id ⁺ A ]|,
 our operations would still be type-correct but would genuinely loop,
 so perhaps Agda is right to be careful.
 
-Why doesn't Agda accept our program? The limitation is ultimately
+We have appropriately specialised weakening for variables though, so 
+why doesn't Agda accept our program? The limitation is ultimately
 technical: Agda only looks at direct arguments to function calls when 
 building the call graph from which it identifies termination order 
 \cite{alti:jfp02}. Because |id| is not passed a sort, the sort cannot be 

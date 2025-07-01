@@ -249,13 +249,13 @@ The method used also applies to other problems; in
 particular, we see the current construction as a warmup for the
 definition of substitution for dependent type theory, which
 may have interesting applications for interpreting dependent types in
-higher categories.
+higher categories (coherence).
 
 \subsection{In a nutshell}
 \label{sec:nutshell}
 
 When working with substitution for a calculus with binders,
-you have to differentiate between renamings (|Δ ⊩v Γ|),
+we have to differentiate between renamings (|Δ ⊩v Γ|),
 where variables are substituted only for variables (|Γ ∋ A|),
 and proper substitutions (|Δ ⊩ Γ|),
 where variables are replaced with terms (|Γ ⊢ A|).
@@ -281,8 +281,8 @@ of substitution such as the functor law,
 x [ xs ∘ ys ] ≡ x [ xs ] [ ys ]
 \end{spec}
 All components |x|, |xs|, |ys| can be either variables/renamings
-or terms/substitutions, so we must prove eight combinations;
-and the repetition extends to the intermediary lemmas. 
+or terms/substitutions, so we must prove eight combinations.
+The repetition extends to the intermediary lemmas. 
 
 Our solution is to introduce a type of sorts with |V : Sort| for
 variables/renamings and |T : Sort| for terms/substitutions, leading
@@ -314,7 +314,7 @@ the substitution laws correspond to the equations of a simply-typed
 category with families (CwF)---a variant of a CwF
 where the types do not depend on a context.
 Our recursive substitution operations lead to a simply typed CwF
-isomorphic to the initial one, giving
+isomorphic to the initial one, yielding
 a normalisation result where $\lambda$-terms without explicit
 substitutions are \emph{substitution normal forms}.
 
@@ -322,13 +322,13 @@ substitutions are \emph{substitution normal forms}.
 \label{sec:related-work}
 
 De Bruijn introduced his eponymous indices and
-simultaneous substitution in \cite{bruijn1972lambda}. Here, we use typed
+simultaneous substitution in \cite{bruijn1972lambda}. We use typed
 typed de Bruijn indices as in \cite{alti:csl99}.
 
 In \cite{alti:csl99}, termination of substitution was shown using
 well-founded recursion. Our approach is
 simpler and scales better.
-Andreas Abel used a similar technique to ours to implement \cite{alti:csl99},
+Andreas Abel used a similar technique to ours to mechanise \cite{alti:csl99},
 without manual well-founded recursion,
 in an unpublished Agda proof \cite{abel:subst11}.
 
@@ -339,7 +339,9 @@ how to extend this factoring to the proofs (by developing a
 ``fusion framework'').
 In languages supporting lexicographic recursion, 
 our technique is simpler.
-These works also embrace the monadic perspective. That is, encoding 
+
+All the works listed so far also embrace the monadic perspective. 
+That is, encoding 
 substitutions as functions from variables to terms (indeed, this is
 one of the motivations for relative monads \cite{altenkirch2015monads}). 
 However, it is not clear how to extend this approach to dependently typed
@@ -370,8 +372,8 @@ formulation (with preterms and typing separate), and applies
 \cite{allais2017type} to factor the construction using kits.
 In contrast, Saffrich~\cite{saffrich2024intrinsically} uses Agda with
 an \emph{intrinsic} formulation (as here, indexing terms by types),
-but with renamings and substitutions defined separately, and relevant 
-substitution lemmas repeated for all required combinations.
+but defines renaming and substitution separately, and the relevant 
+substitution lemmas are repeated for all required combinations.
 
 
 % \subsection{Using Agda}

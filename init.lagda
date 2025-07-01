@@ -31,7 +31,7 @@ summarise the definition of a simply typed CwF as follows:
 \end{itemize}
 
 \vspace{-1ex}
-I.e. a simply typed CwF is just a CwF where the presheaf of types is constant.
+That is, a simply typed CwF is just a CwF where the presheaf of types is constant.
 We will give the precise definition in the next section, hence it
 isn't necessary to be familiar with the categorical terminology to follow the 
 rest of the paper. 
@@ -203,8 +203,8 @@ We introduce the set of types and associate a presheaf with each type:
 \end{minipage}
 \begin{minipage}{0.45\textwidth}
 \begin{spec}
-  [id] : (t [ id ]) ≡ t
-  [∘]  : t [ θ ] [ δ ] ≡ t [ θ ∘ δ ] 
+  [id]  : (t [ id ]) ≡ t
+  [∘]   : t [ θ ] [ δ ] ≡ t [ θ ∘ δ ] 
 \end{spec}
 \end{minipage}\\
 The category of contexts has a terminal object (the empty context), and
@@ -229,11 +229,11 @@ and types:
 \begin{spec}
   •-η : δ ≡ ε
   
-  ▷-β₀ : π₀ (δ , t) ≡ δ
-  ▷-β₁ : π₁ (δ , t) ≡ t
-  ▷-η  : (π₀ δ , π₁ δ) ≡ δ
-  π₀∘  : π₀ (θ ∘ δ) ≡ π₀ θ ∘ δ
-  π₁∘  : π₁ (θ ∘ δ) ≡ (π₁ θ) [ δ ]  
+  ▷-β₀  : π₀ (δ , t) ≡ δ
+  ▷-β₁  : π₁ (δ , t) ≡ t
+  ▷-η   : (π₀ δ , π₁ δ) ≡ δ
+  π₀∘   : π₀ (θ ∘ δ) ≡ π₀ θ ∘ δ
+  π₁∘   : π₁ (θ ∘ δ) ≡ (π₁ θ) [ δ ]  
 \end{spec}
 \end{minipage}\\
 %if jfpstyle

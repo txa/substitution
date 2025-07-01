@@ -42,7 +42,7 @@ variable
 %endif
 
 \noindent
-Next we introduce intrinsically typed de Bruijn variables (|i, j, k|) and
+Next, we introduce intrinsically typed de Bruijn variables (|i, j, k|) and
 $\lambda$-terms (|t, u, v|):
 
 \noindent
@@ -74,7 +74,7 @@ data _⊢_ : Con → Ty → Set where
 
 \noindent
 The constructor |`_| embeds variables in
-$\lambda$-terms. Write applications as |t · u|.
+$\lambda$-terms and we write applications as |t · u|.
 Following de~Bruijn, lambda abstraction |ƛ_| doesn't bind a name explicitly.
 Instead, variables count the number of binders between them and their binding site. 
 Substitutions (|ts, us, vs|) are sequences of terms:
@@ -85,7 +85,7 @@ data _⊩_ : Con → Con → Set where
 \end{code}
 % To define the categorical structure (|_∘_|, |id|) we first must
 % define substitution for terms and variables:
-We define the action of substitution for terms and variables:
+Now we attempt to define the action of substitution for terms and variables:
 
 %if False
 \begin{code}
@@ -117,8 +117,8 @@ _[_] : Γ ⊢ A → Δ ⊩ Γ → Δ ⊢ A
 We encounter a problem with the case for binders |ƛ_|. We are given a
 substitution |ts : Δ ⊩ Γ| but the body lives in the extended context
 |t : Γ , A ⊢ B|. We exploit functoriality of context extension (|_▷_|),
-|_^_ : Γ ⊩ Δ → (A : Ty) → Γ ▷ A ⊩ Δ ▷ A|.
-Using |_^_|, we define |(ƛ t) [ ts ] =  ƛ (t [ ts ^ _ ])|.
+|_^_ : Γ ⊩ Δ → (A : Ty) → Γ ▷ A ⊩ Δ ▷ A|, and write 
+|(ƛ t) [ ts ] =  ƛ (t [ ts ^ _ ])|.
 
 %if false
 \begin{code}
@@ -152,7 +152,7 @@ ts ^ A = ts ⁺ A , ` zero
 %endif
 
 \noindent
-The latter applies weakening |suc-tm| to each term:
+Which, in turn, is just a fold of term-weakening (|suc-tm|) over substitutions:
 
 %if false
 \begin{code}
@@ -173,7 +173,8 @@ suc-tm : Γ ⊢ B → (A : Ty) → Γ ▷ A ⊢ B
 \end{minipage}
 
 \noindent
-But how can we define |suc-tm| when we only have weakening for variables? If we
+But how can we define |suc-tm| when we only have weakening for variables (|vs|)? 
+If we
 already had identity |id : Γ ⊩ Γ| and substitution we could write:
 |suc-tm t A = t [ id ⁺ A ] |, 
 but this is not structurally recursive (and is rejected
@@ -184,7 +185,7 @@ a substitution only containing variables,
 and defining |_⁺v_| for renamings is easy.
 This leads to a structurally recursive definition,
 though with some repetition.
-
+\vspace{-3ex}
 %\centering
 \noindent
 \begin{code}
@@ -250,11 +251,11 @@ suc-tm t A       = t [ idv ⁺v A ]v
 \noindent
 This may not seem too bad, but it gets worse when proving the laws.
 Let |_∘_| be composition of substitutions.
-To prove associativity, we first need to prove functoriality,
-|[∘] : t [ us ∘ vs ] ≡ t [ us ] [ vs ]|.
-Since |t, us, vs| can be variables/renamings or terms/substitutions,
-there are eight combinations. 
-For each, we must prove a number of lemmas again in a different setting.
+To prove associativity, we first need functoriality,
+|[∘] : t [ us ∘ vs ] ≡ t [ us ] [ vs ]| but to prove this, we also need
+to cover all variations where |t, us, vs| are variables/renamings rather than 
+terms/substitutions. This leads to eight combinations, with the cases for
+each constructor of |t| reading near-identically.
 This repetition is emblematic of many prior attempts at mechanising
 substitution
 \cite{adams2004formal, benton2012strongly, schafer2015autosubst, 

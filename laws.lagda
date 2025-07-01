@@ -322,7 +322,7 @@ the naturality of weakening |⁺-nat∘ : xs ∘ (ys ⁺ A) ≡ (xs ∘ ys) ⁺ 
 \end{code}
 %endif
 which unsurprisingly must be shown by establishing a corresponding
-property for substitutions: |⁺-nat[] : x [ xs ⁺ A ] ≡ suc[ _ ] (x [ xs ]) A|.
+property for substitutions: \\|⁺-nat[] : x [ xs ⁺ A ] ≡ suc[ _ ] (x [ xs ]) A|.
 %if False
 \begin{code}
 ⁺-nat[] : ∀ {x : Γ ⊢[ q ] B} {xs : Δ ⊩[ r ] Γ} 
