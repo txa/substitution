@@ -276,7 +276,7 @@ This results in several similar operations:
 \end{center}
 %The operations on terms depend on the operations on variables.
 \noindent The duplication gets worse when we prove properties
-of substitution such as the functor law,
+of substitution, such as the functor law
 \begin{spec}
 x [ xs ∘ ys ] ≡ x [ xs ] [ ys ]
 \end{spec}
@@ -287,7 +287,9 @@ The repetition extends to the intermediary lemmas.
 Our solution is to introduce a type of sorts with |V : Sort| for
 variables/renamings and |T : Sort| for terms/substitutions, leading
 to a single substitution operation 
-|_[_] : Γ ⊢[ q ] A → Δ ⊩[ r ] Γ → Δ ⊢[ q ⊔ r ] A|
+\begin{spec}
+_[_] : Γ ⊢[ q ] A → Δ ⊩[ r ] Γ → Δ ⊢[ q ⊔ r ] A
+\end{spec}
 where |q, r : Sort| and |q ⊔ r| is the least upper bound in the
 lattice of sorts with |V ⊑ T|.
 Now we need only prove one variant of the
