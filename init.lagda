@@ -348,9 +348,9 @@ however, make identity a little trickier.
 |id| doesn't fit |CwF.id| directly as it produces a renaming |Γ ⊩[ V ] Γ|. 
 We need the equivalent substitution |Γ ⊩[ T ] Γ|.
 
-We first extend |tm⊑| to renamings/substitutions with a fold: 
-|tm*⊑ : q ⊑ s → Γ ⊩[ q ] Δ → Γ ⊩[ s ] Δ|, and prove various lemmas about how 
-|tm*⊑| coercions can be lifted outside of our substitution operators:
+We first extend |tm⊑| to renamings/substitutions: 
+|tm*⊑ : q ⊑ s → Γ ⊩[ q ] Δ → Γ ⊩[ s ] Δ| with a fold, and prove various lemmas 
+about how |tm*⊑| coercions can be lifted outside of our substitution operators:
 
 \noindent
 %if jfpstyle
@@ -370,9 +370,9 @@ We first extend |tm⊑| to renamings/substitutions with a fold:
 \begin{minipage}{0.55\textwidth}
 %endif
 \begin{spec}
-  ⊑⁺   : tm*⊑ ⊑t xs ⁺ A     ≡ tm*⊑ v⊑t (xs ⁺ A)
-  ⊑^   : tm*⊑ v⊑t xs ^ A    ≡ tm*⊑ v⊑t (xs ^ A)
-  v[⊑] : i [ tm*⊑ v⊑t ys ]  ≡ tm⊑ v⊑t i [ ys ]
+  ⊑⁺    : tm*⊑ ⊑t xs ⁺ A     ≡ tm*⊑ v⊑t (xs ⁺ A)
+  ⊑^    : tm*⊑ v⊑t xs ^ A    ≡ tm*⊑ v⊑t (xs ^ A)
+  v[⊑]  : i [ tm*⊑ v⊑t ys ]  ≡ tm⊑ v⊑t i [ ys ]
 \end{spec}
 \end{minipage}
 
@@ -416,7 +416,7 @@ ways of weakening variables.
 \end{code}
 %endif
 
-We can now build an identity substitution by applying this coercion to the 
+We can now build an identity substitution by coercing the
 identity renaming: |is-cwf .CwF.id = tm*⊑ v⊑t id|.
 %if False
 \begin{code}
